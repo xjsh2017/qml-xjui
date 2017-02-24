@@ -1,0 +1,8 @@
+module XjQmlUi
+WaveAnalDemo 1.0 views/WaveAnalDemo.qml
+VectorChartDemo 1.0 views/VectorChartDemo.qml
+TimeDisperAnalDemo 1.0 views/TimeDisperAnalDemo.qml
+HarmonicAnalDemo 1.0 views/HarmonicAnalDemo.qml
+Grover.qml 1.0 views/Grover.qml
+plugin XjQmlUi
+typeinfo plugin.qmltypes
