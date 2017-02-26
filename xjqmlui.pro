@@ -33,6 +33,6 @@ qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
-INSTALLS += target qmlui qmldir icons
+INSTALLS += target qmlui qmldir# icons
 
 OTHER_FILES += $$qmlui.files
