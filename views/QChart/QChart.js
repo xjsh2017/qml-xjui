@@ -177,7 +177,8 @@ var Chart = function(canvas, context) {
             scaleStartValue: null,
             scaleLineColor: "rgba(0,0,0,.1)",
             scaleLineWidth: 1,
-            scaleShowLabels: true,
+            scaleShowLabels: true,			// 显示纵坐标
+            scaleXShowLabels: false,		// 显示横坐标
             scaleLabel: "<%=value%>",
             scaleFontFamily: "'Arial'",
             scaleFontSize: 12,
@@ -187,11 +188,11 @@ var Chart = function(canvas, context) {
             scaleGridLineColor: "rgba(0,0,0,.05)",
             scaleGridLineWidth: 1,
             bezierCurve: true,
-            pointDot: true,
+            pointDot: false,					// 显示点标
             pointDotRadius: 4,
             pointDotStrokeWidth: 2,
             datasetStroke: true,
-            datasetStrokeWidth: 2,
+            datasetStrokeWidth: 2,		// 线条粗细
             datasetFill: true,
             animation: true,
             animationSteps: 60,
@@ -911,6 +912,7 @@ var Chart = function(canvas, context) {
 
                 ctx.save();
 
+				if (config.scaleXShowLabels)
                 if (rotateLabels > 0) {
                     ctx.translate(yAxisPosX + i*valueHop,xAxisPosY + config.scaleFontSize);
                     ctx.rotate(-(rotateLabels * (Math.PI/180)));

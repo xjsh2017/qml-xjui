@@ -127,7 +127,7 @@ Item {
                 }
 
                 Button {
-                    text: waveModel.test
+                    text: waveModel.test// + ": " + waveModel.chn_count()
 
                     implicitHeight: dp(28)
                     Layout.rightMargin: dp(8)
@@ -215,98 +215,136 @@ Item {
                 return Math.round(Math.random() * 100);
             }
 
-            Column {
+            Flickable {
+                id: flickable
                 anchors.fill: parent
-                spacing: dp(3)
+                contentHeight: content.childrenRect.height
+                contentWidth: content.childrenRect.width
+                clip: true
+                visible: true
 
-                Repeater {
-                    model: 12
+                Column {
+                    id: content
+//                    width: parent.width
+                    width: 1988
+                    spacing: dp(3)
 
-                    Row {
-                        spacing: dp(3)
-                        height: dp(100)
-                        width: parent.width
+                    Repeater {
+                        model: waveModel.chn_count()
 
-                        property color drawColor: Qt.rgba(Math.random(),
-                                                          Math.random(), Math.random(), 1);
-
-
-                        Column {
-                            height: parent.height
-                            width: dp(169)
-
-                            Rectangle {
-                                height: parent.height / 2
-                                width: parent.width
-                                border.color: drawColor
-
-                                Label {
-                                    text: "通道： " + (index + 1)
-                                    color: Theme.light.textColor
-                                    anchors.centerIn: parent
-                                }
-                                clip: true
-
-                                Rectangle { // 角标
-                                    x: parent.width - dp(8)
-                                    y: -dp(8)
-                                    height: dp(16)
-                                    width: height
-                                    rotation: 45
-
-                                    color: drawColor
-
-                                }
-                            }
-
-                            Rectangle {
-                                height: parent.height / 2
-                                width: parent.width
-                                border.color: drawColor
-
-                                Label {
-                                    text: wave.randomScalingFactor() + " ∠"+ wave.randomScalingFactor() + "°"
-                                    color: Theme.light.textColor
-                                    anchors.centerIn: parent
-                                }
-                            }
-                        }
-
-                        QChart {
-                            id: chart_line;
+                        Row {
+                            spacing: dp(3)
+                            height: dp(100)
                             width: parent.width
-                            height: parent.height
 
-                            chartAnimated: true;
-                            chartAnimationEasing: Easing.InOutElastic;
-                            chartAnimationDuration: 1000;
-                            chartData: {
-                                "labels": ["","","","","","",""],
-                                        "datasets": [{
-                                                         "fillColor": "transparent",
-                                                         "strokeColor": drawColor,
-                                                         "pointColor": "rgba(220,220,220,1)",
-                                                         "pointStrokeColor": "black",
-                                                         "data": [wave.randomScalingFactor(),
-                                                             wave.randomScalingFactor(),
-                                                             wave.randomScalingFactor(),
-                                                             wave.randomScalingFactor(),
-                                                             wave.randomScalingFactor(),
-                                                             wave.randomScalingFactor(),
-                                                             wave.randomScalingFactor()]
-                                                     }
-                                        ]
+                            property color drawColor: Qt.rgba(Math.random(),
+                                                              Math.random(), Math.random(), 1);
+
+
+                            Column {
+                                height: parent.height
+                                width: dp(169)
+
+                                Rectangle {
+                                    height: parent.height / 2
+                                    width: parent.width
+                                    border.color: drawColor
+
+                                    Label {
+                                        text: "通道： " + (index + 1)
+                                        color: Theme.light.textColor
+                                        anchors.centerIn: parent
+                                    }
+                                    clip: true
+
+                                    Rectangle { // 角标
+                                        x: parent.width - dp(8)
+                                        y: -dp(8)
+                                        height: dp(16)
+                                        width: height
+                                        rotation: 45
+
+                                        color: drawColor
+
+                                    }
+                                }
+
+                                Rectangle {
+                                    height: parent.height / 2
+                                    width: parent.width
+                                    border.color: drawColor
+
+                                    Label {
+                                        text: wave.randomScalingFactor() + " ∠"+ wave.randomScalingFactor() + "°"
+                                        color: Theme.light.textColor
+                                        anchors.centerIn: parent
+                                    }
+                                }
                             }
-                            chartType: Charts.ChartType.LINE;
+
+                            QChart {
+                                id: chart_line;
+                                width: parent.width
+                                height: parent.height
+
+                                chartAnimated: true;
+                                chartAnimationEasing: Easing.InOutElastic;
+                                chartAnimationDuration: 1000;
+
+//                                chartData: {
+//                                    "labels": ["1","2","3","4","5","6","7"],
+//                                    "datasets": [{
+//                                                     "fillColor": "transparent",
+//                                                     "strokeColor": drawColor,
+//                                                     "pointColor": "rgba(220,220,220,1)",
+//                                                     "pointStrokeColor": "black",
+//                                                     "data": [wave.randomScalingFactor(),
+//                                                         wave.randomScalingFactor(),
+//                                                         wave.randomScalingFactor(),
+//                                                         wave.randomScalingFactor(),
+//                                                         wave.randomScalingFactor(),
+//                                                         wave.randomScalingFactor(),
+//                                                         wave.randomScalingFactor()]
+//                                                 }
+//                                    ]
+//                                }
+
+                                chartData: {
+                                    "labels": waveModel.x_data(index),
+                                    "datasets": [{
+                                                     "fillColor": "transparent",
+                                                     "strokeColor": drawColor,
+                                                     "pointColor": "rgba(220,220,220,1)",
+                                                     "pointStrokeColor": "black",
+                                                     "data": waveModel.y_data(index)
+                                                 }
+                                    ]
+                                }
+
+                                chartType: Charts.ChartType.LINE;
+
+                                Component.onCompleted: {
+                                }
+                            }
                         }
                     }
                 }
+
             }
 
+            Scrollbar {
+                flickableItem: flickable
+                orientation: Qt.Vertical
+            }
+
+            Scrollbar {
+                flickableItem: flickable
+                orientation: Qt.Horizontal
+            }
 
             Rectangle {
                 width: dp(2)
-                height: parent.height
+                height: flickable.height
 
                 x: gr.value * gr.width / gr.maximumValue + axisLabel.width + dp(7)
 
@@ -322,8 +360,6 @@ Item {
     }
 
     Component.onCompleted: {
-//        waveModel.setTest("hello!")
-//        console.log(waveModel.test);
-//        console.log(ala)
+
     }
 }
