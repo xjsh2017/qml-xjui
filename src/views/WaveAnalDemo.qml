@@ -4,9 +4,13 @@ import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
+//import "./QChartJS"
+//import "./QChartJS/QChartJsTypes.js"  as ChartTypes
+
+//import "./Charts"
+
 import "./QChart"
 import "./QChart/QChart.js"         as Charts
-//import "./QChart/QChartGallery.js"  as ChartsData
 
 Item {
     id: root
@@ -323,8 +327,76 @@ Item {
 
                                 backgroundColor: "black"
 
+//                                QChartJs {
+//                                    id: chart_curve
+
+//                                    anchors.fill: parent
+
+//                                    chartType: ChartTypes.QChartJSTypes.LINE
+//                                    animation: true
+//                                    chartAnimationEasing: Easing.InOutElastic;
+//                                    chartAnimationDuration: 1000;
+
+//                                    chartData: {
+//                                        "labels": waveModel.x_data(index),
+//                                        "datasets": [{
+//                                                         "data": waveModel.y_data(index),
+//                                                         fillColor : "transparent",
+//                                                         strokeColor : drawColor,
+//                                                         pointColor : "rgba(220,220,220,1)",
+//                                                         pointStrokeColor : "#fff",
+//                                                         pointHighlightFill : "#fff",
+//                                                         pointHighlightStroke : "rgba(220,220,220,1)",
+//                                                         "label": 'Dataset 1'
+//                                                     }]
+//                                    }
+
+//                                    Rectangle {
+//                                        anchors.fill: parent
+//                                        border.color: "red"
+//                                        color: "transparent"
+////                                        visible: false
+//                                    }
+//                                }
+
+//                                Chart{
+//                                    id: chart_curve;
+//                                    chartType: ChartType.line
+
+//                                    anchors.fill: parent
+//                                    onWidthChanged: {
+//                                        console.log(width);
+//                                    }
+
+//                                    function randomScalingFactor() {
+//                                        return Math.round(Math.random() * 100);
+//                                    }
+
+//                                    chartData: {
+//                                        "labels": waveModel.x_data(index),
+//                                        "datasets": [{
+//                                                         "data": waveModel.y_data(index),
+//                                                         "backgroundColor": [
+//                                                             "#F7464A",
+//                                                             "#46BFBD",
+//                                                             "#FDB45C",
+//                                                             "#949FB1",
+//                                                             "#4D5360",
+//                                                         ],
+//                                                         "label": 'Da[aset 1'
+//                                                     }]
+//                                    }
+
+//                                    Rectangle {
+//                                        anchors.fill: parent
+//                                        border.color: "red"
+//                                        color: "transparent"
+////                                        visible: false
+//                                    }
+//                                }
+
                                 QChart {
-                                    id: chart_line;
+                                    id: chart_curve;
 
                                     anchors.fill: parent
 
@@ -346,7 +418,7 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : true,
+                                        "pointDot" : false,
                                         "scaleXShowLabels" : false
                                     }
 
@@ -366,7 +438,7 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                flickable_wave.array.push(chart_line)
+                                flickable_wave.array.push(chart_curve)
                             }
                         }
                     }
