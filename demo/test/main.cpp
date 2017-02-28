@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 
 #include <QQmlContext>
+#include <QDir>
 
 #include "stores/waveanaldatamodel.h"
 
@@ -20,13 +21,13 @@ int main(int argc, char *argv[])
 #ifdef Q_USE_QML_RC
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 #else
-    engine.load(QUrl::fromLocalFile(QGuiApplication::applicationDirPath() +
+    engine.load(QUrl::fromLocalFile(QDir::currentPath() +
                                 #if defined(Q_OS_WIN)
-                                    QStringLiteral("/..")
+                                    QStringLiteral("")
                                 #elif defined(Q_OS_MAC)
                                     QStringLiteral("/../../..")
                                 #endif
-                                + QStringLiteral("/../../main.qml")));
+                                + QStringLiteral("/main.qml")));
 #endif
 
     return app.exec();
