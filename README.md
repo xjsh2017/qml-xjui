@@ -17,5 +17,7 @@ qmlplugindump -notrelocatable XjQmlUi 1.0 %{CurrentProject:QT_HOST_BINS}/../qml/
 
 
 ### 参考
+
 https://github.com/bebu/QmlChart.git
+
 https://github.com/jwintz/qchart.js.git
