@@ -16,7 +16,9 @@ include(deployment.pri)
 include(stores/stores.pri)
 
 qmldemo.files += \
-    ./*.qml
+    ./*.qml \
+    views/*.qml \
+    ../../views/*
 
 
 OTHER_FILES += $$qmldemo.files

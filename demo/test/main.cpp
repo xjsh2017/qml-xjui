@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     WaveAnalDataModel data;
-    data.buildData(10, 400, 800);
+//    data.buildData(10, 800, 20);
+    data.buildData(10, 800, 20);
 
     QQmlApplicationEngine engine;
 

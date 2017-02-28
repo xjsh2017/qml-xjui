@@ -178,7 +178,7 @@ var Chart = function(canvas, context) {
             scaleLineColor: "rgba(0,0,0,.1)",
             scaleLineWidth: 1,
             scaleShowLabels: true,			// 显示纵坐标
-            scaleXShowLabels: false,		// 显示横坐标
+            scaleXShowLabels: true,		// 显示横坐标
             scaleLabel: "<%=value%>",
             scaleFontFamily: "'Arial'",
             scaleFontSize: 12,
@@ -188,7 +188,7 @@ var Chart = function(canvas, context) {
             scaleGridLineColor: "rgba(0,0,0,.05)",
             scaleGridLineWidth: 1,
             bezierCurve: true,
-            pointDot: false,					// 显示点标
+            pointDot: true,					// 显示点标
             pointDotRadius: 4,
             pointDotStrokeWidth: 2,
             datasetStroke: true,

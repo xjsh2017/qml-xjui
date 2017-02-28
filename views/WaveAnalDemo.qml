@@ -9,14 +9,24 @@ import "./QChart/QChart.js"         as Charts
 //import "./QChart/QChartGallery.js"  as ChartsData
 
 Item {
-    id: me
+    id: root
 
     function dp(di){
         return di;
     }
 
+    function random_scalingFactor() {
+        return Math.round(Math.random() * 100);
+    }
+
+    function random_color() {
+        return Qt.rgba(Math.random(),
+                       Math.random(), Math.random(), 1);
+    }
+
     ColumnLayout {
         id: rootLayout
+
         anchors {
             fill: parent
             margins: dp(0)
@@ -25,15 +35,16 @@ Item {
 
         // 工具栏
         View {
-            height: dp(36)
+            id: toolbar
 
+            height: dp(36)
             elevation: dp(2)
-            Layout.fillWidth: true
+            clip:false
 //            backgroundColor: Theme.backgroundColor
 
-            clip:false
+            Layout.fillWidth: true
 
-            Rectangle {
+            Rectangle { // 渐变色
                 anchors.fill: parent
                 gradient: Gradient {
                         GradientStop { position: 0.0; color: "white" }
@@ -42,9 +53,11 @@ Item {
                     }
             }
 
+            // 按钮
             RowLayout {
                 width: parent.width
                 height: parent.height
+
                 anchors {
                     margins: dp(11)
                     bottomMargin: dp(8)
@@ -73,9 +86,19 @@ Item {
                     iconName: "action/alarm"
 //                    focus: true
 
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    onClicked: {
+                        var varTmpInfo;
+                        if (timer_waveModel.running)
+                        {
+                            timer_waveModel.stop();
+                            varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
+                        }else
+                        {
+                            timer_waveModel.start();
+                            varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+                        }
+                        snackbar.open(varTmpInfo)
+                        console.log(varTmpInfo)
                     }
                 }
 
@@ -86,9 +109,12 @@ Item {
                     iconName: "content/add"
 //                    focus: true
 
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    onClicked: {
+                        console.log(flickable_wave.array);
+                        for (var i = 0; i < flickable_wave.array.length; ++i){
+                            flickable_wave.array[i].chartOptions.pointDot = !flickable_wave.array[i].chartOptions.pointDot;
+                            flickable_wave.array[i].requestPaint();
+                        }
                     }
                 }
 
@@ -108,8 +134,7 @@ Item {
                 Button {
                     id: addCimDev
 
-                    visible: false
-                    text: "+ Button1"
+                    text: "Mouse: X: " + 0 + ", Y: " + 0
                     implicitHeight: dp(30)
                     elevation: 1
                     activeFocusOnPress: true
@@ -127,7 +152,8 @@ Item {
                 }
 
                 Button {
-                    text: waveModel.test// + ": " + waveModel.chn_count()
+                    id: btn_Show
+                    text: waveModel.test
 
                     implicitHeight: dp(28)
                     Layout.rightMargin: dp(8)
@@ -142,9 +168,9 @@ Item {
             }
         }
 
-        // 坐标轴
+        // 波形标尺
         Rectangle {
-            id: axis
+            id: axis_wave
 
             color: "transparent"
             height: dp(64)
@@ -157,27 +183,31 @@ Item {
                 anchors.fill: parent
 
                 Rectangle {
-                    id: axisLabel
+                    id: axis_desc
+
+                    border.color: Theme.light.textColor
+
                     Layout.fillWidth: true
                     Layout.minimumWidth: dp(80)
                     Layout.maximumWidth: dp(160)
-                    border.color: Theme.light.textColor
 
 
                     Label {
                         text: "时间 （ 毫秒 ） / 帧"
                         color: Theme.light.textColor
+
                         anchors.centerIn: parent
                     }
                 }
 
                 // 坐标轴
                 Rectangle {
-                    id: axisGroove
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    id: axis_groove
 
                     color: "transparent"
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
                     Grover {
                         id: gr
@@ -209,24 +239,22 @@ Item {
             Layout.fillHeight: true
 
             elevation: 1
-            //        backgroundColor: Qt.rgba(0,0, 0, 0.8);
-
-            function randomScalingFactor() {
-                return Math.round(Math.random() * 100);
-            }
+//        backgroundColor: Qt.rgba(0,0, 0, 0.8);
 
             Flickable {
-                id: flickable
-                anchors.fill: parent
-                contentHeight: content.childrenRect.height
-                contentWidth: content.childrenRect.width
+                id: flickable_wave
+
                 clip: true
                 visible: true
+                anchors.fill: parent
+
+                contentHeight: content.childrenRect.height
+//                contentWidth: content.childrenRect.width
+
+                property variant array: []
 
                 Column {
                     id: content
-//                    width: parent.width
-                    width: 1988
                     spacing: dp(3)
 
                     Repeater {
@@ -234,21 +262,23 @@ Item {
 
                         Row {
                             spacing: dp(3)
-                            height: dp(100)
-                            width: parent.width
 
-                            property color drawColor: Qt.rgba(Math.random(),
-                                                              Math.random(), Math.random(), 1);
+                            property color drawColor: root.random_color();
 
+                            View {
+                                id: wave_info
 
-                            Column {
-                                height: parent.height
-                                width: dp(169)
+                                width: dp(160)
+                                height: dp(100)
+
+                                backgroundColor: Qt.lighter(drawColor)
 
                                 Rectangle {
                                     height: parent.height / 2
                                     width: parent.width
                                     border.color: drawColor
+
+                                    color: "transparent"
 
                                     Label {
                                         text: "通道： " + (index + 1)
@@ -270,61 +300,73 @@ Item {
                                 }
 
                                 Rectangle {
+                                    y: parent.height / 2 - dp(1)
                                     height: parent.height / 2
                                     width: parent.width
                                     border.color: drawColor
 
+                                    color: "transparent"
+
                                     Label {
-                                        text: wave.randomScalingFactor() + " ∠"+ wave.randomScalingFactor() + "°"
+                                        text: root.random_scalingFactor() + " ∠"+ root.random_scalingFactor() + "°"
                                         color: Theme.light.textColor
                                         anchors.centerIn: parent
                                     }
                                 }
                             }
 
-                            QChart {
-                                id: chart_line;
-                                width: parent.width
-                                height: parent.height
+                            View {
+                                id: wave_chart
 
-                                chartAnimated: true;
-                                chartAnimationEasing: Easing.InOutElastic;
-                                chartAnimationDuration: 1000;
+                                height: wave_info.height
+                                width: wave.width - wave_info.width - dp(12)
 
-//                                chartData: {
-//                                    "labels": ["1","2","3","4","5","6","7"],
-//                                    "datasets": [{
-//                                                     "fillColor": "transparent",
-//                                                     "strokeColor": drawColor,
-//                                                     "pointColor": "rgba(220,220,220,1)",
-//                                                     "pointStrokeColor": "black",
-//                                                     "data": [wave.randomScalingFactor(),
-//                                                         wave.randomScalingFactor(),
-//                                                         wave.randomScalingFactor(),
-//                                                         wave.randomScalingFactor(),
-//                                                         wave.randomScalingFactor(),
-//                                                         wave.randomScalingFactor(),
-//                                                         wave.randomScalingFactor()]
-//                                                 }
-//                                    ]
-//                                }
+                                backgroundColor: "black"
 
-                                chartData: {
-                                    "labels": waveModel.x_data(index),
-                                    "datasets": [{
-                                                     "fillColor": "transparent",
-                                                     "strokeColor": drawColor,
-                                                     "pointColor": "rgba(220,220,220,1)",
-                                                     "pointStrokeColor": "black",
-                                                     "data": waveModel.y_data(index)
-                                                 }
-                                    ]
+                                QChart {
+                                    id: chart_line;
+
+                                    anchors.fill: parent
+
+                                    chartAnimated: false;
+                                    chartAnimationEasing: Easing.InOutElastic;
+                                    chartAnimationDuration: 1000;
+                                    chart_index: index
+
+                                    chartData: {
+                                        "labels": waveModel.x_data(index),
+                                        "datasets": [{
+                                                         "fillColor": "transparent",
+                                                         "strokeColor": drawColor,
+                                                         "pointColor": "rgba(220,220,220,1)",
+                                                         "pointStrokeColor": "black",
+                                                         "data": waveModel.y_data(index)
+                                                     }
+                                        ]
+                                    }
+
+                                    chartOptions: {
+                                        "pointDot" : true,
+                                        "scaleXShowLabels" : false
+                                    }
+
+                                    chartType: Charts.ChartType.LINE;
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        border.color: "red"
+                                        color: "transparent"
+//                                        visible: false
+                                    }
                                 }
-
-                                chartType: Charts.ChartType.LINE;
 
                                 Component.onCompleted: {
+                                    console.log(wave_chart.width)
                                 }
+                            }
+
+                            Component.onCompleted: {
+                                flickable_wave.array.push(chart_line)
                             }
                         }
                     }
@@ -333,20 +375,20 @@ Item {
             }
 
             Scrollbar {
-                flickableItem: flickable
+                flickableItem: flickable_wave
                 orientation: Qt.Vertical
             }
 
             Scrollbar {
-                flickableItem: flickable
+                flickableItem: flickable_wave
                 orientation: Qt.Horizontal
             }
 
             Rectangle {
-                width: dp(2)
-                height: flickable.height
+                width: dp(1)
+                height: flickable_wave.height
 
-                x: gr.value * gr.width / gr.maximumValue + axisLabel.width + dp(7)
+                x: gr.value * gr.width / gr.maximumValue + axis_desc.width + dp(7)
 
                 Behavior on x {
                     NumberAnimation { duration: 100 }
@@ -359,7 +401,31 @@ Item {
 
     }
 
-    Component.onCompleted: {
 
+    Timer {
+        id:timer_waveModel;
+        repeat: true;
+        interval: 2000;
+        triggeredOnStart: true;
+        onTriggered: {
+            console.log("Wave Data Model has changed again...")
+//            waveModel.buildData(10, 100, 20);
+            waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原来的数据
+            btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
+
+            for (var i = 0; i < flickable_wave.array.length; ++i){
+                flickable_wave.array[i].chartData.labels = waveModel.x_data(i);
+                flickable_wave.array[i].chartData.datasets[0].data = waveModel.y_data(i)
+                flickable_wave.array[i].requestPaint();
+            }
+        }
+    }
+
+    Snackbar {
+        id: snackbar
+    }
+
+    Component.onCompleted: {
+//        timer_waveModel.start();
     }
 }

@@ -73,15 +73,58 @@ QList<int> WaveAnalDataModel::random(int nMax, int nCount)
     return intList;
 }
 
-void WaveAnalDataModel::buildData(int rows, int samplePoints, int nMaxValue)
+void WaveAnalDataModel::buildData(int rows, int nMaxValue, int samplePoints)
 {
     if (nMaxValue < samplePoints)
         return;
+
+    reset();
 
     int nMax = nMaxValue;
     int nCount = samplePoints;
 
     for (int i = 0; i < rows; ++i)
+    {
+        QList<int> x = random(nMax, nCount);
+        QList<int> y = random(nMax, nCount);
+
+        for (int j = 0; j < nCount; ++j)
+        {
+            append_x(i, x.at(j) - nMax / 2);
+            append_y(i, y.at(j) - nMax / 2);
+        }
+    }
+}
+
+void WaveAnalDataModel::queenNewData(int nMaxValue, int samplePoints)
+{
+    int nRows = rows();
+    int nCols = cols();
+
+    if (nMaxValue < samplePoints || nRows == 0)
+        return;
+
+    // ÏÈÉ¾³ýÊý¾Ý
+    int nDeleteCount = qMin(nCols, samplePoints);
+    for (int i = 0; i < nRows; ++i)
+    {
+        QList<qreal> x = m_x.at(i);
+        QList<qreal> y = m_y.at(i);
+
+        for (int j = 0; j < nDeleteCount; ++j)
+        {
+            x.removeAt(0);
+            y.removeAt(0);
+        }
+
+        m_x.replace(i, x);
+        m_y.replace(i, y);
+    }
+
+    int nMax = nMaxValue;
+    int nCount = samplePoints;
+
+    for (int i = 0; i < nRows; ++i)
     {
         QList<int> x = random(nMax, nCount);
         QList<int> y = random(nMax, nCount);
