@@ -554,8 +554,8 @@ Item {
             btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
 
             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                flickable_wave.arrayChart[i].chartData.labels = waveModel.x_data(i);
-                flickable_wave.arrayChart[i].chartData.datasets[0].data = waveModel.y_data(i)
+                flickable_wave.arrayChart[i].chartWholeData.labels = waveModel.x_data(i);
+                flickable_wave.arrayChart[i].chartWholeData.datasets[0].data = waveModel.y_data(i)
                 flickable_wave.arrayChart[i].requestPaint();
             }
         }
