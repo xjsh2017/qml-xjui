@@ -255,7 +255,7 @@ Item {
             Layout.fillHeight: true
 
             elevation: 1
-//        backgroundColor: Qt.rgba(0,0, 0, 0.8);
+            backgroundColor: Qt.lighter(Theme.backgroundColor);
 
             Flickable {
                 id: flickable_wave
@@ -337,7 +337,7 @@ Item {
                                 height: wave_info.height
                                 width: wave.width - wave_info.width - dp(12)
 
-                                backgroundColor: "black"
+                                backgroundColor: "#263238"
 
 //                                QChartJs {
 //                                    id: chart_curve
@@ -431,7 +431,7 @@ Item {
 
                                     chartOptions: {
                                         "pointDot" : true,
-                                        "scaleXShowLabels" : false
+                                        "scaleXShowLabels" : true
                                     }
 
                                     chartType: Charts.ChartType.LINE;
@@ -483,7 +483,7 @@ Item {
             Rectangle {
                 id: grove_line
                 width: dp(1)
-                height: flickable_wave.height
+                height: flickable_wave.contentHeight
 
                 x: 0
 

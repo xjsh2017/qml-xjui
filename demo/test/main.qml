@@ -10,8 +10,10 @@ ApplicationWindow {
     // Necessary when loading the window from C++
     visible: true
 
+    width: dp(1000)
+
     theme {
-        primaryColor: "blue"
+        primaryColor: "Teal"
         accentColor: "red"
         tabHighlightColor: "white"
     }
@@ -20,7 +22,7 @@ ApplicationWindow {
             "Custom Icons", "Color Palette", "Typography"
     ]
 
-    property var basicComponents: [
+    property var homeComponents: [
             "Page1", "Page2", "Page3", "Page4"
             //, "Button", "CheckBox", "Progress Bar", "Radio Button", "Slider", "Switch", "TextField"
     ]
@@ -29,9 +31,9 @@ ApplicationWindow {
             "Bottom Sheet", "Dialog", "Forms", "List Items", "Page Stack", "Time Picker", "Date Picker"
     ]
 
-    property var sections: [ basicComponents, styles, compoundComponents ]
+    property var sections: [ homeComponents, styles, compoundComponents ]
 
-    property var sectionTitles: [ "Basic Components", "Style", "Compound Components" ]
+    property var sectionTitles: [ "Home", "Style", "Compound Components" ]
 
     property string selectedComponent: sections[0][0]
 

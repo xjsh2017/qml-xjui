@@ -31,6 +31,13 @@ Canvas {
   property   int chartAnimationProgress: 0;
   property   int chart_index: -1;
 
+  /* 整个数据的长度 */
+  property   var chartWholeData;
+  /* 图形数据在整个数据中开始的位置 */
+  property   int startChartDataIndex;
+  /* 需显示的数据点个数 */
+  property   int displayChartDataCount;
+
   property  real lastX
   property  real lastY
 
@@ -45,22 +52,22 @@ Canvas {
 
           switch(chartType) {
           case Charts.ChartType.BAR:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Bar(chartData);
+              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Bar(chartData, chartOptions);
               break;
           case Charts.ChartType.DOUGHNUT:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Doughnut(chartData);
+              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Doughnut(chartData, chartOptions);
               break;
           case Charts.ChartType.LINE:
               chart = new Charts.Chart(canvas, canvas.getContext("2d")).Line(chartData, chartOptions);
               break;
           case Charts.ChartType.PIE:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Pie(chartData);
+              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Pie(chartData, chartOptions);
               break;
           case Charts.ChartType.POLAR:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).PolarArea(chartData);
+              chart = new Charts.Chart(canvas, canvas.getContext("2d")).PolarArea(chartData, chartOptions);
               break;
           case Charts.ChartType.RADAR:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Radar(chartData);
+              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Radar(chartData, chartOptions);
               break;
           default:
               console.log('Chart type should be specified.');
@@ -110,6 +117,12 @@ Canvas {
 
       onPositionChanged: {
           canvas.requestPaint()
+      }
+
+
+      onPressAndHold: {
+        console.log("onPressAndHold accuring....")
+          requestPaint();
       }
   }
 
