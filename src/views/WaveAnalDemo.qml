@@ -448,17 +448,25 @@ Item {
                                     chartAnimationDuration: 1000;
                                     chart_index: index
 
-                                    chartWholeData: {
-                                        "labels": waveModel.x_data(index),
-                                        "datasets": [{
-                                                         "fillColor": "transparent",
-                                                         "strokeColor": drawColor,
-                                                         "pointColor": "rgba(220,220,220,1)",
-                                                         "pointStrokeColor": "black",
-                                                         "data": waveModel.y_data(index)
-                                                     }
-                                        ]
+                                    chartDatasetOptions: {
+                                        "fillColor": "transparent",
+                                        "strokeColor": drawColor,
+                                        "pointColor": "rgba(220,220,220,1)",
+                                        "pointStrokeColor": "black"
                                     }
+
+
+//                                    chartWholeData: {
+//                                        "labels": waveModel.x_data(index),
+//                                        "datasets": [{
+//                                                         "fillColor": "transparent",
+//                                                         "strokeColor": drawColor,
+//                                                         "pointColor": "rgba(220,220,220,1)",
+//                                                         "pointStrokeColor": "black",
+//                                                         "data": waveModel.y_data(index)
+//                                                     }
+//                                        ]
+//                                    }
 
 //                                    chartData: {
 //                                        "labels": waveModel.x_data(index),
@@ -554,8 +562,6 @@ Item {
             btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
 
             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                flickable_wave.arrayChart[i].chartWholeData.labels = waveModel.x_data(i);
-                flickable_wave.arrayChart[i].chartWholeData.datasets[0].data = waveModel.y_data(i)
                 flickable_wave.arrayChart[i].requestPaint();
             }
         }

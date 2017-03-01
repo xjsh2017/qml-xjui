@@ -24,6 +24,7 @@ Canvas {
     property   var chart;
     property   var chartData;
     property   var chartOptions;
+    property   var chartDatasetOptions;
     property   int chartType: 0;
     property  bool chartAnimated: true;
     property alias chartAnimationEasing: chartAnimator.easing.type;
@@ -31,8 +32,6 @@ Canvas {
     property   int chartAnimationProgress: 0;
     property   int chart_index: -1;
 
-    /* 整个数据的长度 */
-    property   var chartWholeData;
     /* 图形数据在整个数据中开始的位置 */
     property   int startChartDataIndex: 0;
     /* 需显示的数据点个数 */
@@ -66,14 +65,12 @@ Canvas {
     }
 
     function updateChartData() {
-//        var cc = fetchData(chartWholeData.labels, startChartDataIndex, displayChartDataCount)
-//        var dd = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
+//        chartData.labels = fetchData(chartWholeData.labels, startChartDataIndex, displayChartDataCount)
+//        chartData.datasets[0].data = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
 
-//        chartData.labels = cc;
-//        chartData.datasets[0].data = dd;
+        chartData.labels = fetchData(waveModel.x_data(chart_index), startChartDataIndex, displayChartDataCount)
+        chartData.datasets[0].data = fetchData(waveModel.y_data(chart_index), startChartDataIndex, displayChartDataCount)
 
-        chartData.labels = fetchData(chartWholeData.labels, startChartDataIndex, displayChartDataCount)
-        chartData.datasets[0].data = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
     }
 
     /* 左右移动波形 */
@@ -85,7 +82,7 @@ Canvas {
             return;
         }
 
-        var len = chartWholeData.labels.length;
+        var len = waveModel.x_data(chart_index).length;
         if (tmp + displayChartDataCount > len - 1)
         {
             var tmp2 = len - displayChartDataCount;
@@ -252,13 +249,14 @@ Canvas {
     }
 
     Component.onCompleted: {
+        if (chartData == undefined)
         chartData = {
             "labels": [],
             "datasets": [{
-                             "fillColor": "transparent",
-                             "strokeColor": "red", //chartWholeData.datasets[0].strokeColor,
-                             "pointColor": "rgba(220,220,220,1)",
-                             "pointStrokeColor": "black",
+                             "fillColor": chartDatasetOptions.fillColor,
+                             "strokeColor": chartDatasetOptions.strokeColor,
+                             "pointColor": chartDatasetOptions.pointColor,
+                             "pointStrokeColor": chartDatasetOptions.pointStrokeColor,
                              "data": []
                          }
             ]
