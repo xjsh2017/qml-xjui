@@ -98,7 +98,7 @@ Canvas {
     }
 
     /* 放大缩小波形 */
-    function stepLengend(steps) {
+    function stepLegend(steps) {
         var tmp = displayChartDataCount + steps;
 
         if (tmp < 2){
@@ -192,10 +192,10 @@ Canvas {
 
             if (mouse.button == Qt.RightButton)
 //                stepChart(1);
-                stepLengend(1);
+                stepLegend(1);
             else if (mouse.button == Qt.LeftButton)
 //                stepChart(-1);
-                stepLengend(-1);
+                stepLegend(-1);
 
             requestPaint()
         }

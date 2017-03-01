@@ -119,7 +119,7 @@ Item {
 
                     onClicked: {
                         for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                            flickable_wave.arrayChart[i].stepChart(-1);
+                            flickable_wave.arrayChart[i].stepLegend(-1);
                         }
                     }
                 }
@@ -129,6 +129,34 @@ Item {
 //                    Layout.rightMargin: dp(8)
 
                     iconName: "content/remove"
+//                    focus: true
+
+                    onClicked: {
+                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                            flickable_wave.arrayChart[i].stepLegend(1);
+                        }
+                    }
+                }
+
+                IconButton {
+                    id: moveLeft
+//                    Layout.rightMargin: dp(8)
+
+                    iconName: "hardware/keyboard_arrow_left"
+//                    focus: true
+
+                    onClicked: {
+                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                            flickable_wave.arrayChart[i].stepChart(-1);
+                        }
+                    }
+                }
+
+                IconButton {
+                    id: moveRight
+//                    Layout.rightMargin: dp(8)
+
+                    iconName: "hardware/keyboard_arrow_right"
 //                    focus: true
 
                     onClicked: {
