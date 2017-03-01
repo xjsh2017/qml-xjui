@@ -4,6 +4,8 @@ import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
+import "."
+
 //import "./QChartJS"
 //import "./QChartJS/QChartJsTypes.js"  as ChartTypes
 
@@ -116,10 +118,8 @@ Item {
 //                    focus: true
 
                     onClicked: {
-                        console.log(says + flickable_wave.array);
-                        for (var i = 0; i < flickable_wave.array.length; ++i){
-                            flickable_wave.array[i].chartOptions.pointDot = !flickable_wave.array[i].chartOptions.pointDot;
-                            flickable_wave.array[i].requestPaint();
+                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                            flickable_wave.arrayChart[i].stepChart(-1);
                         }
                     }
                 }
@@ -131,9 +131,10 @@ Item {
                     iconName: "content/remove"
 //                    focus: true
 
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    onClicked: {
+                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                            flickable_wave.arrayChart[i].stepChart(1);
+                        }
                     }
                 }
 

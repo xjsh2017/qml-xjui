@@ -36,7 +36,7 @@ Canvas {
     /* 图形数据在整个数据中开始的位置 */
     property   int startChartDataIndex: 0;
     /* 需显示的数据点个数 */
-    property   int displayChartDataCount: 10;
+    property   int displayChartDataCount: 20;
 
     property  real lastX
     property  real lastY
@@ -76,6 +76,7 @@ Canvas {
         chartData.datasets[0].data = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
     }
 
+    /* 左右移动波形 */
     function stepChart(steps) {
         var tmp = startChartDataIndex + steps;
 
@@ -86,11 +87,26 @@ Canvas {
 
         var len = chartWholeData.labels.length;
         if (tmp + displayChartDataCount > len - 1)
-            startChartDataIndex = len - displayChartDataCount;
-        else
+        {
+            var tmp2 = len - displayChartDataCount;
+            if (tmp2 < 0)
+                startChartDataIndex = 0;
+            else
+                startChartDataIndex = tmp2;
+        }else
             startChartDataIndex = tmp;
+    }
 
-        console.log(says + "startChartDataIndex = " + startChartDataIndex)
+    /* 放大缩小波形 */
+    function stepLengend(steps) {
+        var tmp = displayChartDataCount + steps;
+
+        if (tmp < 2){
+            displayChartDataCount = 2;
+            return;
+        }
+
+        displayChartDataCount = tmp;
     }
 
     // /////////////////////////////////////////////////////////////////
@@ -103,8 +119,8 @@ Canvas {
             console.log(says + "chartData = " + chartData);
         }
         updateChartData()
-        console.log(says + "chartWholeData.labels.data(" + chartWholeData.labels.length + ") = [ " + chartWholeData.labels + " ]");
-        console.log(says + "chartData.labels.data(" + chartData.labels.length + ") = [ " + chartData.labels + " ]");
+//        console.log(says + "chartWholeData.labels.data(" + chartWholeData.labels.length + ") = [ " + chartWholeData.labels + " ]");
+//        console.log(says + "chartData.labels.data(" + chartData.labels.length + ") = [ " + chartData.labels + " ]");
 
         if(!chart) {
 
@@ -148,7 +164,6 @@ Canvas {
 
     onWidthChanged: {
         requestPaint();
-//        console.log(says + width)
     }
 
     onChartAnimationProgressChanged: {
@@ -157,7 +172,6 @@ Canvas {
 
     onStartChartDataIndexChanged: {
         requestPaint();
-        console.log(says + "onStartChartDataIndexChanged: " + startChartDataIndex)
     }
 
     onDisplayChartDataCountChanged: {
@@ -177,9 +191,11 @@ Canvas {
             mousePositionChanged(mouseX, mouseY);
 
             if (mouse.button == Qt.RightButton)
-                stepChart(2);
+//                stepChart(1);
+                stepLengend(1);
             else if (mouse.button == Qt.LeftButton)
-                stepChart(-2);
+//                stepChart(-1);
+                stepLengend(-1);
 
             requestPaint()
         }
