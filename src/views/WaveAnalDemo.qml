@@ -136,7 +136,7 @@ Item {
                 }
 
                 Button {
-                    id: addCimDev
+                    id: btnMouse
 
                     text: "Mouse: X: " + 0 + ", Y: " + 0
                     implicitHeight: dp(30)
@@ -221,15 +221,27 @@ Item {
                         focus: true
                         tickmarksEnabled: true
                         numericValueLabel: true
-                        stepSize: 20
+                        stepSize: 10
                         minimumValue: 0
                         maximumValue: 1000
                         activeFocusOnPress: true
                         darkBackground: false//index == 1
 
                         onValueChanged: {
-                            //console.log(value * gr.width / gr.maximumValue)
+                            var newX = gr.width * value / gr.maximumValue + axis_groove.x
+                            console.log("Grove Calc X = " + newX)
+                            grove_line.x = newX
                         }
+
+//                        MouseArea {
+//                            anchors.fill: parent
+//                            propagateComposedEvents: true
+
+//                            onClicked: {
+//                                console.log("Grove: X =" + mouse.x + ", Y = " + mouse.y)
+//                                mouse.accepted = false
+//                            }
+//                        }
                     }
                 }
             }
@@ -255,7 +267,7 @@ Item {
                 contentHeight: content.childrenRect.height
 //                contentWidth: content.childrenRect.width
 
-                property variant array: []
+                property variant arrayChart: []
 
                 Column {
                     id: content
@@ -418,7 +430,7 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : false,
+                                        "pointDot" : true,
                                         "scaleXShowLabels" : false
                                     }
 
@@ -438,7 +450,19 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                flickable_wave.array.push(chart_curve)
+                                flickable_wave.arrayChart.push(chart_curve)
+                            }
+
+                            Connections {
+                                target: chart_curve
+                                onMousePositionChanged: {
+                                    console.log("Chart Mouse: X: " + x + ", Y: " + y)
+                                    btnMouse.text = "Mouse: X: " + x + ", Y: " + y
+                                    grove_line.x = x + wave_chart.x;
+                                    gr.value = x / chart_curve.width * gr.maximumValue
+
+                                    console.log("Grove Value: " + gr.value)
+                                }
                             }
                         }
                     }
@@ -457,10 +481,11 @@ Item {
             }
 
             Rectangle {
+                id: grove_line
                 width: dp(1)
                 height: flickable_wave.height
 
-                x: gr.value * gr.width / gr.maximumValue + axis_desc.width + dp(7)
+                x: 0
 
                 Behavior on x {
                     NumberAnimation { duration: 100 }
@@ -482,13 +507,13 @@ Item {
         onTriggered: {
             console.log("Wave Data Model has changed again...")
 //            waveModel.buildData(10, 100, 20);
-            waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原来的数据
+            waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原队列中第一个数据
             btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
 
-            for (var i = 0; i < flickable_wave.array.length; ++i){
-                flickable_wave.array[i].chartData.labels = waveModel.x_data(i);
-                flickable_wave.array[i].chartData.datasets[0].data = waveModel.y_data(i)
-                flickable_wave.array[i].requestPaint();
+            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                flickable_wave.arrayChart[i].chartData.labels = waveModel.x_data(i);
+                flickable_wave.arrayChart[i].chartData.datasets[0].data = waveModel.y_data(i)
+                flickable_wave.arrayChart[i].requestPaint();
             }
         }
     }

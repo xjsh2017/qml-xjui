@@ -34,6 +34,8 @@ Canvas {
   property  real lastX
   property  real lastY
 
+  signal mousePositionChanged(var x, var y)
+
 // /////////////////////////////////////////////////////////////////
 // Callbacks
 // /////////////////////////////////////////////////////////////////
@@ -99,9 +101,11 @@ Canvas {
 //          canvas.chartData.datasets[0].data = waveModel.y_data(index)
 //          console.log(" chartData X:  " + canvas.chartData.labels)
 
-          console.log(" X:  " + mouseX + ", Y: " + mouseY)
+//          console.log(" X:  " + mouseX + ", Y: " + mouseY)
 
           requestPaint()
+
+          mousePositionChanged(mouseX, mouseY);
       }
 
       onPositionChanged: {

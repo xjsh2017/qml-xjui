@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     WaveAnalDataModel data;
 //    data.buildData(10, 800, 20);
-    data.buildData(10, 800, 20);
+    data.buildData(10, 800, 60);
 
     QQmlApplicationEngine engine;
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
                                 #elif defined(Q_OS_MAC)
                                     QStringLiteral("/../../..")
                                 #endif
-                                + QStringLiteral("/main.qml")));
+                                + QStringLiteral("/test/main.qml")));
 #endif
 
     return app.exec();
