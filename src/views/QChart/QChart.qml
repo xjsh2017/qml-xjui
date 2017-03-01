@@ -17,152 +17,235 @@ import "QChart.js" as Charts
 
 Canvas {
 
-  id: canvas;
+    id: canvas;
 
-// ///////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////////
 
-  property   var chart;
-  property   var chartData;
-  property   var chartOptions;
-  property   int chartType: 0;
-  property  bool chartAnimated: true;
-  property alias chartAnimationEasing: chartAnimator.easing.type;
-  property alias chartAnimationDuration: chartAnimator.duration;
-  property   int chartAnimationProgress: 0;
-  property   int chart_index: -1;
+    property   var chart;
+    property   var chartData;
+    property   var chartOptions;
+    property   int chartType: 0;
+    property  bool chartAnimated: true;
+    property alias chartAnimationEasing: chartAnimator.easing.type;
+    property alias chartAnimationDuration: chartAnimator.duration;
+    property   int chartAnimationProgress: 0;
+    property   int chart_index: -1;
 
-  /* 整个数据的长度 */
-  property   var chartWholeData;
-  /* 图形数据在整个数据中开始的位置 */
-  property   int startChartDataIndex;
-  /* 需显示的数据点个数 */
-  property   int displayChartDataCount;
+    /* 整个数据的长度 */
+    property   var chartWholeData;
+    /* 图形数据在整个数据中开始的位置 */
+    property   int startChartDataIndex: 0;
+    /* 需显示的数据点个数 */
+    property   int displayChartDataCount: 10;
 
-  property  real lastX
-  property  real lastY
+    property  real lastX
+    property  real lastY
 
-  signal mousePositionChanged(var x, var y)
+    property  string says: "## QChart.qml ##: "
 
-// /////////////////////////////////////////////////////////////////
-// Callbacks
-// /////////////////////////////////////////////////////////////////
+    signal mousePositionChanged(var x, var y)
 
-  onPaint: {
-      if(!chart) {
+    function fetchData(arrData, idx_start, varCount) {
+        var tmp = new Array;
+        var len = arrData.length;
 
-          switch(chartType) {
-          case Charts.ChartType.BAR:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Bar(chartData, chartOptions);
-              break;
-          case Charts.ChartType.DOUGHNUT:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Doughnut(chartData, chartOptions);
-              break;
-          case Charts.ChartType.LINE:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Line(chartData, chartOptions);
-              break;
-          case Charts.ChartType.PIE:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Pie(chartData, chartOptions);
-              break;
-          case Charts.ChartType.POLAR:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).PolarArea(chartData, chartOptions);
-              break;
-          case Charts.ChartType.RADAR:
-              chart = new Charts.Chart(canvas, canvas.getContext("2d")).Radar(chartData, chartOptions);
-              break;
-          default:
-              console.log('Chart type should be specified.');
-          }
+        if (idx_start < 0 || idx_start > len - 1)
+            return tmp;
 
-          chart.init();
+        for (var i = idx_start; i < varCount + idx_start; i++)
+        {
+            if (i >= len)
+                break;
 
-          if (chartAnimated)
-              chartAnimator.start();
-          else
-              chartAnimationProgress = 100;
-      }
+            tmp[i - idx_start] = arrData[i];
+        }
 
-      chart.draw(chartAnimationProgress/100);
-  }
+//        console.log("start idx = " + idx_start + ", chop count = " + realCount)
 
-  onHeightChanged: {
-    requestPaint();
-  }
+        return tmp;
+    }
 
-  onWidthChanged: {
-    requestPaint();
-      console.log(width)
-  }
+    function updateChartData() {
+//        var cc = fetchData(chartWholeData.labels, startChartDataIndex, displayChartDataCount)
+//        var dd = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
 
-  onChartAnimationProgressChanged: {
-      requestPaint();
-  }
+//        chartData.labels = cc;
+//        chartData.datasets[0].data = dd;
 
-  MouseArea {
-      id: area
-      anchors.fill: parent
-      onPressed: {
-          canvas.lastX = mouseX
-          canvas.lastY = mouseY
+        chartData.labels = fetchData(chartWholeData.labels, startChartDataIndex, displayChartDataCount)
+        chartData.datasets[0].data = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
+    }
 
-//          canvas.chartData.labels = waveModel.x_data(index);
-//          canvas.chartData.datasets[0].data = waveModel.y_data(index)
-//          console.log(" chartData X:  " + canvas.chartData.labels)
+    function stepChart(steps) {
+        var tmp = startChartDataIndex + steps;
 
-//          console.log(" X:  " + mouseX + ", Y: " + mouseY)
+        if (tmp < 0){
+            startChartDataIndex = 0;
+            return;
+        }
 
-          requestPaint()
+        var len = chartWholeData.labels.length;
+        if (tmp + displayChartDataCount > len - 1)
+            startChartDataIndex = len - displayChartDataCount;
+        else
+            startChartDataIndex = tmp;
 
-          mousePositionChanged(mouseX, mouseY);
-      }
+        console.log(says + "startChartDataIndex = " + startChartDataIndex)
+    }
 
-      onPositionChanged: {
-          canvas.requestPaint()
-      }
+    // /////////////////////////////////////////////////////////////////
+    // Callbacks
+    // /////////////////////////////////////////////////////////////////
+
+    onPaint: {
+        console.log(says + "onPaint Called: " + "chart = " + chart)
+        if (chartData == undefined){
+            console.log(says + "chartData = " + chartData);
+        }
+        updateChartData()
+        console.log(says + "chartWholeData.labels.data(" + chartWholeData.labels.length + ") = [ " + chartWholeData.labels + " ]");
+        console.log(says + "chartData.labels.data(" + chartData.labels.length + ") = [ " + chartData.labels + " ]");
+
+        if(!chart) {
+
+            switch(chartType) {
+            case Charts.ChartType.BAR:
+                chart = new Charts.Chart(canvas, canvas.getContext("2d")).Bar(chartData, chartOptions);
+                break;
+            case Charts.ChartType.DOUGHNUT:
+                chart = new Charts.Chart(canvas, canvas.getContext("2d")).Doughnut(chartData, chartOptions);
+                break;
+            case Charts.ChartType.LINE:
+                chart = new Charts.Chart(canvas, canvas.getContext("2d")).Line(chartData, chartOptions);
+                break;
+            case Charts.ChartType.PIE:
+                chart = new Charts.Chart(canvas, canvas.getContext("2d")).Pie(chartData, chartOptions);
+                break;
+            case Charts.ChartType.POLAR:
+                chart = new Charts.Chart(canvas, canvas.getContext("2d")).PolarArea(chartData, chartOptions);
+                break;
+            case Charts.ChartType.RADAR:
+                chart = new Charts.Chart(canvas, canvas.getContext("2d")).Radar(chartData, chartOptions);
+                break;
+            default:
+                console.log('Chart type should be specified.');
+            }
+
+            chart.init();
+
+            if (chartAnimated)
+                chartAnimator.start();
+            else
+                chartAnimationProgress = 100;
+        }
+
+        chart.draw(chartAnimationProgress/100);
+    }
+
+    onHeightChanged: {
+        requestPaint();
+    }
+
+    onWidthChanged: {
+        requestPaint();
+//        console.log(says + width)
+    }
+
+    onChartAnimationProgressChanged: {
+        requestPaint();
+    }
+
+    onStartChartDataIndexChanged: {
+        requestPaint();
+        console.log(says + "onStartChartDataIndexChanged: " + startChartDataIndex)
+    }
+
+    onDisplayChartDataCountChanged: {
+        requestPaint();
+        console.log(says + "onDisplayChartDataCountChanged: " + displayChartDataCount)
+    }
+
+    MouseArea {
+        id: area
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onPressed: {
+            canvas.lastX = mouseX
+            canvas.lastY = mouseY
+
+            mousePositionChanged(mouseX, mouseY);
+
+            if (mouse.button == Qt.RightButton)
+                stepChart(2);
+            else if (mouse.button == Qt.LeftButton)
+                stepChart(-2);
+
+            requestPaint()
+        }
+
+        onPositionChanged: {
+            canvas.requestPaint()
+        }
 
 
-      onPressAndHold: {
-        console.log("onPressAndHold accuring....")
-          requestPaint();
-      }
-  }
+        onPressAndHold: {
+            console.log(says + "onPressAndHold accuring....")
+            requestPaint();
+        }
+    }
 
-//  Timer {
-//        id: timer1;
-//        repeat: true;
-//        interval: 2000;
-//        triggeredOnStart: true;
-//        onTriggered: {
-//            // ... add code here
-//            console.log("chartOptions.pointDot = " + chartOptions.pointDot);
-//            chartOptions.pointDot = !chartOptions.pointDot;
+    //  Timer {
+    //        id: timer1;
+    //        repeat: true;
+    //        interval: 2000;
+    //        triggeredOnStart: true;
+    //        onTriggered: {
+    //            // ... add code here
+    //            console.log("chartOptions.pointDot = " + chartOptions.pointDot);
+    //            chartOptions.pointDot = !chartOptions.pointDot;
 
-//            requestPaint()
-//        }
-//    }
+    //            requestPaint()
+    //        }
+    //    }
 
-//    Component.onCompleted: {
-//        timer1.start();
-//    }
+    //    Component.onCompleted: {
+    //        timer1.start();
+    //    }
 
-// /////////////////////////////////////////////////////////////////
-// Functions
-// /////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////
+    // Functions
+    // /////////////////////////////////////////////////////////////////
 
-  function repaint() {
-      chartAnimationProgress = 100;
-      chartAnimator.start();
-  }
+    function repaint() {
+        chartAnimationProgress = 100;
+        chartAnimator.start();
+    }
 
-// /////////////////////////////////////////////////////////////////
-// Internals
-// /////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////
+    // Internals
+    // /////////////////////////////////////////////////////////////////
 
-  PropertyAnimation {
-             id: chartAnimator;
-         target: canvas;
-       property: "chartAnimationProgress";
-             to: 100;
-       duration: 500;
-    easing.type: Easing.InOutElastic;
-  }
+    PropertyAnimation {
+        id: chartAnimator;
+        target: canvas;
+        property: "chartAnimationProgress";
+        to: 100;
+        duration: 500;
+        easing.type: Easing.InOutElastic;
+    }
+
+    Component.onCompleted: {
+        chartData = {
+            "labels": [],
+            "datasets": [{
+                             "fillColor": "transparent",
+                             "strokeColor": "red", //chartWholeData.datasets[0].strokeColor,
+                             "pointColor": "rgba(220,220,220,1)",
+                             "pointStrokeColor": "black",
+                             "data": []
+                         }
+            ]
+        }
+    }
 }

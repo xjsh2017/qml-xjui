@@ -15,6 +15,8 @@ import "./QChart/QChart.js"         as Charts
 Item {
     id: root
 
+    property  string says: "## WaveAnalDemo.qml ##: "
+
     function dp(di){
         return di;
     }
@@ -102,7 +104,7 @@ Item {
                             varTmpInfo = " Timer for Changing Wave Data Model is running  !";
                         }
                         snackbar.open(varTmpInfo)
-                        console.log(varTmpInfo)
+                        console.log(says + varTmpInfo)
                     }
                 }
 
@@ -114,7 +116,7 @@ Item {
 //                    focus: true
 
                     onClicked: {
-                        console.log(flickable_wave.array);
+                        console.log(says + flickable_wave.array);
                         for (var i = 0; i < flickable_wave.array.length; ++i){
                             flickable_wave.array[i].chartOptions.pointDot = !flickable_wave.array[i].chartOptions.pointDot;
                             flickable_wave.array[i].requestPaint();
@@ -229,7 +231,7 @@ Item {
 
                         onValueChanged: {
                             var newX = gr.width * value / gr.maximumValue + axis_groove.x
-                            console.log("Grove Calc X = " + newX)
+                            console.log(says + "Grove Calc X = " + newX)
                             grove_line.x = newX
                         }
 
@@ -238,7 +240,7 @@ Item {
 //                            propagateComposedEvents: true
 
 //                            onClicked: {
-//                                console.log("Grove: X =" + mouse.x + ", Y = " + mouse.y)
+//                                console.log(says + "Grove: X =" + mouse.x + ", Y = " + mouse.y)
 //                                mouse.accepted = false
 //                            }
 //                        }
@@ -377,7 +379,7 @@ Item {
 
 //                                    anchors.fill: parent
 //                                    onWidthChanged: {
-//                                        console.log(width);
+//                                        console.log(says + width);
 //                                    }
 
 //                                    function randomScalingFactor() {
@@ -417,7 +419,7 @@ Item {
                                     chartAnimationDuration: 1000;
                                     chart_index: index
 
-                                    chartData: {
+                                    chartWholeData: {
                                         "labels": waveModel.x_data(index),
                                         "datasets": [{
                                                          "fillColor": "transparent",
@@ -428,6 +430,18 @@ Item {
                                                      }
                                         ]
                                     }
+
+//                                    chartData: {
+//                                        "labels": waveModel.x_data(index),
+//                                        "datasets": [{
+//                                                         "fillColor": "transparent",
+//                                                         "strokeColor": drawColor,
+//                                                         "pointColor": "rgba(220,220,220,1)",
+//                                                         "pointStrokeColor": "black",
+//                                                         "data": waveModel.y_data(index)
+//                                                     }
+//                                        ]
+//                                    }
 
                                     chartOptions: {
                                         "pointDot" : true,
@@ -445,7 +459,7 @@ Item {
                                 }
 
                                 Component.onCompleted: {
-                                    console.log(wave_chart.width)
+//                                    console.log(says + wave_chart.width)
                                 }
                             }
 
@@ -456,12 +470,12 @@ Item {
                             Connections {
                                 target: chart_curve
                                 onMousePositionChanged: {
-                                    console.log("Chart Mouse: X: " + x + ", Y: " + y)
+                                    console.log(says + "Chart Mouse: X: " + x + ", Y: " + y)
                                     btnMouse.text = "Mouse: X: " + x + ", Y: " + y
                                     grove_line.x = x + wave_chart.x;
                                     gr.value = x / chart_curve.width * gr.maximumValue
 
-                                    console.log("Grove Value: " + gr.value)
+                                    console.log(says + "Grove Value: " + gr.value)
                                 }
                             }
                         }
@@ -505,7 +519,7 @@ Item {
         interval: 2000;
         triggeredOnStart: true;
         onTriggered: {
-            console.log("Wave Data Model has changed again...")
+            console.log(says + "Wave Data Model has changed again...")
 //            waveModel.buildData(10, 100, 20);
             waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原队列中第一个数据
             btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
