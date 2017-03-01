@@ -152,7 +152,7 @@ Canvas {
                 chartAnimationProgress = 100;
         }
 
-        chart.draw(chartAnimationProgress/100);
+        chart.draw(chartAnimationProgress/100, chartOptions);
     }
 
     onHeightChanged: {

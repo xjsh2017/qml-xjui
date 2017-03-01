@@ -824,11 +824,13 @@ var Chart = function(canvas, context) {
         // drawing
         // /////////////////////////////////////////////////////////////////
 
-        this.draw = function (progress) {
+        this.draw = function (progress, ops) {
 
             this.init();
 
             clear(ctx);
+
+            config = (ops) ? mergeChartConfig(config,ops) : config;
 
             if(config.scaleOverlay) {
                 drawLines(progress);

@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
 import "."
+import "../components"
 
 //import "./QChartJS"
 //import "./QChartJS/QChartJsTypes.js"  as ChartTypes
@@ -74,94 +75,95 @@ Item {
                 spacing: dp(12)
 
                 IconButton {
-                    id: serh
+                    id: action_search
                     Layout.leftMargin: dp(8)
 
-                    iconName: "action/search"
+                    action: Action {
+                        iconName: "action/search"
+                        name: "Chart : searching"
+                        onTriggered: {
 
-                    property bool showSearch: false
-
-                    MouseArea {
-                        anchors.fill: parent
-//                        hoverEnabled: true
-                    }
-                }
-
-                IconButton {
-                    id: alarm
-//                    Layout.rightMargin: dp(8)
-
-                    iconName: "action/alarm"
-//                    focus: true
-
-                    onClicked: {
-                        var varTmpInfo;
-                        if (timer_waveModel.running)
-                        {
-                            timer_waveModel.stop();
-                            varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
-                        }else
-                        {
-                            timer_waveModel.start();
-                            varTmpInfo = " Timer for Changing Wave Data Model is running  !";
-                        }
-                        snackbar.open(varTmpInfo)
-                        console.log(says + varTmpInfo)
-                    }
-                }
-
-                IconButton {
-                    id: add
-//                    Layout.rightMargin: dp(8)
-
-                    iconName: "content/add"
-//                    focus: true
-
-                    onClicked: {
-                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                            flickable_wave.arrayChart[i].stepLegend(-1);
                         }
                     }
                 }
 
                 IconButton {
-                    id: remove
-//                    Layout.rightMargin: dp(8)
+                    id: action_timer
 
-                    iconName: "content/remove"
-//                    focus: true
+                    action: Action {
+                        iconName: "action/alarm"
+                        name: "Chart : timer for data runtime.."
+                        hoverAnimation: true
+                        onTriggered: {
+                            var varTmpInfo;
+                            if (timer_waveModel.running)
+                            {
+                                timer_waveModel.stop();
+                                varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
+                            }else
+                            {
+                                timer_waveModel.start();
+                                varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+                            }
+                            snackbar.open(varTmpInfo)
+                            console.log(says + varTmpInfo)
+                        }
+                    }
+                }
 
-                    onClicked: {
-                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                            flickable_wave.arrayChart[i].stepLegend(1);
+                IconButton {
+                    id: action_inflate
+                    Layout.rightMargin: dp(8)
+
+                    action: Action {
+                        iconName: "content/add"
+                        name: "Chart : Inflate"
+                        onTriggered: {
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].stepLegend(-1);
+                            }
+                        }
+                    }
+                }
+
+                IconButton {
+                    id: action_deflate
+
+                    action: Action {
+                        iconName: "content/remove"
+                        name: "Chart : Deflate"
+                        onTriggered: {
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].stepLegend(1);
+                            }
                         }
                     }
                 }
 
                 IconButton {
                     id: moveLeft
-//                    Layout.rightMargin: dp(8)
 
-                    iconName: "hardware/keyboard_arrow_left"
-//                    focus: true
-
-                    onClicked: {
-                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                            flickable_wave.arrayChart[i].stepChart(-1);
+                    action: Action {
+                        iconName: "hardware/keyboard_arrow_left"
+                        name: "Chart : Move Left"
+                        onTriggered: {
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].stepChart(-1);
+                            }
                         }
                     }
                 }
 
                 IconButton {
                     id: moveRight
-//                    Layout.rightMargin: dp(8)
 
-                    iconName: "hardware/keyboard_arrow_right"
-//                    focus: true
-
-                    onClicked: {
-                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                            flickable_wave.arrayChart[i].stepChart(1);
+                    action: Action {
+                        iconName: "hardware/keyboard_arrow_right"
+                        name: "Chart : Move Right"
+                        onTriggered: {
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].stepChart(1);
+                            }
                         }
                     }
                 }
@@ -191,7 +193,6 @@ Item {
                     text: waveModel.test
 
                     implicitHeight: dp(28)
-                    Layout.rightMargin: dp(8)
                     elevation: 1
                     //                    activeFocusOnPress: true
                     backgroundColor: Theme.accentColor
@@ -199,6 +200,20 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
 
                     onClicked: snackbar.open("That button is colored!")
+                }
+
+                IconButton {
+                    id: chart_setting
+                    Layout.rightMargin: dp(8)
+
+                    action: Action {
+                        iconName: "action/settings"
+                        name: "Settings"
+                        hoverAnimation: true
+                        onTriggered: {
+                            chartSettings.show()
+                        }
+                    }
                 }
             }
         }
@@ -571,7 +586,127 @@ Item {
         id: snackbar
     }
 
+    Dialog {
+        id: chartSettings
+        title: qsTr("Chart Settings")
+
+        positiveButtonText: "Done"
+
+        MagicDivider {
+
+
+            styleDivider:  1
+            dash_len: 3
+            color: Theme.accentColor
+        }
+
+        Grid {
+            columns: 2
+            spacing: dp(8)
+
+            CheckBox {
+                checked: true
+                text: "Show Points"
+                darkBackground: index == 1
+
+                onCheckedChanged: {
+                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                        flickable_wave.arrayChart[i].chartOptions.pointDot = checked;
+                        flickable_wave.arrayChart[i].requestPaint();
+                    }
+                }
+            }
+
+            Item { width: 1; height: 1 }
+
+            CheckBox {
+                checked: true
+                text: "Show X Labels"
+                darkBackground: index == 1
+            }
+
+            CheckBox {
+                checked: true
+                text: "Show Y Labels"
+                darkBackground: index == 1
+            }
+
+            CheckBox {
+                checked: true
+                text: "Show Axis"
+                darkBackground: index == 1
+            }
+
+            CheckBox {
+                checked: true
+                text: "Show Grid Lines"
+                darkBackground: index == 1
+            }
+        }
+
+        MagicDivider {
+
+
+            styleDivider:  2
+            dash_len: 3
+            color: Theme.accentColor
+        }
+
+        MenuField {
+            id: selection
+            model: ["Curve Line color", "Point stroke color", "Point fill color", "Grid Line color"]
+            width: dp(160)
+        }
+
+        Grid {
+            columns: 10
+            spacing: dp(8)
+
+            Repeater {
+                model: [
+                    "red", "pink", "purple", "deepPurple", "indigo",
+                    "blue", "lightBlue", "cyan", "teal", "green",
+                    "lightGreen", "lime", "yellow", "amber", "orange",
+                    "deepOrange", "grey", "blueGrey", "brown", "black",
+                    "white"
+                ]
+
+                Rectangle {
+                    width: dp(30)
+                    height: dp(30)
+                    radius: dp(2)
+                    color: Palette.colors[modelData]["500"]
+                    border.width: modelData === "white" ? dp(2) : 0
+                    border.color: Theme.alpha("#000", 0.26)
+
+                    Ink {
+                        anchors.fill: parent
+
+                        onPressed: {
+                            switch(selection.selectedIndex) {
+                                case 0:
+                                    theme.primaryColor = parent.color
+                                    break;
+                                case 1:
+                                    theme.accentColor = parent.color
+                                    break;
+                                case 2:
+                                    theme.backgroundColor = parent.color
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        onRejected: {
+            // TODO set default colors again but we currently don't know what that is
+        }
+    }
+
+
     Component.onCompleted: {
-//        timer_waveModel.start();
+
     }
 }
