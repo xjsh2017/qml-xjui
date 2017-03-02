@@ -32,17 +32,25 @@ Canvas {
     property   int chartAnimationProgress: 0;
     property   int chart_index: -1;
 
+    property   int preWidth: 0;
+
     /* 图形数据在整个数据中开始的位置 */
     property   int startChartDataIndex: 0;
     /* 需显示的数据点个数 */
-    property   int displayChartDataCount: 20;
+    property   int displayChartDataCount: 100;
 
     property  real lastX
     property  real lastY
 
+    property  real lastGroverlineX: 0;
+
+    property   int pressedButton: -1
+    property color grovelineColor: "yellow"
+
     property  string says: "## QChart.qml ##: "
 
     signal mousePositionChanged(var x, var y)
+    signal groverlineReachedPointChanged(var reachedPointIdx, var groverlineX)
 
     function fetchData(arrData, idx_start, varCount) {
         var tmp = new Array;
@@ -106,6 +114,15 @@ Canvas {
         displayChartDataCount = tmp;
     }
 
+    /* */
+    function fnCalcGroverNearPoint(mouseX) {
+        var delta = 47;
+        var tmp = (mouseX - delta) / (canvas.width - delta) * (displayChartDataCount - 1);
+        tmp = Math.round(tmp)
+
+        return tmp;
+    }
+
     // /////////////////////////////////////////////////////////////////
     // Callbacks
     // /////////////////////////////////////////////////////////////////
@@ -155,12 +172,42 @@ Canvas {
         chart.draw(chartAnimationProgress/100, chartOptions);
     }
 
+    Rectangle {
+        id: grove_line
+        width: dp(1)
+        height: parent.height
+
+        x: 0
+
+        Behavior on x {
+            NumberAnimation { duration: 100 }
+            enabled: true
+        }
+
+        color: grovelineColor
+    }
+
     onHeightChanged: {
         requestPaint();
     }
 
     onWidthChanged: {
+        if (Math.abs(canvas.width - preWidth) < 4)
+            return
+
         requestPaint();
+
+        var tmp = lastX * canvas.width / preWidth;
+        preWidth = canvas.width
+        lastX = tmp;
+    }
+
+    onLastGroverlineXChanged: {
+        grove_line.x = lastGroverlineX;
+
+        var tmp = fnCalcGroverNearPoint(lastGroverlineX);
+        console.log(says + "fnCalcGroverNearPoint： " + tmp)
+        groverlineReachedPointChanged(tmp, lastGroverlineX)
     }
 
     onChartAnimationProgressChanged: {
@@ -173,7 +220,7 @@ Canvas {
 
     onDisplayChartDataCountChanged: {
         requestPaint();
-        console.log(says + "onDisplayChartDataCountChanged: " + displayChartDataCount)
+//        console.log(says + "onDisplayChartDataCountChanged: " + displayChartDataCount)
     }
 
     MouseArea {
@@ -181,31 +228,53 @@ Canvas {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
+        hoverEnabled: false
+
         onPressed: {
+            pressedButton = mouse.button
+
             canvas.lastX = mouseX
             canvas.lastY = mouseY
 
-            mousePositionChanged(mouseX, mouseY);
+            if (pressedButton == Qt.LeftButton){
+                lastGroverlineX = mouseX    // 改变游标位置
+            }
 
-            if (mouse.button == Qt.RightButton)
-//                stepChart(1);
-                stepLegend(1);
-            else if (mouse.button == Qt.LeftButton)
-//                stepChart(-1);
-                stepLegend(-1);
+//            if (mouse.button == Qt.RightButton){
+////                stepChart(1);
+//                stepLegend(1);
+//            }else if (mouse.button == Qt.LeftButton){
+////                stepChart(-1);
+//                stepLegend(-1);
+//            }
 
-            requestPaint()
+            console.log(canvas.width)
         }
 
         onPositionChanged: {
-            canvas.requestPaint()
+            console.log(canvas.says
+                        + "Position changed: " + (mouseX - canvas.lastX)
+                        + ",  Old X = " + canvas.lastX + ", Current X = " + mouseX)
+
+            var lenStep = 1;
+
+            if (pressedButton == Qt.RightButton){
+                if (mouseX > canvas.lastX)
+                    stepChart(1 * lenStep)
+                else if (mouseX < canvas.lastX)
+                    stepChart(-1 * lenStep)
+            } else if (pressedButton == Qt.LeftButton){
+                lastGroverlineX = mouseX
+                mousePositionChanged(mouseX, mouseY);
+            }
         }
 
 
         onPressAndHold: {
             console.log(says + "onPressAndHold accuring....")
-            requestPaint();
         }
+
+
     }
 
     //  Timer {
@@ -261,5 +330,7 @@ Canvas {
                          }
             ]
         }
+
+        preWidth = width;
     }
 }

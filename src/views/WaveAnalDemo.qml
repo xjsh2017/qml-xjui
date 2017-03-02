@@ -275,8 +275,11 @@ Item {
 
                         onValueChanged: {
                             var newX = gr.width * value / gr.maximumValue + axis_groove.x
-                            console.log(says + "Grove Calc X = " + newX)
-                            grove_line.x = newX
+//                            console.log(says + "Grove Calc X = " + newX)
+//                            flickable_wave.arrayChart[0].lastGroverlineX = newX;
+//                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+//                                flickable_wave.arrayChart[i].lastGroverlineX = newX;
+//                            }
                         }
 
 //                        MouseArea {
@@ -314,6 +317,7 @@ Item {
 //                contentWidth: content.childrenRect.width
 
                 property variant arrayChart: []
+                property variant arrayChartInfo: []
 
                 Column {
                     id: content
@@ -332,6 +336,8 @@ Item {
 
                                 width: dp(160)
                                 height: dp(100)
+
+                                property int chartSelectedDataPointIndex: 0
 
                                 backgroundColor: Qt.lighter(drawColor)
 
@@ -370,7 +376,9 @@ Item {
                                     color: "transparent"
 
                                     Label {
-                                        text: root.random_scalingFactor() + " ∠"+ root.random_scalingFactor() + "°"
+                                        text: waveModel.x_data(index)[wave_info.chartSelectedDataPointIndex]
+                                              + " ∠ "
+                                              + waveModel.y_data(index)[wave_info.chartSelectedDataPointIndex] + "°"
                                         color: Theme.light.textColor
                                         anchors.centerIn: parent
                                     }
@@ -462,6 +470,7 @@ Item {
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
                                     chart_index: index
+                                    grovelineColor: gr.color
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -517,17 +526,29 @@ Item {
 
                             Component.onCompleted: {
                                 flickable_wave.arrayChart.push(chart_curve)
+                                flickable_wave.arrayChartInfo.push(wave_info)
                             }
 
                             Connections {
                                 target: chart_curve
                                 onMousePositionChanged: {
-                                    console.log(says + "Chart Mouse: X: " + x + ", Y: " + y)
                                     btnMouse.text = "Mouse: X: " + x + ", Y: " + y
                                     grove_line.x = x + wave_chart.x;
                                     gr.value = x / chart_curve.width * gr.maximumValue
 
-                                    console.log(says + "Grove Value: " + gr.value)
+//                                    console.log(says + "Grove Value: " + gr.value)
+                                }
+                            }
+
+                            Connections {
+                                target: chart_curve
+                                onGroverlineReachedPointChanged: {
+                                    for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
+                                        flickable_wave.arrayChartInfo[i].chartSelectedDataPointIndex = reachedPointIdx + flickable_wave.arrayChart[i].startChartDataIndex;
+                                        flickable_wave.arrayChart[i].lastGroverlineX = groverlineX;
+                                    }
+
+                                    gr.value = groverlineX / chart_curve.width * gr.maximumValue
                                 }
                             }
                         }
@@ -548,6 +569,7 @@ Item {
 
             Rectangle {
                 id: grove_line
+                visible: false
                 width: dp(1)
                 height: flickable_wave.contentHeight
 
