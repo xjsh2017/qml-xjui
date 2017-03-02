@@ -337,7 +337,7 @@ Item {
                                 width: dp(160)
                                 height: dp(100)
 
-                                property int chartSelectedDataPointIndex: 0
+                                property   int selDataPointIndex: 0
 
                                 backgroundColor: Qt.lighter(drawColor)
 
@@ -376,9 +376,9 @@ Item {
                                     color: "transparent"
 
                                     Label {
-                                        text: waveModel.x_data(index)[wave_info.chartSelectedDataPointIndex]
+                                        text: waveModel.x_data(index)[wave_info.selDataPointIndex]
                                               + " ∠ "
-                                              + waveModel.y_data(index)[wave_info.chartSelectedDataPointIndex] + "°"
+                                              + waveModel.y_data(index)[wave_info.selDataPointIndex] + "°"
                                         color: Theme.light.textColor
                                         anchors.centerIn: parent
                                     }
@@ -392,74 +392,6 @@ Item {
                                 width: wave.width - wave_info.width - dp(12)
 
                                 backgroundColor: "#263238"
-
-//                                QChartJs {
-//                                    id: chart_curve
-
-//                                    anchors.fill: parent
-
-//                                    chartType: ChartTypes.QChartJSTypes.LINE
-//                                    animation: true
-//                                    chartAnimationEasing: Easing.InOutElastic;
-//                                    chartAnimationDuration: 1000;
-
-//                                    chartData: {
-//                                        "labels": waveModel.x_data(index),
-//                                        "datasets": [{
-//                                                         "data": waveModel.y_data(index),
-//                                                         fillColor : "transparent",
-//                                                         strokeColor : drawColor,
-//                                                         pointColor : "rgba(220,220,220,1)",
-//                                                         pointStrokeColor : "#fff",
-//                                                         pointHighlightFill : "#fff",
-//                                                         pointHighlightStroke : "rgba(220,220,220,1)",
-//                                                         "label": 'Dataset 1'
-//                                                     }]
-//                                    }
-
-//                                    Rectangle {
-//                                        anchors.fill: parent
-//                                        border.color: "red"
-//                                        color: "transparent"
-////                                        visible: false
-//                                    }
-//                                }
-
-//                                Chart{
-//                                    id: chart_curve;
-//                                    chartType: ChartType.line
-
-//                                    anchors.fill: parent
-//                                    onWidthChanged: {
-//                                        console.log(says + width);
-//                                    }
-
-//                                    function randomScalingFactor() {
-//                                        return Math.round(Math.random() * 100);
-//                                    }
-
-//                                    chartData: {
-//                                        "labels": waveModel.x_data(index),
-//                                        "datasets": [{
-//                                                         "data": waveModel.y_data(index),
-//                                                         "backgroundColor": [
-//                                                             "#F7464A",
-//                                                             "#46BFBD",
-//                                                             "#FDB45C",
-//                                                             "#949FB1",
-//                                                             "#4D5360",
-//                                                         ],
-//                                                         "label": 'Da[aset 1'
-//                                                     }]
-//                                    }
-
-//                                    Rectangle {
-//                                        anchors.fill: parent
-//                                        border.color: "red"
-//                                        color: "transparent"
-////                                        visible: false
-//                                    }
-//                                }
 
                                 QChart {
                                     id: chart_curve;
@@ -478,31 +410,6 @@ Item {
                                         "pointColor": "rgba(220,220,220,1)",
                                         "pointStrokeColor": "black"
                                     }
-
-
-//                                    chartWholeData: {
-//                                        "labels": waveModel.x_data(index),
-//                                        "datasets": [{
-//                                                         "fillColor": "transparent",
-//                                                         "strokeColor": drawColor,
-//                                                         "pointColor": "rgba(220,220,220,1)",
-//                                                         "pointStrokeColor": "black",
-//                                                         "data": waveModel.y_data(index)
-//                                                     }
-//                                        ]
-//                                    }
-
-//                                    chartData: {
-//                                        "labels": waveModel.x_data(index),
-//                                        "datasets": [{
-//                                                         "fillColor": "transparent",
-//                                                         "strokeColor": drawColor,
-//                                                         "pointColor": "rgba(220,220,220,1)",
-//                                                         "pointStrokeColor": "black",
-//                                                         "data": waveModel.y_data(index)
-//                                                     }
-//                                        ]
-//                                    }
 
                                     chartOptions: {
                                         "pointDot" : true,
@@ -531,21 +438,20 @@ Item {
 
                             Connections {
                                 target: chart_curve
+
                                 onMousePositionChanged: {
                                     btnMouse.text = "Mouse: X: " + x + ", Y: " + y
-                                    grove_line.x = x + wave_chart.x;
                                     gr.value = x / chart_curve.width * gr.maximumValue
 
 //                                    console.log(says + "Grove Value: " + gr.value)
                                 }
-                            }
 
-                            Connections {
-                                target: chart_curve
-                                onGroverlineReachedPointChanged: {
+                                onSigChartInfoChanged: {
                                     for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
-                                        flickable_wave.arrayChartInfo[i].chartSelectedDataPointIndex = reachedPointIdx + flickable_wave.arrayChart[i].startChartDataIndex;
+                                        flickable_wave.arrayChartInfo[i].selDataPointIndex =
+                                                reachedChartDataIndex + startChartDataIndex;
                                         flickable_wave.arrayChart[i].lastGroverlineX = groverlineX;
+                                        flickable_wave.arrayChart[i].startChartDataIndex = startChartDataIndex;
                                     }
 
                                     gr.value = groverlineX / chart_curve.width * gr.maximumValue
@@ -565,22 +471,6 @@ Item {
             Scrollbar {
                 flickableItem: flickable_wave
                 orientation: Qt.Horizontal
-            }
-
-            Rectangle {
-                id: grove_line
-                visible: false
-                width: dp(1)
-                height: flickable_wave.contentHeight
-
-                x: 0
-
-                Behavior on x {
-                    NumberAnimation { duration: 100 }
-                    enabled: true
-                }
-
-                color: "red"
             }
         }
 

@@ -36,21 +36,32 @@ Canvas {
 
     /* 图形数据在整个数据中开始的位置 */
     property   int startChartDataIndex: 0;
+    property   int reachedChartDataIndex: 0;
     /* 需显示的数据点个数 */
-    property   int displayChartDataCount: 100;
+    property   int displayChartDataCount: 20;
+
+    property  real lastGroverlineX: 0;
 
     property  real lastX
     property  real lastY
 
-    property  real lastGroverlineX: 0;
-
     property   int pressedButton: -1
     property color grovelineColor: "yellow"
 
-    property  string says: "## QChart.qml ##: "
+
+    // ///////////////////////////////////////////////////////////////
 
     signal mousePositionChanged(var x, var y)
-    signal groverlineReachedPointChanged(var reachedPointIdx, var groverlineX)
+    signal groverlineReachedPointChanged(var reachedPointIndex, var groverlineX)
+    signal sigChartInfoChanged(var reachedChartDataIndex, var groverlineX
+                               , var startChartDataIndex, var displayChartDataCount)
+
+
+    // ///////////////////////////////////////////////////////////////
+
+    function fnLog(says) {
+        console.log("## QChart.qml ##: " + says);
+    }
 
     function fetchData(arrData, idx_start, varCount) {
         var tmp = new Array;
@@ -73,9 +84,6 @@ Canvas {
     }
 
     function updateChartData() {
-//        chartData.labels = fetchData(chartWholeData.labels, startChartDataIndex, displayChartDataCount)
-//        chartData.datasets[0].data = fetchData(chartWholeData.datasets[0].data, startChartDataIndex, displayChartDataCount)
-
         chartData.labels = fetchData(waveModel.x_data(chart_index), startChartDataIndex, displayChartDataCount)
         chartData.datasets[0].data = fetchData(waveModel.y_data(chart_index), startChartDataIndex, displayChartDataCount)
 
@@ -133,8 +141,6 @@ Canvas {
             console.log(says + "chartData = " + chartData);
         }
         updateChartData()
-//        console.log(says + "chartWholeData.labels.data(" + chartWholeData.labels.length + ") = [ " + chartWholeData.labels + " ]");
-//        console.log(says + "chartData.labels.data(" + chartData.labels.length + ") = [ " + chartData.labels + " ]");
 
         if(!chart) {
 
@@ -173,7 +179,7 @@ Canvas {
     }
 
     Rectangle {
-        id: grove_line
+        id: groverLine
         width: dp(1)
         height: parent.height
 
@@ -185,6 +191,26 @@ Canvas {
         }
 
         color: grovelineColor
+    }
+
+    onLastGroverlineXChanged: {
+        groverLine.x = lastGroverlineX;
+
+        var tmp = fnCalcGroverNearPoint(lastGroverlineX);
+        reachedChartDataIndex = tmp;
+        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, displayChartDataCount)
+
+//        fnLog("fnCalcGroverNearPoint： " + tmp)
+    }
+
+    onDisplayChartDataCountChanged: {
+//        fnLog("displayChartDataCount = " + displayChartDataCount)
+
+        var tmp = fnCalcGroverNearPoint(lastGroverlineX);
+        reachedChartDataIndex = tmp;
+        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, displayChartDataCount)
+
+        requestPaint();
     }
 
     onHeightChanged: {
@@ -202,25 +228,14 @@ Canvas {
         lastX = tmp;
     }
 
-    onLastGroverlineXChanged: {
-        grove_line.x = lastGroverlineX;
-
-        var tmp = fnCalcGroverNearPoint(lastGroverlineX);
-        console.log(says + "fnCalcGroverNearPoint： " + tmp)
-        groverlineReachedPointChanged(tmp, lastGroverlineX)
-    }
-
     onChartAnimationProgressChanged: {
         requestPaint();
     }
 
     onStartChartDataIndexChanged: {
-        requestPaint();
-    }
+        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, displayChartDataCount)
 
-    onDisplayChartDataCountChanged: {
         requestPaint();
-//        console.log(says + "onDisplayChartDataCountChanged: " + displayChartDataCount)
     }
 
     MouseArea {
@@ -247,13 +262,10 @@ Canvas {
 ////                stepChart(-1);
 //                stepLegend(-1);
 //            }
-
-            console.log(canvas.width)
         }
 
         onPositionChanged: {
-            console.log(canvas.says
-                        + "Position changed: " + (mouseX - canvas.lastX)
+            fnLog("Position changed: " + (mouseX - canvas.lastX)
                         + ",  Old X = " + canvas.lastX + ", Current X = " + mouseX)
 
             var lenStep = 1;

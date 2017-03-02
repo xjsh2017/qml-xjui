@@ -14,7 +14,7 @@ ApplicationWindow {
 
     theme {
         primaryColor: "Teal"
-        accentColor: "red"
+        accentColor: "#FF9800"
         tabHighlightColor: "white"
     }
 
