@@ -4,7 +4,7 @@ import QtQuick 2.0
 import "../../../src/views"
 
 Item {
-    TimeDisperAnalDemo {
+    TimeDisperAnal {
         anchors.fill: parent
     }
 }

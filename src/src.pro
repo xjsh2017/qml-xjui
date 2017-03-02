@@ -40,6 +40,8 @@ views.files += views/*
 views.path = $$[QT_INSTALL_QML]/$$uri/views
 
 components.files += components/*
+                components/QChart/*
+                components/Grover/*
 components.path = $$[QT_INSTALL_QML]/$$uri/components
 
 icons.files += icons/*

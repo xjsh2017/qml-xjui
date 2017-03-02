@@ -3,14 +3,17 @@ module XjQmlUi
 plugin XjQmlUi
 
 # Components
-EntryCase 1.0 views/EntryCase.qml
-PageInfo 1.0 views/PageInfo.qml
+EntryCase 1.0 components/EntryCase.qml
+PageInfo 1.0 components/PageInfo.qml
+Grover.qml 1.0 components/Grover/Grover.qml
+GroverStyle.qml 1.0 components/Grover/GroverStyle.qml
+QChart.qml 1.0 components/QChart/QChart.qml
+QChart.js 1.0 components/QChart/QChart.js
 
 # views
-WaveAnalDemo 1.0 views/WaveAnalDemo.qml
-VectorChartDemo 1.0 views/VectorChartDemo.qml
-TimeDisperAnalDemo 1.0 views/TimeDisperAnalDemo.qml
-HarmonicAnalDemo 1.0 views/HarmonicAnalDemo.qml
-Grover.qml 1.0 views/Grover.qml
+WaveChartAnal 1.0 views/WaveChartAnal.qml
+VectorChart 1.0 views/VectorChart.qml
+TimeDisperAnal 1.0 views/TimeDisperAnal.qml
+HarmonicAnal 1.0 views/HarmonicAnal.qml
 
 typeinfo plugin.qmltypes

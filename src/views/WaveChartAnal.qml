@@ -6,14 +6,9 @@ import Material.ListItems 0.1 as ListItem
 
 import "."
 import "../components"
-
-//import "./QChartJS"
-//import "./QChartJS/QChartJsTypes.js"  as ChartTypes
-
-//import "./Charts"
-
-import "./QChart"
-import "./QChart/QChart.js"         as Charts
+import "../components/Grover"
+import "../components/QChart"
+import "../components/QChart/QChart.js"         as Charts
 
 Item {
     id: root
@@ -219,13 +214,14 @@ Item {
         }
 
         // 波形标尺
-        Rectangle {
+        View {
             id: axis_wave
 
-            color: "transparent"
+//            color: "transparent"
+            elevation: 1
             height: dp(64)
-            border.color: "black"
-            border.width: dp(1)
+//            border.color: "black"
+//            border.width: dp(1)
 
             Layout.fillWidth: true
 
@@ -263,7 +259,7 @@ Item {
                         id: gr
                         anchors.fill: parent
 
-                        value: 280
+                        value: maximumValue * 0.2
                         focus: true
                         tickmarksEnabled: true
                         numericValueLabel: true
@@ -274,11 +270,10 @@ Item {
                         darkBackground: false//index == 1
 
                         onValueChanged: {
-                            var newX = gr.width * value / gr.maximumValue + axis_groove.x
-//                            console.log(says + "Grove Calc X = " + newX)
-//                            flickable_wave.arrayChart[0].lastGroverlineX = newX;
+                            var newX = gr.width * value / gr.maximumValue
+                            console.log(newX)
 //                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-//                                flickable_wave.arrayChart[i].lastGroverlineX = newX;
+//                                flickable_wave.arrayChart[i].lastGroverlineX = Math.round(newX);
 //                            }
                         }
 

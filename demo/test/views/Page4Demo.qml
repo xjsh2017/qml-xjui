@@ -4,7 +4,7 @@ import QtQuick 2.0
 import "../../../src/views"
 
 Item {
-    VectorChartDemo {
+    VectorChart {
         anchors.fill: parent
     }
 }
