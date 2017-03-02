@@ -36,10 +36,11 @@ for (searchvar, searchlist) {
 
 OTHER_FILES += $$qrclist
 
-qmlui.files += \
-            views/*
+views.files += views/*
+views.path = $$[QT_INSTALL_QML]/$$uri/views
 
-qmlui.path = $$[QT_INSTALL_QML]/$$uri/views
+components.files += components/*
+components.path = $$[QT_INSTALL_QML]/$$uri/components
 
 icons.files += icons/*
 icons.path = $$[QT_INSTALL_QML]/XjQmlUi/icons
@@ -48,6 +49,6 @@ qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
-INSTALLS += target qmlui qmldir# icons
+INSTALLS += target views components qmldir# icons
 
 OTHER_FILES += $$qmlui.files
