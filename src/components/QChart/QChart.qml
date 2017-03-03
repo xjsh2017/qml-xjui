@@ -219,13 +219,15 @@ Canvas {
 
     onWidthChanged: {
         if (Math.abs(canvas.width - preWidth) < 4)
-            return
+            return;
 
-        requestPaint();
-
-        var tmp = lastX * canvas.width / preWidth;
+        if (preWidth == 0)
+            preWidth = width;
+        if (width == 0)
+            return;
+        var tmp = canvas.width / preWidth;
         preWidth = canvas.width
-        lastX = tmp;
+        lastGroverlineX = tmp * lastGroverlineX
     }
 
     onChartAnimationProgressChanged: {

@@ -266,7 +266,7 @@ Item {
                         id: gr
                         anchors.fill: parent
 
-                        value: maximumValue * 0.2
+                        value: maximumValue * 0
                         focus: true
                         tickmarksEnabled: true
                         numericValueLabel: true
@@ -611,6 +611,6 @@ Item {
 
 
     Component.onCompleted: {
-        log("gr.lockValueChange" + gr.lockValueChange)
+        log("gr.lockValueChange = " + gr.lockValueChange)
     }
 }
