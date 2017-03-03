@@ -13,7 +13,7 @@ import "../components/QChart/QChart.js"         as Charts
 Item {
     id: root
 
-    property  string says: "## WaveAnalDemo.qml ##: "
+    // ///////////////////////////////////////////////////////////////
 
     function dp(di){
         return di;
@@ -27,6 +27,13 @@ Item {
         return Qt.rgba(Math.random(),
                        Math.random(), Math.random(), 1);
     }
+
+    function log(says) {
+        console.log("## WaveAnalDemo.qml ##: " + says);
+    }
+
+
+    // ///////////////////////////////////////////////////////////////
 
     ColumnLayout {
         id: rootLayout
@@ -101,7 +108,7 @@ Item {
                                 varTmpInfo = " Timer for Changing Wave Data Model is running  !";
                             }
                             snackbar.open(varTmpInfo)
-                            console.log(says + varTmpInfo)
+                            log(varTmpInfo)
                         }
                     }
                 }
@@ -269,23 +276,19 @@ Item {
                         activeFocusOnPress: true
                         darkBackground: false//index == 1
 
+                        property bool lockValueChange: false
+
                         onValueChanged: {
                             var newX = gr.width * value / gr.maximumValue
-                            console.log(newX)
-//                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-//                                flickable_wave.arrayChart[i].lastGroverlineX = Math.round(newX);
-//                            }
+//                            log(newX)
+
+                            lockValueChange = true;
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].lastGroverlineX = Math.round(newX);
+                                break;
+                            }
+                            lockValueChange = false;
                         }
-
-//                        MouseArea {
-//                            anchors.fill: parent
-//                            propagateComposedEvents: true
-
-//                            onClicked: {
-//                                console.log(says + "Grove: X =" + mouse.x + ", Y = " + mouse.y)
-//                                mouse.accepted = false
-//                            }
-//                        }
                     }
                 }
             }
@@ -422,7 +425,7 @@ Item {
                                 }
 
                                 Component.onCompleted: {
-//                                    console.log(says + wave_chart.width)
+//                                    log(wave_chart.width)
                                 }
                             }
 
@@ -434,13 +437,6 @@ Item {
                             Connections {
                                 target: chart_curve
 
-                                onMousePositionChanged: {
-                                    btnMouse.text = "Mouse: X: " + x + ", Y: " + y
-                                    gr.value = x / chart_curve.width * gr.maximumValue
-
-//                                    console.log(says + "Grove Value: " + gr.value)
-                                }
-
                                 onSigChartInfoChanged: {
                                     for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
                                         flickable_wave.arrayChartInfo[i].selDataPointIndex =
@@ -449,7 +445,8 @@ Item {
                                         flickable_wave.arrayChart[i].startChartDataIndex = startChartDataIndex;
                                     }
 
-                                    gr.value = groverlineX / chart_curve.width * gr.maximumValue
+                                    if (!gr.lockValueChange)
+                                        gr.value = groverlineX / chart_curve.width * gr.maximumValue
                                 }
                             }
                         }
@@ -478,7 +475,7 @@ Item {
         interval: 2000;
         triggeredOnStart: true;
         onTriggered: {
-            console.log(says + "Wave Data Model has changed again...")
+            log("Wave Data Model has changed again...")
 //            waveModel.buildData(10, 100, 20);
             waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原队列中第一个数据
             btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
@@ -614,6 +611,6 @@ Item {
 
 
     Component.onCompleted: {
-
+        log("gr.lockValueChange" + gr.lockValueChange)
     }
 }
