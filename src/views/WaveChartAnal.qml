@@ -544,9 +544,9 @@ Item {
             spacing: dp(8)
 
             CheckBox {
-                checked: true
+                checked: flickable_wave.arrayChart.length > 0 ? flickable_wave.arrayChart[0].chartOptions.pointDot : false
                 text: "Show Points"
-                darkBackground: index == 1
+                darkBackground: false
 
                 onCheckedChanged: {
                     for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
@@ -561,25 +561,25 @@ Item {
             CheckBox {
                 checked: true
                 text: "Show X Labels"
-                darkBackground: index == 1
+                darkBackground: false
             }
 
             CheckBox {
                 checked: true
                 text: "Show Y Labels"
-                darkBackground: index == 1
+                darkBackground: false
             }
 
             CheckBox {
                 checked: true
                 text: "Show Axis"
-                darkBackground: index == 1
+                darkBackground: false
             }
 
             CheckBox {
                 checked: true
                 text: "Show Grid Lines"
-                darkBackground: index == 1
+                darkBackground: false
             }
         }
 
