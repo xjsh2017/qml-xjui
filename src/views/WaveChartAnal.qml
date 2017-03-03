@@ -436,9 +436,8 @@ Item {
 
                                     Rectangle {
                                         anchors.fill: parent
-                                        border.color: "red"
+                                        border.color: Qt.lighter(drawColor)
                                         color: "transparent"
-//                                        visible: false
                                     }
                                 }
 
