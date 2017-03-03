@@ -56,7 +56,7 @@ SliderStyle {
             }
 
             horizontalAlignment: Qt.AlignHCenter
-            verticalAlignment: Qt.AlignVCenter
+//            verticalAlignment: Qt.AlignVCenter
             text: knobLabel
             fontSizeMode: Text.Fit
             font.pixelSize: knobHeight - 19 * Units.dp
@@ -78,7 +78,7 @@ SliderStyle {
 
         Rectangle {
             id: roundKnob
-            implicitHeight: parent.height
+            implicitHeight: parent.height * 3 / 4
             implicitWidth: parent.width
             radius: implicitWidth / 2
             color: style.color
@@ -91,7 +91,7 @@ SliderStyle {
                 color: style.color
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: dp(12)
+                anchors.bottomMargin: dp(16)
                 anchors.horizontalCenterOffset: dp(-1)
                 antialiasing: true
 
@@ -139,20 +139,20 @@ SliderStyle {
         Loader {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.top
-            anchors.bottomMargin: 16 * Units.dp
+            anchors.bottomMargin: 4 * Units.dp
             sourceComponent: style.numericValueLabel ? knob : null
         }
 
         Rectangle {
             anchors.centerIn: parent
-            implicitHeight: 32 * Units.dp
-            implicitWidth: 32 * Units.dp
+            implicitHeight: 28 * Units.dp
+            implicitWidth: 28 * Units.dp
             color: control.focus ?
                        Theme.alpha(style.color, 0.20) :
                        "transparent"
             radius: implicitHeight / 2
             Rectangle {
-                property var diameter: control.enabled ? 16 * Units.dp : 12 * Units.dp
+                property var diameter: control.enabled ? 12 * Units.dp : 10 * Units.dp
                 anchors.centerIn: parent
                 color: control.value === control.minimumValue ?
                            Theme.backgroundColor : style.color

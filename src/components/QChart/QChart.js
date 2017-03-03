@@ -23,6 +23,10 @@ var ChartType = {
 
 var Chart = function(canvas, context) {
 
+    function log(says) {
+        console.log("## QChart.js ##: " + says)
+    }
+
     var chart = this;
 
 // /////////////////////////////////////////////////////////////////
@@ -54,7 +58,7 @@ var Chart = function(canvas, context) {
             pointDotRadius: 4,
             pointDotStrokeWidth: 2,
             datasetStroke: true,
-            datasetStrokeWidth: 2,          // 线条粗细
+            datasetStrokeWidth: 1,          // 线条粗细
             datasetFill: true,
             animation: true,
             animationSteps: 60,
@@ -74,17 +78,17 @@ var Chart = function(canvas, context) {
     var Line = function(data,config,ctx) {
 
         var maxSize;
-        var scaleHop;
-        var calculatedScale;
-        var labelHeight;
-        var scaleHeight;
-        var valueBounds;
+        var scaleHop;   // 纵坐标刻度间的像素长度
+        var calculatedScale;    // 纵坐标刻度相关取值: 步数，步长，刻度取值
+        var labelHeight;    // 坐标值的字体高度
+        var scaleHeight;    // 纵坐标的像素高度
+        var valueBounds;    // 纵坐标的实际采样取值范围，不是绘图刻度范围
         var labelTemplateString;
-        var valueHop;
-        var widestXLabel;
-        var xAxisLength;
-        var yAxisPosX;
-        var xAxisPosY;
+        var valueHop;       // 横坐标刻度间的像素长度
+        var widestXLabel;   // 横坐标取值的最大内容长度
+        var xAxisLength;    // 横坐标的像素长度
+        var yAxisPosX;      // 纵左标刻度线离绘图框左边的像素距离
+        var xAxisPosY;      // 横坐标刻度线离绘图框顶部的像素距离
         var rotateLabels = 0;
 
         // /////////////////////////////////////////////////////////////////
@@ -99,6 +103,7 @@ var Chart = function(canvas, context) {
             labelTemplateString = (config.scaleShowLabels)? config.scaleLabel : "";
 
             if (!config.scaleOverride) {
+                log("here")
                 calculatedScale = calculateScale(scaleHeight,valueBounds.maxSteps,valueBounds.minSteps,valueBounds.maxValue,valueBounds.minValue,labelTemplateString);
             } else {
                 calculatedScale = {
@@ -111,6 +116,7 @@ var Chart = function(canvas, context) {
             }
 
             scaleHop = Math.floor(scaleHeight/calculatedScale.steps);
+            log("scaleHop = " + scaleHop)
             calculateXAxisSize();
         }
 
@@ -127,9 +133,11 @@ var Chart = function(canvas, context) {
             config = (ops) ? mergeChartConfig(config,ops) : config;
 
             if(config.scaleOverlay) {
+                log("hahaha")
                 drawLines(progress);
                 drawScale();
             } else {
+                log("hohoho")
                 drawScale();
                 drawLines(progress);
             }
@@ -192,8 +200,10 @@ var Chart = function(canvas, context) {
             ctx.lineWidth = config.scaleLineWidth;
             ctx.strokeStyle = config.scaleLineColor;
             ctx.beginPath();
-            ctx.moveTo(width-widestXLabel/2+5,xAxisPosY);
-            ctx.lineTo(width-(widestXLabel/2)-xAxisLength-5,xAxisPosY);
+//            ctx.moveTo(width-widestXLabel/2 + 5,xAxisPosY);
+            ctx.moveTo(width-widestXLabel/2,xAxisPosY);
+//            ctx.lineTo(width-(widestXLabel/2)-xAxisLength-5,xAxisPosY);
+            ctx.lineTo(yAxisPosX - 5, xAxisPosY)
             ctx.stroke();
 
             if (rotateLabels > 0) {
@@ -204,11 +214,12 @@ var Chart = function(canvas, context) {
             }
             ctx.fillStyle = config.scaleFontColor;
 
+            // 绘制纵向网格线，不包括纵坐标刻度线，并绘制横坐标的刻度数值
             for (var i=0; i<data.labels.length; i++) {
 
                 ctx.save();
 
-				if (config.scaleXShowLabels)
+                if (config.scaleXShowLabels)
                 if (rotateLabels > 0) {
                     ctx.translate(yAxisPosX + i*valueHop,xAxisPosY + config.scaleFontSize);
                     ctx.rotate(-(rotateLabels * (Math.PI/180)));
@@ -231,6 +242,7 @@ var Chart = function(canvas, context) {
                 ctx.stroke();
             }
 
+            // 绘制横纵坐标、横向网格线，不包括横坐标，并绘制纵坐标刻度数值
             ctx.lineWidth = config.scaleLineWidth;
             ctx.strokeStyle = config.scaleLineColor;
             ctx.beginPath();
@@ -240,6 +252,7 @@ var Chart = function(canvas, context) {
             ctx.textAlign = "right";
             ctx.textBaseline = "middle";
 
+            log("calculatedScale.labels = " + calculatedScale.labels)
             for (var j=0; j<calculatedScale.steps; j++) {
                 ctx.beginPath();
                 ctx.moveTo(yAxisPosX-3,xAxisPosY - ((j+1) * scaleHop));
@@ -252,14 +265,19 @@ var Chart = function(canvas, context) {
                 }
                 ctx.stroke();
                 if (config.scaleShowLabels) {
-                    ctx.fillText(calculatedScale.labels[j],yAxisPosX-8,xAxisPosY - ((j+1) * scaleHop));
+                    log(j)
+                    ctx.fillText(calculatedScale.labels[j],yAxisPosX-8,xAxisPosY - ((j+0) * scaleHop));
                 }
+            }
+            if (config.scaleShowLabels) { // 绘制纵坐标最上面一个刻度数值
+                ctx.moveTo(yAxisPosX-3, xAxisPosY - ((calculatedScale.steps) * scaleHop));
+                ctx.fillText(calculatedScale.labels[calculatedScale.steps], yAxisPosX-8, xAxisPosY - ((calculatedScale.steps) * scaleHop));
             }
         }
 
         function calculateXAxisSize() {
 
-            var longestText = 1;
+            var longestText = 1;    // 纵坐标最长的刻度数值的右边缘离整个绘图框左边的像素长度
 
             if (config.scaleShowLabels) {
                 ctx.font = config.scaleFontStyle + " " + config.scaleFontSize+"px " + config.scaleFontFamily;
@@ -269,55 +287,71 @@ var Chart = function(canvas, context) {
                 }
                 longestText +=10;
             }
+            log("longestText = " + longestText)
 
             xAxisLength = width - longestText - widestXLabel;
-            valueHop = Math.floor(xAxisLength/(data.labels.length-1));
+//            valueHop = Math.floor(xAxisLength/(data.labels.length-1));
+            valueHop = xAxisLength/(data.labels.length-1);
+            log("xAxisLength = " + xAxisLength + ", valueHop = " + valueHop)
 
             yAxisPosX = width-widestXLabel/2-xAxisLength;
             xAxisPosY = scaleHeight + config.scaleFontSize/2;
+            log("yAxisPosX = " + yAxisPosX + ", xAxisPosY = " + xAxisPosY)
         }
 
-        function calculateDrawingSizes() {
+        function calculateDrawingSizes() { // 计算纵坐标可用的高度
+
+            log("height = " + height + ", width = " + width)
 
             maxSize = height;
 
             ctx.font = config.scaleFontStyle + " " + config.scaleFontSize+"px " + config.scaleFontFamily;
 
             widestXLabel = 1;
+            log("ctx.font = " + ctx.font)
+            if (config.scaleXShowLabels){
+                for (var i=0; i<data.labels.length; i++) {
 
-            for (var i=0; i<data.labels.length; i++) {
-
-                var textLength = ctx.measureText(data.labels[i]).width;
-                widestXLabel = (textLength > widestXLabel)? textLength : widestXLabel;
-            }
-
-            if (width/data.labels.length < widestXLabel) {
-
-                rotateLabels = 45;
-
-                if (width/data.labels.length < Math.cos(rotateLabels) * widestXLabel) {
-                    rotateLabels = 90;
-                    maxSize -= widestXLabel;
-                } else{
-                    maxSize -= Math.sin(rotateLabels) * widestXLabel;
+                    var textLength = ctx.measureText(data.labels[i]).width;
+                    widestXLabel = (textLength > widestXLabel)? textLength : widestXLabel;
+    //                log("data.labels[" + i + "].width = " + textLength)
                 }
-            } else{
-                maxSize -= config.scaleFontSize;
+                log("widestXLabel = " + widestXLabel)
+
+                if (width/data.labels.length < widestXLabel) {
+                    log("less")
+
+                    rotateLabels = 45;
+
+                    if (width/data.labels.length < Math.cos(rotateLabels) * widestXLabel) {
+                        rotateLabels = 90;
+                        maxSize -= widestXLabel;
+                    } else{
+                        maxSize -= Math.sin(rotateLabels) * widestXLabel;
+                    }
+                } else{
+                    maxSize -= config.scaleFontSize;
+                }
             }
+
+            log("maxSize = " + maxSize)
 
             maxSize -= 5;
 
             labelHeight = config.scaleFontSize;
-
             maxSize -= labelHeight;
 
             scaleHeight = maxSize;
+
+            log("maxSize = " + maxSize)
         }
 
-        function getValueBounds() {
+        function getValueBounds() { // 获取 data.datasets 最大最小值，即纵坐标的范围
 
             var upperValue = Number.MIN_VALUE;
             var lowerValue = Number.MAX_VALUE;
+
+            log("upperValue = " + upperValue + ", lowerValue = " + lowerValue)
 
             for (var i=0; i<data.datasets.length; i++) {
                 for (var j=0; j<data.datasets[i].data.length; j++) {
@@ -326,8 +360,12 @@ var Chart = function(canvas, context) {
                 }
             };
 
+            log("upperValue = " + upperValue + ", lowerValue = " + lowerValue)
+
             var maxSteps = Math.floor((scaleHeight / (labelHeight*0.66)));
             var minSteps = Math.floor((scaleHeight / labelHeight*0.5));
+
+            log("maxSteps = " + maxSteps + ", minSteps = " + minSteps)
 
             return {
                 maxValue: upperValue,
@@ -356,17 +394,24 @@ var Chart = function(canvas, context) {
         return (scaleHop*calculatedScale.steps) * scalingFactor;
     }
 
+    /* 计算纵坐标的刻度值 */
     function calculateScale(drawingHeight,maxSteps,minSteps,maxValue,minValue,labelTemplateString) {
 
         var graphMin,graphMax,graphRange,stepValue,numberOfSteps,valueRange,rangeOrderOfMagnitude,decimalNum;
 
         valueRange = maxValue - minValue;
         rangeOrderOfMagnitude = calculateOrderOfMagnitude(valueRange);
+        log("rangeOrderOfMagnitude = " + rangeOrderOfMagnitude)
         graphMin = Math.floor(minValue / (1 * Math.pow(10, rangeOrderOfMagnitude))) * Math.pow(10, rangeOrderOfMagnitude);
         graphMax = Math.ceil(maxValue / (1 * Math.pow(10, rangeOrderOfMagnitude))) * Math.pow(10, rangeOrderOfMagnitude);
+
+        log("graphMax = " + graphMax + ", graphMin = " + graphMin)
+
         graphRange = graphMax - graphMin;
         stepValue = Math.pow(10, rangeOrderOfMagnitude);
         numberOfSteps = Math.round(graphRange / stepValue);
+
+        log("stepValue = " + stepValue + ", numberOfSteps = " + numberOfSteps)
 
         while(numberOfSteps < minSteps || numberOfSteps > maxSteps) {
             if (numberOfSteps < minSteps) {
@@ -381,12 +426,13 @@ var Chart = function(canvas, context) {
         var labels = [];
 
         populateLabels(labelTemplateString, labels, numberOfSteps, graphMin, stepValue);
+        log("labels = " + labels)
 
         return {
-            steps: numberOfSteps,
-            stepValue: stepValue,
-            graphMin: graphMin,
-            labels: labels
+            steps: numberOfSteps,   // 步数
+            stepValue: stepValue,   // 步长
+            graphMin: graphMin,     // 最小刻度值
+            labels: labels          // 每步刻度值，从小到大
         }
 
         function calculateOrderOfMagnitude(val) {
@@ -396,7 +442,7 @@ var Chart = function(canvas, context) {
 
     function populateLabels(labelTemplateString, labels, numberOfSteps, graphMin, stepValue) {
         if (labelTemplateString) {
-            for (var i = 1; i < numberOfSteps + 1; i++) {
+            for (var i = 0; i < numberOfSteps + 1; i++) {
                 labels.push(tmpl(labelTemplateString, {value: (graphMin + (stepValue * i)).toFixed(getDecimalPlaces(stepValue))}));
             }
         }

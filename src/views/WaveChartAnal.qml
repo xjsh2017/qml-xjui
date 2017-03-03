@@ -131,7 +131,7 @@ Item {
                         name: "Chart : Inflate"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(-1);
+                                flickable_wave.arrayChart[i].stepLegend(-50);
                             }
                         }
                     }
@@ -145,7 +145,7 @@ Item {
                         name: "Chart : Deflate"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(1);
+                                flickable_wave.arrayChart[i].stepLegend(50);
                             }
                         }
                     }
@@ -159,7 +159,7 @@ Item {
                         name: "Chart : Move Left"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepChart(-1);
+                                flickable_wave.arrayChart[i].stepChart(-2);
                             }
                         }
                     }
@@ -173,7 +173,7 @@ Item {
                         name: "Chart : Move Right"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepChart(1);
+                                flickable_wave.arrayChart[i].stepChart(2);
                             }
                         }
                     }
@@ -190,8 +190,7 @@ Item {
                     Layout.alignment: Qt.AlignVCenter
 
                     onClicked: {
-                        actionSheet.visible = !actionSheet.visible
-                        //                        actionSheet.open()
+//                        actionSheet.visible = !actionSheet.visible
                     }
                 }
 
@@ -298,7 +297,6 @@ Item {
                         property bool lockValueChange: false
 
                         onValueChanged: {
-//                            var newX = gr.width * value / gr.maximumValue
                             var newX = value - valueChangedDelta
 //                            log(newX)
 
@@ -325,9 +323,9 @@ Item {
                                 if (flickable_wave.arrayChart[i].startChartDataIndex < 0)
                                     flickable_wave.arrayChart[i].startChartDataIndex = 0;
                                 else if (flickable_wave.arrayChart[i].startChartDataIndex
-                                         > waveModel.cols() - flickable_wave.arrayChart[i].displayChartDataCount)
+                                         > waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount)
                                     flickable_wave.arrayChart[i].startChartDataIndex
-                                         = waveModel.cols() - flickable_wave.arrayChart[i].displayChartDataCount;
+                                         = waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount;
                                 break;
                             }
                         }
@@ -443,8 +441,13 @@ Item {
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
                                     chart_index: index
-                                    displayChartDataCount: (gr.maximumValue - gr.minimumValue) / 10
+                                    chartDisplayPointCount: gr.maximumValue - gr.minimumValue
                                     grovelineColor: gr.color
+
+                                    onChartDisplayPointCountChanged: {
+                                        btnMouse.text = "Mouse: X: " + 0 + ", Y: " + 0 + ", Count: "
+                                                + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
+                                    }
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -554,7 +557,7 @@ Item {
 
             CheckBox {
                 checked: flickable_wave.arrayChart.length > 0 ? flickable_wave.arrayChart[0].chartOptions.pointDot : false
-                text: "Show Points"
+                text: "Show Points" + flickable_wave.arrayChart.length
                 darkBackground: false
 
                 onCheckedChanged: {

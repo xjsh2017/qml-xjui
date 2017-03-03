@@ -38,7 +38,7 @@ Canvas {
     property   int startChartDataIndex: 0;
     property   int reachedChartDataIndex: 0;
     /* 需显示的数据点个数 */
-    property   int displayChartDataCount: 20;
+    property   int chartDisplayPointCount: 20;
 
     property  real lastGroverlineX: 0;
 
@@ -52,9 +52,8 @@ Canvas {
     // ///////////////////////////////////////////////////////////////
 
     signal mousePositionChanged(var x, var y)
-    signal groverlineReachedPointChanged(var reachedPointIndex, var groverlineX)
     signal sigChartInfoChanged(var reachedChartDataIndex, var groverlineX
-                               , var startChartDataIndex, var displayChartDataCount)
+                               , var startChartDataIndex, var chartDisplayPointCount)
 
 
     // ///////////////////////////////////////////////////////////////
@@ -78,16 +77,18 @@ Canvas {
             tmp[i - idx_start] = arrData[i];
         }
 
-//        console.log("start idx = " + idx_start + ", chop count = " + realCount)
-
         return tmp;
     }
 
     function updateChartData() {
+        if (!chartData){
+            fnInit();
+        }
+
         chartData.labels = fetchData(waveModel.x_data(chart_index)
-                                     , startChartDataIndex, displayChartDataCount)
+                                     , startChartDataIndex, chartDisplayPointCount)
         chartData.datasets[0].data = fetchData(waveModel.y_data(chart_index)
-                                               , startChartDataIndex, displayChartDataCount)
+                                               , startChartDataIndex, chartDisplayPointCount)
 
     }
 
@@ -101,9 +102,9 @@ Canvas {
         }
 
         var len = waveModel.x_data(chart_index).length;
-        if (tmp + displayChartDataCount > len - 1)
+        if (tmp + chartDisplayPointCount > len - 1)
         {
-            var tmp2 = len - displayChartDataCount;
+            var tmp2 = len - chartDisplayPointCount;
             if (tmp2 < 0)
                 startChartDataIndex = 0;
             else
@@ -114,23 +115,39 @@ Canvas {
 
     /* 放大缩小波形 */
     function stepLegend(steps) {
-        var tmp = displayChartDataCount + steps;
+        var tmp = chartDisplayPointCount + steps;
 
         if (tmp < 2){
-            displayChartDataCount = 2;
+            chartDisplayPointCount = 2;
             return;
         }
 
-        displayChartDataCount = tmp;
+        chartDisplayPointCount = tmp;
     }
 
     /* */
     function fnCalcGroverNearPoint(mouseX) {
         var delta = dp(47);
-        var tmp = (mouseX - delta) / (canvas.width - delta) * (displayChartDataCount - 1);
+        var tmp = (mouseX - delta) / (canvas.width - delta) * (chartDisplayPointCount - 1);
         tmp = Math.round(tmp)
 
         return tmp;
+    }
+
+    function fnInit() {
+        chartData = {
+            "labels": [],
+            "datasets": [{
+                             "fillColor": chartDatasetOptions.fillColor,
+                             "strokeColor": chartDatasetOptions.strokeColor,
+                             "pointColor": chartDatasetOptions.pointColor,
+                             "pointStrokeColor": chartDatasetOptions.pointStrokeColor,
+                             "data": []
+                         }
+            ]
+        }
+
+        preWidth = width;
     }
 
     // /////////////////////////////////////////////////////////////////
@@ -200,17 +217,17 @@ Canvas {
 
         var tmp = fnCalcGroverNearPoint(lastGroverlineX);
         reachedChartDataIndex = tmp;
-        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, displayChartDataCount)
+        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, chartDisplayPointCount)
 
 //        log("fnCalcGroverNearPoint： " + tmp)
     }
 
-    onDisplayChartDataCountChanged: {
-//        log("displayChartDataCount = " + displayChartDataCount)
+    onChartDisplayPointCountChanged: {
+//        log("chartDisplayPointCount = " + chartDisplayPointCount)
 
         var tmp = fnCalcGroverNearPoint(lastGroverlineX);
         reachedChartDataIndex = tmp;
-        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, displayChartDataCount)
+        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, chartDisplayPointCount)
 
         requestPaint();
     }
@@ -234,7 +251,7 @@ Canvas {
 //        log("tmp * lastGroverlineX = " + (tmp * lastGroverlineX));
         lastGroverlineX = tmp * lastGroverlineX
 
-        log("displayChartDataCount = " + displayChartDataCount);
+        log("chartDisplayPointCount = " + chartDisplayPointCount);
     }
 
     onChartAnimationProgressChanged: {
@@ -242,7 +259,7 @@ Canvas {
     }
 
     onStartChartDataIndexChanged: {
-        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, displayChartDataCount)
+        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, chartDisplayPointCount)
 
         requestPaint();
     }
@@ -272,7 +289,8 @@ Canvas {
 //                stepLegend(-1);
 //            }
 
-            log("displayChartDataCount = " + canvas.displayChartDataCount);
+            log("chartDisplayPointCount = " + canvas.chartDisplayPointCount);
+            log("canvas.with = " + canvas.width)
         }
 
         onPositionChanged: {
@@ -341,18 +359,6 @@ Canvas {
     }
 
     Component.onCompleted: {
-        chartData = {
-            "labels": [],
-            "datasets": [{
-                             "fillColor": chartDatasetOptions.fillColor,
-                             "strokeColor": chartDatasetOptions.strokeColor,
-                             "pointColor": chartDatasetOptions.pointColor,
-                             "pointStrokeColor": chartDatasetOptions.pointStrokeColor,
-                             "data": []
-                         }
-            ]
-        }
-
-        preWidth = width;
+        fnInit();
     }
 }
