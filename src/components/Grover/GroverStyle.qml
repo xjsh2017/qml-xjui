@@ -195,20 +195,13 @@ SliderStyle {
             color: style.darkBackground ? "#FFFFFF" : "#000000"
             width: Math.round(1 * Units.dp); height: {
                 if (index % 10 == 0)
-                    return grooveBasiceHeight  *  10;
+                    return grooveBasiceHeight  *  8;
                 else if (index % 5 == 0)
-                    return grooveBasiceHeight  * 5;
+                    return grooveBasiceHeight  * 3;
                 else
                     return grooveBasiceHeight * 1;
             }
-            y: {
-                if (index % 10 == 0)
-                    return grooveBasiceHeight  *  0;
-                else if (index % 5 == 0)
-                    return grooveBasiceHeight  * 5;
-                else
-                    return grooveBasiceHeight * 9;
-            }
+            y: -height
 
             x: styleData.handleWidth / 2 + index * ((repeater.width - styleData.handleWidth) / (repeater.count-1))
 
@@ -263,13 +256,14 @@ SliderStyle {
                 sourceComponent: groove
                 width: (horizontal ? parent.width : parent.height) - padding.left - padding.right - (control.__panel.handleWidth)
                 y:  Math.round(padding.top + (Math.round(horizontal ? parent.height : parent.width - padding.top - padding.bottom) - grooveLoader.item.height - control.__panel.handleHeight) / (style.numericValueLabel ? 1 : 2))
+                        - dp (10)
             }
 
             Loader {
                 id: tickMarkLoader
                 x: padding.left
                 width: (horizontal ? parent.width : parent.height) - padding.left - padding.right
-                y:  grooveLoader.y - 10 * grooveBasiceHeight * tickmarksUp
+                y:  grooveLoader.y //- 10 * grooveBasiceHeight * tickmarksUp
                 sourceComponent: control.tickmarksEnabled ? tickmarks : null
                 property QtObject styleData: QtObject { readonly property int handleWidth: control.__panel.handleWidth }
             }

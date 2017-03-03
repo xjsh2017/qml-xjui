@@ -290,6 +290,24 @@ Item {
                             lockValueChange = false;
                         }
                     }
+
+                    Connections {
+                        target: gr
+
+                        onScrollbarPosChanged : {
+                            log(pos)
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].startChartDataIndex += (pos ? 1 : -1);
+                                if (flickable_wave.arrayChart[i].startChartDataIndex < 0)
+                                    flickable_wave.arrayChart[i].startChartDataIndex = 0;
+                                else if (flickable_wave.arrayChart[i].startChartDataIndex
+                                         > waveModel.cols() - flickable_wave.arrayChart[i].displayChartDataCount)
+                                    flickable_wave.arrayChart[i].startChartDataIndex
+                                         = waveModel.cols() - flickable_wave.arrayChart[i].displayChartDataCount;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }

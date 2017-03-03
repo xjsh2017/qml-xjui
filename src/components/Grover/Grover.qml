@@ -61,5 +61,66 @@ Controls.Slider {
     implicitHeight: numericValueLabel ? 54 * Units.dp : 32 * Units.dp
     implicitWidth: 200 * Units.dp
 
+    // /////////////////////////////////////////////////////////////////
+
+    function log(says) {
+        console.log("## Grover.qml ##: " + says);
+    }
+
+    // /////////////////////////////////////////////////////////////////
+
+    signal scrollbarPosChanged(var pos)
+
+    Rectangle {
+//        z: -1
+        width: parent.width
+        height: 10 * Units.dp
+
+        radius: height / 2
+
+        anchors.bottom: parent.bottom
+
+        color: "transparent"
+
+        border.color: "lightgrey"
+
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            height: parent.height - dp(2)
+
+            radius: height / 2
+            width: dp(52)
+
+            color: Theme.accentColor
+            border.color: Qt.lighter(color)
+
+            property real lastX: 0
+
+            Rectangle {
+                width: parent.height * 2 / 4
+                height: width
+                radius: height / 2
+
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                drag.target: parent
+            }
+
+            onXChanged: {
+                if (x <  dp(1))
+                    x =  dp(1);
+                if (x > parent.width - width - dp(1))
+                    x = parent.width - width - dp(1)
+
+//                log("X = " + x)
+                scrollbarPosChanged(x - lastX)
+                lastX  = x;
+            }
+        }
+    }
+
     style: GroverStyle {}
 }
