@@ -43,6 +43,7 @@ SliderStyle {
             ? control.tickmarksUp : true
 
     property Component knob : Item {
+        visible: control.value > 0
         implicitHeight: control.pressed || control.focus || control.alwaysShowValueLabel
                 ? knobHeight : 0
         implicitWidth: control.pressed || control.focus || control.alwaysShowValueLabel

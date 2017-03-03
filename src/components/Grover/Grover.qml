@@ -41,7 +41,7 @@ Controls.Slider {
     /*!
        The label to display within the value label knob, by default the sliders current value
      */
-    property string knobLabel: slider.value.toFixed(0) + "/" + slider.value.toFixed(0) * 2
+    property string knobLabel: slider.value.toFixed(0)
 
     /*!
        The width of the value label knob

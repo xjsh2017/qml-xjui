@@ -84,8 +84,10 @@ Canvas {
     }
 
     function updateChartData() {
-        chartData.labels = fetchData(waveModel.x_data(chart_index), startChartDataIndex, displayChartDataCount)
-        chartData.datasets[0].data = fetchData(waveModel.y_data(chart_index), startChartDataIndex, displayChartDataCount)
+        chartData.labels = fetchData(waveModel.x_data(chart_index)
+                                     , startChartDataIndex, displayChartDataCount)
+        chartData.datasets[0].data = fetchData(waveModel.y_data(chart_index)
+                                               , startChartDataIndex, displayChartDataCount)
 
     }
 
@@ -227,6 +229,9 @@ Canvas {
             return;
         var tmp = canvas.width / preWidth;
         preWidth = canvas.width
+//        log("lastGroverlineX = " + lastGroverlineX);
+//        log("tmp = " + tmp);
+//        log("tmp * lastGroverlineX = " + (tmp * lastGroverlineX));
         lastGroverlineX = tmp * lastGroverlineX
     }
 
@@ -332,7 +337,6 @@ Canvas {
     }
 
     Component.onCompleted: {
-        if (chartData == undefined)
         chartData = {
             "labels": [],
             "datasets": [{

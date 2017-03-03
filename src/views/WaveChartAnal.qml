@@ -32,6 +32,15 @@ Item {
         console.log("## WaveAnalDemo.qml ##: " + says);
     }
 
+    function random_colos(clrCount) {
+        var arrClr = new Array;
+        for (var i = 0; i < clrCount; i++)
+            arrClr.push(random_color());
+
+        log(arrClr);
+
+        return arrClr;
+    }
 
     // ///////////////////////////////////////////////////////////////
 
@@ -84,7 +93,7 @@ Item {
                         iconName: "action/search"
                         name: "Chart : searching"
                         onTriggered: {
-
+                            flickable_wave.arrayColor = random_colos(waveModel.chn_count())
                         }
                     }
                 }
@@ -244,8 +253,16 @@ Item {
                     Layout.minimumWidth: dp(80)
                     Layout.maximumWidth: dp(160)
 
+                    Rectangle {
+                        height: labelDesc.height
+                        width: dp(5)
+                        color: Theme.accentColor
+
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
 
                     Label {
+                        id: labelDesc
                         text: "时间 （ 毫秒 ） / 帧"
                         color: Theme.light.textColor
 
@@ -334,6 +351,7 @@ Item {
 
                 property variant arrayChart: []
                 property variant arrayChartInfo: []
+                property variant arrayColor: []
 
                 Column {
                     id: content
@@ -428,8 +446,8 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : true,
-                                        "scaleXShowLabels" : true
+                                        "pointDot" : false,
+                                        "scaleXShowLabels" : false
                                     }
 
                                     chartType: Charts.ChartType.LINE;
@@ -629,5 +647,5 @@ Item {
 
     Component.onCompleted: {
         log("gr.lockValueChange = " + gr.lockValueChange)
-    }
+    }    
 }
