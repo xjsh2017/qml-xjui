@@ -41,7 +41,7 @@ Controls.Slider {
     /*!
        The label to display within the value label knob, by default the sliders current value
      */
-    property string knobLabel: slider.value.toFixed(0)
+    property string knobLabel: slider.value.toFixed(0) / 4 + "/" + slider.value.toFixed(0)
 
     /*!
        The width of the value label knob
@@ -69,7 +69,7 @@ Controls.Slider {
 
     // /////////////////////////////////////////////////////////////////
 
-    signal scrollbarPosChanged(var pos)
+    signal scrollbarPosChanged(var delta, var pos)
 
     Rectangle {
 //        z: -1
@@ -111,12 +111,12 @@ Controls.Slider {
 
             onXChanged: {
                 if (x <  dp(1))
-                    x =  dp(1);
+                    x =  0;
                 if (x > parent.width - width - dp(1))
                     x = parent.width - width - dp(1)
 
 //                log("X = " + x)
-                scrollbarPosChanged(x - lastX)
+                scrollbarPosChanged(x - lastX, x)
                 lastX  = x;
             }
         }

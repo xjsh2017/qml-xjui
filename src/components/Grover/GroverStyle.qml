@@ -39,9 +39,6 @@ SliderStyle {
     property int grooveBasiceHeight: control.hasOwnProperty("grooveBasiceHeight")
                             ? control.grooveBasiceHeight : 5 * Units.dp
 
-    property bool tickmarksUp: control.hasOwnProperty("tickmarksUp")
-            ? control.tickmarksUp : true
-
     property Component knob : Item {
         visible: control.value > 0
         implicitHeight: control.pressed || control.focus || control.alwaysShowValueLabel
@@ -190,11 +187,12 @@ SliderStyle {
 
     tickmarks: Repeater {
         id: repeater
-        model: control.stepSize > 0 ? 1 + (control.maximumValue - control.minimumValue) / control.stepSize : 0
+        model: control.stepSize > 0 ? 1 + (control.maximumValue/* -  control.minimumValue*/) / control.stepSize : 0
 
         Rectangle {
             color: style.darkBackground ? "#FFFFFF" : "#000000"
-            width: Math.round(1 * Units.dp); height: {
+            width: Math.round(1 * Units.dp);
+            height: {
                 if (index % 10 == 0)
                     return grooveBasiceHeight  *  8;
                 else if (index % 5 == 0)
@@ -207,13 +205,36 @@ SliderStyle {
             x: styleData.handleWidth / 2 + index * ((repeater.width - styleData.handleWidth) / (repeater.count-1))
 
             Text {
-                text: index * stepSize
+                text: index * stepSize / 4
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.horizontalCenterOffset: {
                                                     if (index  == 0)
                                                         return dp(10);
                                                     else
                                                         return -dp(10);
+                                                }
+
+                anchors.top: parent.top
+                rotation: {
+                    if (index  == 0)
+                        return 0;
+                    else
+                        return -90;
+                }
+
+                visible: !(index % 10)
+            }
+
+            Text {
+
+                color: Theme.accentColor
+                text: index * stepSize / 1
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: {
+                                                    if (index  == 0)
+                                                        return dp(10);
+                                                    else
+                                                        return dp(10);
                                                 }
 
                 anchors.top: parent.top
@@ -247,6 +268,7 @@ SliderStyle {
 
         Item {
             anchors.fill: parent
+            clip: true
 
             Loader {
                 id: grooveLoader
@@ -262,9 +284,9 @@ SliderStyle {
 
             Loader {
                 id: tickMarkLoader
-                x: padding.left
-                width: (horizontal ? parent.width : parent.height) - padding.left - padding.right
-                y:  grooveLoader.y //- 10 * grooveBasiceHeight * tickmarksUp
+                x: padding.left - control.minimumValue
+                width: (horizontal ? parent.width : parent.height) - padding.left - padding.right + control.minimumValue
+                y:  grooveLoader.y
                 sourceComponent: control.tickmarksEnabled ? tickmarks : null
                 property QtObject styleData: QtObject { readonly property int handleWidth: control.__panel.handleWidth }
             }

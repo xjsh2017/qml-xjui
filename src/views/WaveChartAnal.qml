@@ -250,8 +250,8 @@ Item {
                     border.color: Theme.light.textColor
 
                     Layout.fillWidth: true
-                    Layout.minimumWidth: dp(80)
-                    Layout.maximumWidth: dp(160)
+                    Layout.minimumWidth: dp(80) + dp(47)
+                    Layout.maximumWidth: dp(160) + dp(47)
 
                     Rectangle {
                         height: labelDesc.height
@@ -287,21 +287,24 @@ Item {
                         focus: true
                         tickmarksEnabled: true
                         numericValueLabel: true
-                        stepSize: 10
+                        stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
                         minimumValue: 0
-                        maximumValue: 1000
+                        maximumValue: parent.width + minimumValue  // 刻度尺的长度
                         activeFocusOnPress: true
                         darkBackground: false//index == 1
+
+                        property real valueChangedDelta: 0
 
                         property bool lockValueChange: false
 
                         onValueChanged: {
-                            var newX = gr.width * value / gr.maximumValue
+//                            var newX = gr.width * value / gr.maximumValue
+                            var newX = value - valueChangedDelta
 //                            log(newX)
 
                             lockValueChange = true;
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].lastGroverlineX = Math.round(newX);
+                                flickable_wave.arrayChart[i].lastGroverlineX = newX + dp(47);
                                 break;
                             }
                             lockValueChange = false;
@@ -312,9 +315,13 @@ Item {
                         target: gr
 
                         onScrollbarPosChanged : {
-                            log(pos)
+                            log("scrollbar status: " + delta + ", " + pos)
+                            gr.minimumValue = pos
+                            gr.valueChangedDelta = delta
+//                            gr.value += delta
+                            log("gr.maximumValue = " + gr.maximumValue)
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].startChartDataIndex += (pos ? 1 : -1);
+                                flickable_wave.arrayChart[i].startChartDataIndex += (delta ? 1 : -1);
                                 if (flickable_wave.arrayChart[i].startChartDataIndex < 0)
                                     flickable_wave.arrayChart[i].startChartDataIndex = 0;
                                 else if (flickable_wave.arrayChart[i].startChartDataIndex
@@ -436,6 +443,7 @@ Item {
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
                                     chart_index: index
+                                    displayChartDataCount: (gr.maximumValue - gr.minimumValue) / 10
                                     grovelineColor: gr.color
 
                                     chartDatasetOptions: {
@@ -481,7 +489,8 @@ Item {
                                     }
 
                                     if (!gr.lockValueChange)
-                                        gr.value = groverlineX / chart_curve.width * gr.maximumValue
+//                                        gr.value = groverlineX / chart_curve.width * gr.maximumValue
+                                        gr.value = groverlineX - dp(47)
                                 }
                             }
                         }
@@ -559,9 +568,15 @@ Item {
             Item { width: 1; height: 1 }
 
             CheckBox {
-                checked: true
+                checked: flickable_wave.arrayChart.length > 0 ? flickable_wave.arrayChart[0].chartOptions.scaleXShowLabels : false
                 text: "Show X Labels"
                 darkBackground: false
+                onCheckedChanged: {
+                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                        flickable_wave.arrayChart[i].chartOptions.scaleXShowLabels = checked;
+                        flickable_wave.arrayChart[i].requestPaint();
+                    }
+                }
             }
 
             CheckBox {

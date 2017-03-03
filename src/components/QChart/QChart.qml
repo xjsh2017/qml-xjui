@@ -126,7 +126,7 @@ Canvas {
 
     /* */
     function fnCalcGroverNearPoint(mouseX) {
-        var delta = 47;
+        var delta = dp(47);
         var tmp = (mouseX - delta) / (canvas.width - delta) * (displayChartDataCount - 1);
         tmp = Math.round(tmp)
 
@@ -233,6 +233,8 @@ Canvas {
 //        log("tmp = " + tmp);
 //        log("tmp * lastGroverlineX = " + (tmp * lastGroverlineX));
         lastGroverlineX = tmp * lastGroverlineX
+
+        log("displayChartDataCount = " + displayChartDataCount);
     }
 
     onChartAnimationProgressChanged: {
@@ -269,6 +271,8 @@ Canvas {
 ////                stepChart(-1);
 //                stepLegend(-1);
 //            }
+
+            log("displayChartDataCount = " + canvas.displayChartDataCount);
         }
 
         onPositionChanged: {
