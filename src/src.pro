@@ -19,22 +19,8 @@ HEADERS += \
 
 target.path = $$[QT_INSTALL_QML]/$$uri
 
-#message($$target.path)
-
-searchlist += \
-    *.qml \
-    *.js \
-    *.png \
-    *.jpg \
-    *.gif \
-    *.svg \
-    *qmldir
-
-for (searchvar, searchlist) {
-    qrclist += $$files($$searchvar, true)
-}
-
-OTHER_FILES += $$qrclist
+#----------------------------------------------------------------
+# INSTALLS
 
 views.files += views/*
 views.path = $$[QT_INSTALL_QML]/$$uri/views
@@ -51,6 +37,43 @@ qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
-INSTALLS += target views components qmldir# icons
+INSTALLS += target qmldir views components# icons
 
-OTHER_FILES += $$qmlui.files
+#---------------------------INSTALLS FILES end -------------------------------------
+# generate QML folder
+
+searchlist += \
+    *.qml \
+    *.js \
+    *qmldir \
+
+for (searchvar, searchlist) {
+    qrclist += $$files($$searchvar, true)
+}
+
+OTHER_FILES += $$qrclist # QML folder
+
+#---------------------generate QML folder end-------------------------------------------
+# generate qml.qrc
+
+RESOURCE_CONTENT = \
+    "<RCC>" \
+    "    <qresource prefix=\"/\"> "
+for (qrcvar, qrclist) {
+        resourcefileabsolutepath = $$absolute_path($$qrcvar)
+        relativepath_in = $$relative_path($$resourcefileabsolutepath, $$PWD)
+#        relativepath_out = $$relative_path($$resourcefileabsolutepath, $$OUT_PWD)
+        RESOURCE_CONTENT += "<file alias=\"$$relativepath_in\">$$relativepath_in</file>"
+}
+RESOURCE_CONTENT += \
+    '    </qresource>' \
+    </RCC>
+GENERATED_RESOURCE_FILE = $$PWD/qml.qrc
+#write_file($$GENERATED_RESOURCE_FILE, RESOURCE_CONTENT)
+#RESOURCES += $$GENERATED_RESOURCE_FILE
+#QMAKE_PRE_LINK += $(DEL_FILE) $$GENERATED_RESOURCE_FILE
+QMAKE_CLEAN += $$GENERATED_RESOURCE_FILE
+
+
+CONFIG += qtquickcompiler
+#--------------------generate qml.qrc end--------------------------------------------

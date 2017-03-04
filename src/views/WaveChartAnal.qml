@@ -86,12 +86,12 @@ Item {
                 spacing: dp(12)
 
                 IconButton {
-                    id: action_search
+                    id: action_color
                     Layout.leftMargin: dp(8)
 
                     action: Action {
-                        iconName: "action/search"
-                        name: "Chart : searching"
+                        iconName: "image/color_lens"
+                        name: "Chart : colors"
                         onTriggered: {
                             flickable_wave.arrayColor = random_colos(waveModel.chn_count())
                         }
@@ -131,7 +131,7 @@ Item {
                         name: "Chart : Inflate"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(-50);
+                                flickable_wave.arrayChart[i].stepLegend(-2);
                             }
                         }
                     }
@@ -145,7 +145,7 @@ Item {
                         name: "Chart : Deflate"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(50);
+                                flickable_wave.arrayChart[i].stepLegend(2);
                             }
                         }
                     }
@@ -248,9 +248,7 @@ Item {
 
                     border.color: Theme.light.textColor
 
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: dp(80) + dp(47)
-                    Layout.maximumWidth: dp(160) + dp(47)
+                    width: dp(160)
 
                     Rectangle {
                         height: labelDesc.height
@@ -275,12 +273,16 @@ Item {
 
                     color: "transparent"
 
+                    property real leftMargin: 0
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.leftMargin: leftMargin
 
                     Grover {
                         id: gr
                         anchors.fill: parent
+                        anchors.leftMargin: 0
 
                         value: maximumValue * 0
                         focus: true
@@ -297,15 +299,15 @@ Item {
                         property bool lockValueChange: false
 
                         onValueChanged: {
-                            var newX = value - valueChangedDelta
-//                            log(newX)
+//                            var newX = value - valueChangedDelta
+////                            log(newX)
 
-                            lockValueChange = true;
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].lastGroverlineX = newX + dp(47);
-                                break;
-                            }
-                            lockValueChange = false;
+//                            lockValueChange = true;
+//                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+//                                flickable_wave.arrayChart[i].chartGroovePosX = newX + dp(47);
+//                                break;
+//                            }
+//                            lockValueChange = false;
                         }
                     }
 
@@ -319,12 +321,12 @@ Item {
 //                            gr.value += delta
                             log("gr.maximumValue = " + gr.maximumValue)
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].startChartDataIndex += (delta ? 1 : -1);
-                                if (flickable_wave.arrayChart[i].startChartDataIndex < 0)
-                                    flickable_wave.arrayChart[i].startChartDataIndex = 0;
-                                else if (flickable_wave.arrayChart[i].startChartDataIndex
+                                flickable_wave.arrayChart[i].chartStartDataIndex += (delta ? 1 : -1);
+                                if (flickable_wave.arrayChart[i].chartStartDataIndex < 0)
+                                    flickable_wave.arrayChart[i].chartStartDataIndex = 0;
+                                else if (flickable_wave.arrayChart[i].chartStartDataIndex
                                          > waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount)
-                                    flickable_wave.arrayChart[i].startChartDataIndex
+                                    flickable_wave.arrayChart[i].chartStartDataIndex
                                          = waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount;
                                 break;
                             }
@@ -374,7 +376,7 @@ Item {
                                 id: wave_info
 
                                 width: dp(160)
-                                height: dp(100)
+                                height: dp(300)
 
                                 property   int selDataPointIndex: 0
 
@@ -441,8 +443,8 @@ Item {
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
                                     chart_index: index
-                                    chartDisplayPointCount: gr.maximumValue - gr.minimumValue
-                                    grovelineColor: gr.color
+                                    chartDisplayPointCount: 10//gr.maximumValue - gr.minimumValue
+                                    chartGrooveColor: gr.color
 
                                     onChartDisplayPointCountChanged: {
                                         btnMouse.text = "Mouse: X: " + 0 + ", Y: " + 0 + ", Count: "
@@ -457,8 +459,11 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : false,
-                                        "scaleXShowLabels" : false
+                                        "pointDot" : true,
+                                        "scaleShowLabelsX" : false,
+                                        "scaleShowLabelsY" : true,
+                                        "scaleShowGridLines" : false,
+                                        "fixedLenLabelsY": dp(40)
                                     }
 
                                     chartType: Charts.ChartType.LINE;
@@ -483,23 +488,25 @@ Item {
                             Connections {
                                 target: chart_curve
 
+                                onSigDrawingCompleted: {
+                                    gr.anchors.leftMargin = x;
+                                }
+
                                 onSigChartInfoChanged: {
                                     for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
                                         flickable_wave.arrayChartInfo[i].selDataPointIndex =
-                                                reachedChartDataIndex + startChartDataIndex;
-                                        flickable_wave.arrayChart[i].lastGroverlineX = groverlineX;
-                                        flickable_wave.arrayChart[i].startChartDataIndex = startChartDataIndex;
+                                                chartReachedPointIndex + chartStartDataIndex;
+                                        flickable_wave.arrayChart[i].chartGroovePosX = chartGroovePosX;
+                                        flickable_wave.arrayChart[i].chartStartDataIndex = chartStartDataIndex;
                                     }
 
                                     if (!gr.lockValueChange)
-//                                        gr.value = groverlineX / chart_curve.width * gr.maximumValue
-                                        gr.value = groverlineX - dp(47)
+                                        gr.value = chartGroovePosX
                                 }
                             }
                         }
                     }
                 }
-
             }
 
             Scrollbar {

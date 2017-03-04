@@ -32,28 +32,29 @@ Canvas {
     property   int chartAnimationProgress: 0;
     property   int chart_index: -1;
 
-    property   int preWidth: 0;
+    property  point chartScaleLeftTop;
+    property  point chartScaleRightBottom;
 
     /* 图形数据在整个数据中开始的位置 */
-    property   int startChartDataIndex: 0;
-    property   int reachedChartDataIndex: 0;
-    /* 需显示的数据点个数 */
+    property   int chartStartDataIndex: 0;
+    property   int chartReachedPointIndex: 0;
     property   int chartDisplayPointCount: 20;
+    property  real chartGroovePosX: 0;
+    property color chartGrooveColor: "yellow"
 
-    property  real lastGroverlineX: 0;
 
     property  real lastX
     property  real lastY
 
     property   int pressedButton: -1
-    property color grovelineColor: "yellow"
-
+    property   int preWidth: 0;
 
     // ///////////////////////////////////////////////////////////////
 
     signal mousePositionChanged(var x, var y)
-    signal sigChartInfoChanged(var reachedChartDataIndex, var groverlineX
-                               , var startChartDataIndex, var chartDisplayPointCount)
+    signal sigChartInfoChanged(var chartReachedPointIndex, var chartGroovePosX
+                               , var chartStartDataIndex, var chartDisplayPointCount)
+    signal sigDrawingCompleted(var x)
 
 
     // ///////////////////////////////////////////////////////////////
@@ -82,22 +83,22 @@ Canvas {
 
     function updateChartData() {
         if (!chartData){
-            fnInit();
+            init();
         }
 
         chartData.labels = fetchData(waveModel.x_data(chart_index)
-                                     , startChartDataIndex, chartDisplayPointCount)
+                                     , chartStartDataIndex, chartDisplayPointCount)
         chartData.datasets[0].data = fetchData(waveModel.y_data(chart_index)
-                                               , startChartDataIndex, chartDisplayPointCount)
+                                               , chartStartDataIndex, chartDisplayPointCount)
 
     }
 
     /* 左右移动波形 */
     function stepChart(steps) {
-        var tmp = startChartDataIndex + steps;
+        var tmp = chartStartDataIndex + steps;
 
         if (tmp < 0){
-            startChartDataIndex = 0;
+            chartStartDataIndex = 0;
             return;
         }
 
@@ -106,11 +107,11 @@ Canvas {
         {
             var tmp2 = len - chartDisplayPointCount;
             if (tmp2 < 0)
-                startChartDataIndex = 0;
+                chartStartDataIndex = 0;
             else
-                startChartDataIndex = tmp2;
+                chartStartDataIndex = tmp2;
         }else
-            startChartDataIndex = tmp;
+            chartStartDataIndex = tmp;
     }
 
     /* 放大缩小波形 */
@@ -125,16 +126,20 @@ Canvas {
         chartDisplayPointCount = tmp;
     }
 
-    /* */
-    function fnCalcGroverNearPoint(mouseX) {
-        var delta = dp(47);
-        var tmp = (mouseX - delta) / (canvas.width - delta) * (chartDisplayPointCount - 1);
+    /* 找到离游标刻度线最近的点 */
+    function findGrooveNearPoint(scalePosX, leftTop, rightBottom) {
+        log("find start pos x = " + scalePosX)
+
+        var scalewidth = rightBottom.x - leftTop.x
+        var tmp = scalePosX * (chartDisplayPointCount - 1) / scalewidth;
         tmp = Math.round(tmp)
+
+        log("found point idx = " + tmp)
 
         return tmp;
     }
 
-    function fnInit() {
+    function init() {
         chartData = {
             "labels": [],
             "datasets": [{
@@ -195,10 +200,12 @@ Canvas {
         }
 
         chart.draw(chartAnimationProgress/100, chartOptions);
+
+        sigDrawingCompleted(chartScaleLeftTop.x)
     }
 
     Rectangle {
-        id: groverLine
+        id: groove
         width: dp(1)
         height: parent.height
 
@@ -209,25 +216,33 @@ Canvas {
             enabled: true
         }
 
-        color: grovelineColor
+        color: chartGrooveColor
     }
 
-    onLastGroverlineXChanged: {
-        groverLine.x = lastGroverlineX;
+    onChartGroovePosXChanged: {
+        groove.x = chartGroovePosX + chartScaleLeftTop.x;
 
-        var tmp = fnCalcGroverNearPoint(lastGroverlineX);
-        reachedChartDataIndex = tmp;
-        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, chartDisplayPointCount)
+        log("groove.posx = " + chartGroovePosX)
 
-//        log("fnCalcGroverNearPoint： " + tmp)
+        var tmp = findGrooveNearPoint(chartGroovePosX, chartScaleLeftTop, chartScaleRightBottom);
+        chartReachedPointIndex = tmp;
+        sigChartInfoChanged(chartReachedPointIndex, chartGroovePosX, chartStartDataIndex, chartDisplayPointCount)
+
+//        log("findGrooveNearPoint： " + tmp)
     }
 
     onChartDisplayPointCountChanged: {
 //        log("chartDisplayPointCount = " + chartDisplayPointCount)
 
-        var tmp = fnCalcGroverNearPoint(lastGroverlineX);
-        reachedChartDataIndex = tmp;
-        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, chartDisplayPointCount)
+        var tmp = findGrooveNearPoint(chartGroovePosX, chartScaleLeftTop, chartScaleRightBottom);
+        chartReachedPointIndex = tmp;
+        sigChartInfoChanged(chartReachedPointIndex, chartGroovePosX, chartStartDataIndex, chartDisplayPointCount)
+
+        requestPaint();
+    }
+
+    onChartStartDataIndexChanged: {
+        sigChartInfoChanged(chartReachedPointIndex, chartGroovePosX, chartStartDataIndex, chartDisplayPointCount)
 
         requestPaint();
     }
@@ -246,10 +261,10 @@ Canvas {
             return;
         var tmp = canvas.width / preWidth;
         preWidth = canvas.width
-//        log("lastGroverlineX = " + lastGroverlineX);
+//        log("chartGroovePosX = " + chartGroovePosX);
 //        log("tmp = " + tmp);
-//        log("tmp * lastGroverlineX = " + (tmp * lastGroverlineX));
-        lastGroverlineX = tmp * lastGroverlineX
+//        log("tmp * chartGroovePosX = " + (tmp * chartGroovePosX));
+        chartGroovePosX = tmp * chartGroovePosX
 
         log("chartDisplayPointCount = " + chartDisplayPointCount);
     }
@@ -258,10 +273,11 @@ Canvas {
         requestPaint();
     }
 
-    onStartChartDataIndexChanged: {
-        sigChartInfoChanged(reachedChartDataIndex, lastGroverlineX, startChartDataIndex, chartDisplayPointCount)
-
-        requestPaint();
+    function calcChartGroovePosX(mouseX) {
+        var tmpLeft = mouseX - chartScaleLeftTop.x;
+        var tmpRight = chartScaleRightBottom.x - mouseX;
+        if (tmpLeft > 0 && tmpRight > 0)
+            return tmpLeft;
     }
 
     MouseArea {
@@ -271,6 +287,9 @@ Canvas {
 
         hoverEnabled: false
 
+        onReleased: {
+        }
+
         onPressed: {
             pressedButton = mouse.button
 
@@ -278,19 +297,16 @@ Canvas {
             canvas.lastY = mouseY
 
             if (mouse.button == Qt.LeftButton){
-                lastGroverlineX = mouseX    // 改变游标位置
+                var tmp = calcChartGroovePosX(mouseX);
+                if (tmp)
+                    chartGroovePosX = tmp    // 改变游标位置
             }
 
-//            if (mouse.button == Qt.RightButton){
-////                stepChart(1);
-//                stepLegend(1);
-//            }else if (mouse.button == Qt.LeftButton){
-////                stepChart(-1);
-//                stepLegend(-1);
-//            }
+            log("scaleVertex.leftTop = " + canvas.chartScaleLeftTop)
+            log("scaleVertex.rightBottom = " + canvas.chartScaleRightBottom)
 
-            log("chartDisplayPointCount = " + canvas.chartDisplayPointCount);
-            log("canvas.with = " + canvas.width)
+//            log("chartDisplayPointCount = " + canvas.chartDisplayPointCount);
+//            log("canvas.with = " + canvas.width)
         }
 
         onPositionChanged: {
@@ -301,11 +317,13 @@ Canvas {
 
             if (pressedButton == Qt.RightButton){
                 if (mouseX > canvas.lastX)
-                    stepChart(1 * lenStep)
-                else if (mouseX < canvas.lastX)
                     stepChart(-1 * lenStep)
+                else if (mouseX < canvas.lastX)
+                    stepChart(1 * lenStep)
             } else if (pressedButton == Qt.LeftButton){
-                lastGroverlineX = mouseX
+                var tmp = calcChartGroovePosX(mouseX);
+                if (tmp)
+                    chartGroovePosX = tmp    // 改变游标位置
                 mousePositionChanged(mouseX, mouseY);
             }
         }
@@ -359,6 +377,6 @@ Canvas {
     }
 
     Component.onCompleted: {
-        fnInit();
+        init();
     }
 }

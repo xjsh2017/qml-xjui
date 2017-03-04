@@ -85,13 +85,12 @@ void WaveAnalDataModel::buildData(int rows, int nMaxValue, int samplePoints)
 
     for (int i = 0; i < rows; ++i)
     {
-//        QList<int> x = random(nMax, nCount);
+        QList<int> x = random(nMax, nCount);
         QList<int> y = random(nMax, nCount);
 
         for (int j = 0; j < nCount; ++j)
         {
-//            append_x(i, x.at(j) - nMax / 2);
-            append_x(i, j);
+            append_x(i, x.at(j) - nMax / 2);
             append_y(i, y.at(j) - nMax / 2);
         }
     }
