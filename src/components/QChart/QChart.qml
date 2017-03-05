@@ -21,6 +21,8 @@ Canvas {
 
     // ///////////////////////////////////////////////////////////////
 
+    property string test: waveModel.test        // 主要是在QQuickWidget项目中，当嵌入到TabWidget之后，切换标签会清空canvas的ctx清空
+
     property   var chart;
     property   var chartData;
     property   var chartOptions;
@@ -167,7 +169,7 @@ Canvas {
     // /////////////////////////////////////////////////////////////////
 
     onPaint: {
-        log("onPaint Called: " + "chart = " + chart)
+        log("***** ---- > >> onPaint Called: " + "chart = " + chart)
         if (chartData == undefined){
             log("chartData = " + chartData);
         }
@@ -272,12 +274,8 @@ Canvas {
             return;
         var tmp = canvas.width / preWidth;
         preWidth = canvas.width
-//        log("chartGroovePosX = " + chartGroovePosX);
-//        log("tmp = " + tmp);
-//        log("tmp * chartGroovePosX = " + (tmp * chartGroovePosX));
-        chartGroovePosX = tmp * chartGroovePosX
 
-        log("chartDisplayPointCount = " + chartDisplayPointCount);
+        chartGroovePosX = tmp * chartGroovePosX
     }
 
     onChartAnimationProgressChanged: {
@@ -308,9 +306,6 @@ Canvas {
 
             log("scaleVertex.leftTop = " + canvas.chartScaleLeftTop)
             log("scaleVertex.rightBottom = " + canvas.chartScaleRightBottom)
-
-//            log("chartDisplayPointCount = " + canvas.chartDisplayPointCount);
-//            log("canvas.with = " + canvas.width)
         }
 
         onPositionChanged: {
@@ -340,23 +335,22 @@ Canvas {
 
     }
 
-    //  Timer {
-    //        id: timer1;
-    //        repeat: true;
-    //        interval: 2000;
-    //        triggeredOnStart: true;
-    //        onTriggered: {
-    //            // ... add code here
-    //            console.log("chartOptions.pointDot = " + chartOptions.pointDot);
-    //            chartOptions.pointDot = !chartOptions.pointDot;
+    onTestChanged: {
+        log("detect test value changed...start to repaint ...")
+        chart = null
+        requestPaint();
+    }
 
-    //            requestPaint()
-    //        }
-    //    }
-
-    //    Component.onCompleted: {
-    //        timer1.start();
-    //    }
+    Timer {
+        id: timer1;
+        repeat: true;
+        interval: 5000;
+        triggeredOnStart: true;
+        onTriggered: {
+//            chart = null
+//            requestPaint();
+        }
+    }
 
     // /////////////////////////////////////////////////////////////////
     // Functions
@@ -382,5 +376,6 @@ Canvas {
 
     Component.onCompleted: {
         init();
+//        timer1.start();
     }
 }

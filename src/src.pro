@@ -4,7 +4,7 @@ TARGET = XjQmlUi
 QT += qml quick
 CONFIG += qt plugin c++11
 
-TARGET = $$qtLibraryTarget($$TARGET)
+TARGET = XjQmlUi#$$qtLibraryTarget($$TARGET)
 uri = XjQmlUi
 
 # Input

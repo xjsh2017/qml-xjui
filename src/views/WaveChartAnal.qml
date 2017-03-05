@@ -13,10 +13,14 @@ import "../components/QChart/QChart.js"         as Charts
 Item {
     id: root
 
+
+    // ///////////////////////////////////////////////////////////////
+
+
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-//        console.log("## WaveAnalDemo.qml ##: " + says);
+        console.log("## WaveAnalDemo.qml ##: " + says);
     }
 
     function dp(di){
@@ -456,7 +460,7 @@ Item {
                                     MagicDivider {
                                         width: parent.width
 
-                                        styleDivider: 2
+//                                        styleDivider: 2
                                         dash_len: 4
                                         color: drawColor
                                     }
