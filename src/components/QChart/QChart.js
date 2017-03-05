@@ -24,7 +24,7 @@ var ChartType = {
 var Chart = function(canvas, context) {
 
     function log(says) {
-        console.log("## QChart.js ##: " + says)
+//        console.log("## QChart.js ##: " + says)
     }
 
     var chart = this;
@@ -464,6 +464,7 @@ var Chart = function(canvas, context) {
 
             canvas.chartScaleLeftTop = Qt.point(scaleVertex.leftTop.x, scaleVertex.leftTop.y)
             canvas.chartScaleRightBottom = Qt.point(scaleVertex.rightBottom.x, scaleVertex.rightBottom.y)
+            canvas.chartDisplayPointCount = scaleVertex.width
         }
     }
 

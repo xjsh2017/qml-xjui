@@ -60,7 +60,7 @@ Canvas {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## QChart.qml ##: " + says);
+//        console.log("## QChart.qml ##: " + says);
     }
 
     function fetchData(arrData, idx_start, varCount) {
@@ -137,6 +137,13 @@ Canvas {
         log("found point idx = " + tmp)
 
         return tmp;
+    }
+
+    function calcChartGroovePosX(mouseX) {
+        var tmpLeft = mouseX - chartScaleLeftTop.x;
+        var tmpRight = chartScaleRightBottom.x - mouseX;
+        if (tmpLeft >= 0 && tmpRight >= 0)
+            return tmpLeft;
     }
 
     function init() {
@@ -271,13 +278,6 @@ Canvas {
 
     onChartAnimationProgressChanged: {
         requestPaint();
-    }
-
-    function calcChartGroovePosX(mouseX) {
-        var tmpLeft = mouseX - chartScaleLeftTop.x;
-        var tmpRight = chartScaleRightBottom.x - mouseX;
-        if (tmpLeft > 0 && tmpRight > 0)
-            return tmpLeft;
     }
 
     MouseArea {

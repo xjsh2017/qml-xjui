@@ -85,26 +85,27 @@ Item {
                 }
                 spacing: dp(12)
 
-                IconButton {
-                    id: action_color
-                    Layout.leftMargin: dp(8)
+//                IconButton {
+//                    id: action_color
+//                    Layout.leftMargin: dp(8)
 
-                    action: Action {
-                        iconName: "image/color_lens"
-                        name: "Chart : colors"
-                        onTriggered: {
-                            flickable_wave.arrayColor = random_colos(waveModel.chn_count())
-                        }
-                    }
-                }
+//                    action: Action {
+//                        iconName: "image/color_lens"
+//                        name: "Chart : colors"
+//                        onTriggered: {
+//                            flickable_wave.arrayColor = random_colos(waveModel.chn_count())
+//                        }
+//                    }
+//                }
 
                 IconButton {
                     id: action_timer
+                    Layout.leftMargin: dp(8)
 
                     action: Action {
                         iconName: "action/alarm"
                         name: "Chart : timer for data runtime.."
-                        hoverAnimation: true
+                        hoverAnimation: false
                         onTriggered: {
                             var varTmpInfo;
                             if (timer_waveModel.running)
@@ -127,8 +128,8 @@ Item {
                     Layout.rightMargin: dp(8)
 
                     action: Action {
-                        iconName: "content/add"
-                        name: "Chart : Inflate"
+                        iconName: "action/inflate"
+                        name: "Chart : Inflate look"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
                                 flickable_wave.arrayChart[i].stepLegend(-2);
@@ -138,42 +139,28 @@ Item {
                 }
 
                 IconButton {
+                    id: action_inflate_default
+
+                    action: Action {
+                        iconName: "action/inflate_default"
+                        name: "Chart : default look"
+                        onTriggered: {
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].stepLegend(0);
+                            }
+                        }
+                    }
+                }
+
+                IconButton {
                     id: action_deflate
 
                     action: Action {
-                        iconName: "content/remove"
-                        name: "Chart : Deflate"
+                        iconName: "action/deflate"
+                        name: "Chart : Deflate look"
                         onTriggered: {
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
                                 flickable_wave.arrayChart[i].stepLegend(2);
-                            }
-                        }
-                    }
-                }
-
-                IconButton {
-                    id: moveLeft
-
-                    action: Action {
-                        iconName: "hardware/keyboard_arrow_left"
-                        name: "Chart : Move Left"
-                        onTriggered: {
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepChart(-2);
-                            }
-                        }
-                    }
-                }
-
-                IconButton {
-                    id: moveRight
-
-                    action: Action {
-                        iconName: "hardware/keyboard_arrow_right"
-                        name: "Chart : Move Right"
-                        onTriggered: {
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepChart(2);
                             }
                         }
                     }
@@ -234,7 +221,7 @@ Item {
 
 //            color: "transparent"
             elevation: 1
-            height: dp(64)
+            height: dp(76)
 //            border.color: "black"
 //            border.width: dp(1)
 
@@ -273,16 +260,12 @@ Item {
 
                     color: "transparent"
 
-                    property real leftMargin: 0
-
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    Layout.leftMargin: leftMargin
 
-                    Grover {
+                    Groove {
                         id: gr
                         anchors.fill: parent
-                        anchors.leftMargin: 0
 
                         value: maximumValue * 0
                         focus: true
@@ -290,7 +273,7 @@ Item {
                         numericValueLabel: true
                         stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
                         minimumValue: 0
-                        maximumValue: parent.width + minimumValue  // 刻度尺的长度
+                        maximumValue: parent.width + minimumValue - gr.anchors.leftMargin  // 刻度尺的长度
                         activeFocusOnPress: true
                         darkBackground: false//index == 1
 
@@ -309,6 +292,14 @@ Item {
 //                            }
 //                            lockValueChange = false;
                         }
+
+                        onLeftMoveClicked: {
+
+                        }
+
+                        onRightMoveClicked: {
+                            gr.scrollbar_posx += gr.scrollbarSteps * 1
+                        }
                     }
 
                     Connections {
@@ -316,12 +307,11 @@ Item {
 
                         onScrollbarPosChanged : {
                             log("scrollbar status: " + delta + ", " + pos)
-                            gr.minimumValue = pos
-                            gr.valueChangedDelta = delta
-//                            gr.value += delta
-                            log("gr.maximumValue = " + gr.maximumValue)
+                            gr.minimumValue = gr.scrollbarSteps * pos;
+                            log("gr.min_max = (" + gr.minimumValue + ", " + gr.maximumValue + ")")
+
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].chartStartDataIndex += (delta ? 1 : -1);
+                                flickable_wave.arrayChart[i].chartStartDataIndex = (delta ? 1 : -1) * gr.scrollbarSteps * pos;
                                 if (flickable_wave.arrayChart[i].chartStartDataIndex < 0)
                                     flickable_wave.arrayChart[i].chartStartDataIndex = 0;
                                 else if (flickable_wave.arrayChart[i].chartStartDataIndex
@@ -368,6 +358,7 @@ Item {
                         model: waveModel.chn_count()
 
                         Row {
+                            id: rowChart
                             spacing: dp(3)
 
                             property color drawColor: root.random_color();
@@ -376,7 +367,7 @@ Item {
                                 id: wave_info
 
                                 width: dp(160)
-                                height: dp(300)
+                                height: dp(100)
 
                                 property   int selDataPointIndex: 0
 
@@ -430,7 +421,7 @@ Item {
                                 id: wave_chart
 
                                 height: wave_info.height
-                                width: wave.width - wave_info.width - dp(12)
+                                width: wave.width - wave_info.width - rowChart.spacing
 
                                 backgroundColor: "#263238"
 
@@ -443,11 +434,11 @@ Item {
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
                                     chart_index: index
-                                    chartDisplayPointCount: 10//gr.maximumValue - gr.minimumValue
+                                    chartDisplayPointCount: gr.maximumValue - gr.minimumValue
                                     chartGrooveColor: gr.color
 
                                     onChartDisplayPointCountChanged: {
-                                        btnMouse.text = "Mouse: X: " + 0 + ", Y: " + 0 + ", Count: "
+                                        btnMouse.text = "Count: "
                                                 + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
                                     }
 
@@ -459,7 +450,7 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : true,
+                                        "pointDot" : false,
                                         "scaleShowLabelsX" : false,
                                         "scaleShowLabelsY" : true,
                                         "scaleShowGridLines" : false,
@@ -489,10 +480,13 @@ Item {
                                 target: chart_curve
 
                                 onSigDrawingCompleted: {
-                                    gr.anchors.leftMargin = x;
+                                    gr.anchors.leftMargin = x - dp(2);
+                                    log("gr.anchors.leftMargin = " + gr.anchors.leftMargin)
+                                    log("gr.width = " + gr.width)
                                 }
 
                                 onSigChartInfoChanged: {
+                                    log("chartGroovePosX = " + chartGroovePosX)
                                     for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
                                         flickable_wave.arrayChartInfo[i].selDataPointIndex =
                                                 chartReachedPointIndex + chartStartDataIndex;
@@ -500,8 +494,14 @@ Item {
                                         flickable_wave.arrayChart[i].chartStartDataIndex = chartStartDataIndex;
                                     }
 
+
+                                    btnMouse.text = "Count: "
+                                            + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
+                                            + ", Start = " + flickable_wave.arrayChart[0].chartStartDataIndex
+                                            + ", Select = " + flickable_wave.arrayChartInfo[0].selDataPointIndex
+
                                     if (!gr.lockValueChange)
-                                        gr.value = chartGroovePosX
+                                        gr.value = chartGroovePosX + gr.minimumValue
                                 }
                             }
                         }
