@@ -7,6 +7,6 @@
 
 
 TEMPLATE = subdirs
-SUBDIRS += test/test.pro
+SUBDIRS += test qmlquickwidget
 
 CONFIG += ordered
