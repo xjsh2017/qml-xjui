@@ -60,7 +60,7 @@ Canvas {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-//        console.log("## QChart.qml ##: " + says);
+        console.log("## QChart.qml ##: " + says);
     }
 
     function fetchData(arrData, idx_start, varCount) {
@@ -172,6 +172,10 @@ Canvas {
             log("chartData = " + chartData);
         }
         updateChartData()
+
+        var ctx = canvas.getContext("2d");
+        if (!chart)
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
 
         if(!chart) {
 

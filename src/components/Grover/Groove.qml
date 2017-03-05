@@ -86,7 +86,7 @@ Item {
     // /////////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## Groove.qml ##: " + says);
+//        console.log("## Groove.qml ##: " + says);
     }
 
     // /////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ Item {
             radius: height / 2
             width: control.valueRange - (waveModel.cols() - control.valueRange) / control.scrollbarSteps
 
-            color: Theme.accentColor
+            color: "#9e9e9e"//Theme.accentColor
             border.color: Qt.lighter(color)
 
             property real lastX: 0
@@ -358,7 +358,7 @@ Item {
         model: control.stepSize > 0 ? 1 + (control.maximumValue/* -  control.minimumValue*/) / control.stepSize : 0
 
         Rectangle {
-            color: style.darkBackground ? "#FFFFFF" : "#000000"
+            color: control.darkBackground ? "#FFFFFF" : "#000000"
             width: Math.round(1 * Units.dp);
             height: {
                 if (index % 10 == 0)
@@ -447,6 +447,25 @@ Item {
 
         clip: true
 
+        Label {
+            id: labelUnit
+            text: "ms"
+            color: Theme.light.textColor
+
+            anchors {
+                top: parent.top
+                topMargin: dp(2)
+                left: parent.left
+                leftMargin: dp(20)
+            }
+
+            Rectangle {
+                anchors.fill: parent
+//                border.color: Theme.accentColor
+                z: -1
+            }
+        }
+
         Loader {
             id: grooveLoader
             property QtObject styleData: QtObject {
@@ -455,7 +474,7 @@ Item {
             x: 0
             sourceComponent: groove
             width: dp(900)//(panel.horizontal ? parent.width : parent.height) - (panel.handleWidth)// - padding.left - padding.right - (control.__panel.handleWidth)
-            y:  parent.height - scrollbarLoader.height - dp(6)
+            y:  parent.height - dp(6) - (scrollbarLoader.item.visible ? scrollbarLoader.item.height : 0)
         }
 
         Loader {
@@ -473,26 +492,9 @@ Item {
             anchors.verticalCenter: grooveLoader.verticalCenter
             x: control.value - control.minimumValue
 
-//            Rectangle {
-//                anchors.fill: parent
-//                color: "transparent"
-//                border.color: "red"
-//            }
-
             Behavior on x {
                 NumberAnimation { duration: 100 }
                 enabled: control.tickmarksEnabled
-            }
-
-
-            onXChanged: {
-                log("handle.x = " + x);
-                log("handleLoader.x = " + handleLoader.x);
-                log("handleLoader.width = " + handleLoader.width);
-            }
-
-            Component.onCompleted: {
-                console.log(width)
             }
         }
     }
@@ -513,6 +515,7 @@ Item {
         anchors.bottom: panel.bottom
         width: panel.width
         x: 0
+        z: -1
 
         Behavior on x {
             NumberAnimation { duration: 100 }

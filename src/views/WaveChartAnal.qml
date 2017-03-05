@@ -15,6 +15,10 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
+    function log(says) {
+//        console.log("## WaveAnalDemo.qml ##: " + says);
+    }
+
     function dp(di){
         return di;
     }
@@ -26,10 +30,6 @@ Item {
     function random_color() {
         return Qt.rgba(Math.random(),
                        Math.random(), Math.random(), 1);
-    }
-
-    function log(says) {
-        console.log("## WaveAnalDemo.qml ##: " + says);
     }
 
     function random_colos(clrCount) {
@@ -107,18 +107,24 @@ Item {
                         name: "Chart : timer for data runtime.."
                         hoverAnimation: false
                         onTriggered: {
-                            var varTmpInfo;
-                            if (timer_waveModel.running)
-                            {
-                                timer_waveModel.stop();
-                                varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
-                            }else
-                            {
-                                timer_waveModel.start();
-                                varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+//                            var varTmpInfo;
+//                            if (timer_waveModel.running)
+//                            {
+//                                timer_waveModel.stop();
+//                                varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
+//                            }else
+//                            {
+//                                timer_waveModel.start();
+//                                varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+//                            }
+//                            snackbar.open(varTmpInfo)
+//                            log(varTmpInfo)
+
+                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                flickable_wave.arrayChart[i].chart = null;
+                                flickable_wave.arrayChart[i].requestPaint();
+                                break;
                             }
-                            snackbar.open(varTmpInfo)
-                            log(varTmpInfo)
                         }
                     }
                 }
@@ -167,7 +173,9 @@ Item {
                 }
 
                 Button {
-                    id: btnMouse
+                    id: btnDebug1
+
+                    visible: false
 
                     text: "Mouse: X: " + 0 + ", Y: " + 0
                     implicitHeight: dp(30)
@@ -186,7 +194,7 @@ Item {
                 }
 
                 Button {
-                    id: btn_Show
+                    id: btnDebug
                     text: waveModel.test
 
                     implicitHeight: dp(28)
@@ -230,27 +238,64 @@ Item {
             RowLayout {
                 anchors.fill: parent
 
-                Rectangle {
-                    id: axis_desc
-
-                    border.color: Theme.light.textColor
-
+                Column {
+                    id: chart_info_title_panel
                     width: dp(160)
 
-                    Rectangle {
-                        height: labelDesc.height
-                        width: dp(5)
-                        color: Theme.accentColor
+                    height: parent.height
 
-                        anchors.verticalCenter: parent.verticalCenter
+                    anchors {
+                        verticalCenter: parent.verticalCenter
                     }
 
-                    Label {
-                        id: labelDesc
-                        text: "时间 （ 毫秒 ） / 帧"
-                        color: Theme.light.textColor
+                    spacing: dp(6)
 
-                        anchors.centerIn: parent
+                    Item {
+                        width: dp(160)//parent.width - dp(1)
+                        height: labelMac.height
+
+                        ActionButton {
+                            width: labelMac.height - dp(2)
+                            height: width
+
+                            elevation: 0
+
+                            anchors {
+                                right: labelMac.left
+                                rightMargin: dp(8)
+
+                                verticalCenter: labelMac.verticalCenter
+                            }
+
+                            backgroundColor: Theme.accentColor
+
+                            tooltip: "Send Terminal Mac Address"
+
+                        }
+
+                        Label {
+                            id: labelMac
+                            text: "链路 : 0c-03-2b-c3-7e"
+                            color: Theme.light.textColor
+
+                            anchors {
+                                horizontalCenterOffset: gr.anchors.leftMargin / 2
+                                centerIn: parent
+                            }
+
+                            MagicDivider {
+                                visible: false
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    top: parent.bottom
+                                }
+
+                                styleDivider:  2
+                                dash_len: 3
+                                color: Theme.accentColor
+                            }
+                        }
                     }
                 }
 
@@ -369,50 +414,66 @@ Item {
                                 width: dp(160)
                                 height: dp(100)
 
+                                elevation: 2
+
                                 property   int selDataPointIndex: 0
 
                                 backgroundColor: Qt.lighter(drawColor)
 
                                 Rectangle {
-                                    height: parent.height / 2
-                                    width: parent.width
+                                    anchors.fill: parent
+
                                     border.color: drawColor
-
                                     color: "transparent"
-
-                                    Label {
-                                        text: "通道： " + (index + 1)
-                                        color: Theme.light.textColor
-                                        anchors.centerIn: parent
-                                    }
-                                    clip: true
-
-                                    Rectangle { // 角标
-                                        x: parent.width - dp(8)
-                                        y: -dp(8)
-                                        height: dp(16)
-                                        width: height
-                                        rotation: 45
-
-                                        color: drawColor
-
-                                    }
                                 }
 
-                                Rectangle {
-                                    y: parent.height / 2 - dp(1)
-                                    height: parent.height / 2
-                                    width: parent.width
-                                    border.color: drawColor
+                                Column {
+                                    anchors.fill: parent
 
-                                    color: "transparent"
+                                    Rectangle {
+                                        height: parent.height / 2
+                                        width: parent.width
 
-                                    Label {
-                                        text: waveModel.x_data(index)[wave_info.selDataPointIndex]
-                                              + " ∠ "
-                                              + waveModel.y_data(index)[wave_info.selDataPointIndex] + "°"
-                                        color: Theme.light.textColor
-                                        anchors.centerIn: parent
+                                        color: "transparent"
+
+                                        View {
+                                            elevation: 1
+                                            height: labelChn.height
+                                            width: dp(5)
+
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+
+                                        Label {
+                                            id: labelChn
+                                            text: "通道： " + (index + 1)
+                                            color: Theme.light.textColor
+                                            anchors.centerIn: parent
+                                        }
+
+                                    }
+
+                                    MagicDivider {
+                                        width: parent.width
+
+                                        styleDivider: 2
+                                        dash_len: 4
+                                        color: drawColor
+                                    }
+
+                                    Rectangle {
+                                        height: parent.height / 2
+                                        width: parent.width
+
+                                        color: "transparent"
+
+                                        Label {
+                                            text: waveModel.x_data(index)[wave_info.selDataPointIndex]
+                                                  + " ∠ "
+                                                  + waveModel.y_data(index)[wave_info.selDataPointIndex] + "°"
+                                            color: Theme.light.textColor
+                                            anchors.centerIn: parent
+                                        }
                                     }
                                 }
                             }
@@ -437,10 +498,10 @@ Item {
                                     chartDisplayPointCount: gr.maximumValue - gr.minimumValue
                                     chartGrooveColor: gr.color
 
-                                    onChartDisplayPointCountChanged: {
-                                        btnMouse.text = "Count: "
-                                                + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
-                                    }
+//                                    onChartDisplayPointCountChanged: {
+//                                        btnDebug.text = "Count: "
+//                                                + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
+//                                    }
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -495,9 +556,11 @@ Item {
                                     }
 
 
-                                    btnMouse.text = "Count: "
+                                    btnDebug.text = "Count: "
                                             + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
                                             + ", Start = " + flickable_wave.arrayChart[0].chartStartDataIndex
+                                            + ", End = " + (flickable_wave.arrayChart[0].chartStartDataIndex
+                                            + flickable_wave.arrayChart[0].chartDisplayPointCount)
                                             + ", Select = " + flickable_wave.arrayChartInfo[0].selDataPointIndex
 
                                     if (!gr.lockValueChange)
@@ -532,7 +595,7 @@ Item {
             log("Wave Data Model has changed again...")
 //            waveModel.buildData(10, 100, 20);
             waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原队列中第一个数据
-            btn_Show.text = waveModel.test + ": " + waveModel.x_data(0)
+            btnDebug.text = waveModel.test + ": " + waveModel.x_data(0)
 
             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
                 flickable_wave.arrayChart[i].requestPaint();
@@ -563,8 +626,8 @@ Item {
             spacing: dp(8)
 
             CheckBox {
-                checked: flickable_wave.arrayChart.length > 0 ? flickable_wave.arrayChart[0].chartOptions.pointDot : false
-                text: "Show Points" + flickable_wave.arrayChart.length
+                checked: false
+                text: "Show Points: " + flickable_wave.arrayChart.length
                 darkBackground: false
 
                 onCheckedChanged: {
@@ -578,12 +641,24 @@ Item {
             Item { width: 1; height: 1 }
 
             CheckBox {
-                checked: flickable_wave.arrayChart.length > 0 ? flickable_wave.arrayChart[0].chartOptions.scaleXShowLabels : false
-                text: "Show X Labels"
+                checked: false
+                text: "Show X Labels: " + flickable_wave.arrayChart.length
                 darkBackground: false
                 onCheckedChanged: {
                     for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                        flickable_wave.arrayChart[i].chartOptions.scaleXShowLabels = checked;
+                        flickable_wave.arrayChart[i].chartOptions.scaleShowLabelsX = checked;
+                        flickable_wave.arrayChart[i].requestPaint();
+                    }
+                }
+            }
+
+            CheckBox {
+                checked: false
+                text: "Show Y Labels: " + flickable_wave.arrayChart.length
+                darkBackground: false
+                onCheckedChanged: {
+                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                        flickable_wave.arrayChart[i].chartOptions.scaleShowLabelsY = checked;
                         flickable_wave.arrayChart[i].requestPaint();
                     }
                 }
@@ -591,20 +666,27 @@ Item {
 
             CheckBox {
                 checked: true
-                text: "Show Y Labels"
+                text: "Show Y Labels: " + flickable_wave.arrayChart.length
                 darkBackground: false
+                onCheckedChanged: {
+                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                        flickable_wave.arrayChart[i].chartOptions.scaleShowAxisX = checked;
+                        flickable_wave.arrayChart[i].chartOptions.scaleShowAxisY = checked;
+                        flickable_wave.arrayChart[i].requestPaint();
+                    }
+                }
             }
 
             CheckBox {
-                checked: true
-                text: "Show Axis"
+                checked: false
+                text: "Show Y Labels: " + flickable_wave.arrayChart.length
                 darkBackground: false
-            }
-
-            CheckBox {
-                checked: true
-                text: "Show Grid Lines"
-                darkBackground: false
+                onCheckedChanged: {
+                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                        flickable_wave.arrayChart[i].chartOptions.scaleShowGridLines = checked;
+                        flickable_wave.arrayChart[i].requestPaint();
+                    }
+                }
             }
         }
 

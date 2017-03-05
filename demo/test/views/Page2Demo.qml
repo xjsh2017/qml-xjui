@@ -3,6 +3,7 @@ import QtQuick 2.0
 import Material 0.3
 //import XjQmlUi 1.0
 import "../../../src/views"
+import QtQuick.Layouts 1.1
 
 Item {
     //    TimeDisperAnal {
@@ -13,9 +14,141 @@ Item {
         anchors.fill: parent
         elevation: 1
 
+        // 波形标尺
+        View {
+            id: axis_wave
+
+            //            color: "transparent"
+            elevation: 2
+            height: dp(76)
+            //            border.color: "black"
+            //            border.width: dp(1)
+
+            //            Layout.fillWidth: true
+            width: parent.width
+
+            anchors {
+                top: parent.top
+                topMargin: dp(24)
+            }
+
+            RowLayout {
+                anchors.fill: parent
+
+                Column {
+                    id: chart_info_title_panel
+                    width: dp(160)
+                    //                    Layout.fillHeight: true
+
+                    height: parent.height
+
+                    anchors {
+                        //                        topMargin: dp(18)
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    spacing: dp(6)
+
+                    Item {
+                        width: dp(160)//parent.width - dp(1)
+                        height: labelTitle.height
+
+                        Rectangle {
+                            height: parent.height
+                            width: dp(5)
+                            color: "green"
+
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Label {
+                            id: labelTitle
+                            text: "0x4001"
+                            color: Theme.light.textColor
+
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                leftMargin: dp(20)
+                            }
+
+                            MagicDivider {
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    top: parent.bottom
+                                }
+
+                                styleDivider:  2
+                                dash_len: 3
+                                color: "green"
+                            }
+                        }
+                    }
+
+                    Item {
+                        width: dp(160)//parent.width - dp(1)
+                        height: labelMac.height
+
+                        Rectangle {
+                            height: parent.height
+                            width: dp(5)
+                            color: Theme.accentColor
+
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Label {
+                            id: labelMac
+                            text: "0c-03-2b-c3-7e"
+                            color: Theme.light.textColor
+
+                            anchors {
+                                verticalCenter: parent.verticalCenter
+                                left: parent.left
+                                leftMargin: dp(20)
+                            }
+
+                            MagicDivider {
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    top: parent.bottom
+                                }
+
+                                styleDivider:  2
+                                dash_len: 3
+                                color: Theme.accentColor
+                            }
+                        }
+                    }
+                }
+
+                // 坐标轴
+                Rectangle {
+                    id: axis_groove
+
+                    color: "transparent"
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    Rectangle {
+                        height: parent.height
+                        width: parent.width
+
+                        border.color: "red"
+                    }
+                }
+            }
+        }
+
+
+
+
         Rectangle {
             width: parent.width
-            height: 12 * Units.dp
+            height: 14 * Units.dp
 
             visible: handleScroll.width > 0 && handleScroll.width <= width
 
@@ -64,7 +197,7 @@ Item {
                 radius: height / 2
                 width: dp(60)
 
-                color: Theme.accentColor
+                color: "grey"//Theme.accentColor
                 border.color: Qt.lighter(color)
 
                 property real lastX: 0
@@ -73,6 +206,8 @@ Item {
                     width: parent.height * 2 / 4
                     height: width
                     radius: height / 2
+
+                    //                    color: Theme.accentColor
 
                     anchors.centerIn: parent
                 }
