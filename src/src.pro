@@ -16,6 +16,8 @@ HEADERS += \
     xjqmlui_plugin.h \
     xjitem.h
 
+include(stores/stores.pri)
+
 
 target.path = $$[QT_INSTALL_QML]/$$uri
 

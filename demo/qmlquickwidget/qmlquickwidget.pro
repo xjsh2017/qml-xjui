@@ -39,4 +39,4 @@ RESOURCES += \
 
 FORMS    += mainwindow.ui
 
-include(stores/stores.pri)
+include(../../src/stores/stores.pri)

@@ -199,7 +199,9 @@ Item {
 
                 Button {
                     id: btnDebug
-                    text: waveModel.test
+                    text: ""/*waveModel.test*/
+
+                    visible: text.length > 0
 
                     implicitHeight: dp(28)
                     elevation: 1
@@ -279,7 +281,15 @@ Item {
 
                         Label {
                             id: labelMac
-                            text: "链路 : 0c-03-2b-c3-7e"
+                            text: {
+                                var tmp = "链路 :";
+                                if (waveModel.appid)
+                                    tmp += "0x" + waveModel.appid;
+                                if (waveModel.mac2)
+                                    tmp += " " + waveModel.mac2
+
+                                return tmp
+                            }
                             color: Theme.light.textColor
 
                             anchors {
@@ -472,9 +482,9 @@ Item {
                                         color: "transparent"
 
                                         Label {
-                                            text: waveModel.x_data(index)[wave_info.selDataPointIndex]
+                                            text: waveModel.y_data(index)[wave_info.selDataPointIndex]
                                                   + " ∠ "
-                                                  + waveModel.y_data(index)[wave_info.selDataPointIndex] + "°"
+                                                  + waveModel.x_data(index)[wave_info.selDataPointIndex] + "°"
                                             color: Theme.light.textColor
                                             anchors.centerIn: parent
                                         }
