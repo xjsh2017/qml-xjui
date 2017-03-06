@@ -15,8 +15,6 @@
 import QtQuick 2.0
 import "QChart.js" as Charts
 
-import "../../core"
-
 Canvas {
 
     id: canvas;
@@ -64,7 +62,7 @@ Canvas {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## QChart.qml ##: " + says);
+//        console.log("## QChart.qml ##: " + says);
     }
 
     function fetchData(arrData, idx_start, varCount) {
@@ -178,21 +176,30 @@ Canvas {
        \c curSamplePos: 计算点.
      */
     function calcLatitudeAndPhase(input, sampleCount, curSamplePos) {
-        var out = [];
-        if (!input || input.length < 8 || sampleCount < 8)
-            return
+        var out = [NaN, NaN, NaN];
+        if (!input || input.length < 8 || sampleCount < 8 || curSamplePos < sampleCount)
+            return out
 
-        log("input[curSamplePos] = " + input[curSamplePos])
+        console.log("Click value = " + input[curSamplePos])
         var tmp = 0.0;
+        var ex = 0.0;
         var samplearr = [];
         for (var i = curSamplePos + 1 - sampleCount; i <= curSamplePos; i++){
             samplearr[i - curSamplePos - 1 + sampleCount] = input[i];
             tmp += (input[i] / 10000) * (input[i] / 10000);
+            ex += input[i] / 10000;
         }
-        log("sample for calc" + samplearr);
+        console.log("sample(" + samplearr.length + "):" + samplearr);
+        var dx = tmp/sampleCount * 10000 * 10000 - (ex / sampleCount * 10000) * (ex / sampleCount * 10000)
+        console.log("dx = " + dx + ", ex = " + ex)
         out[0] = Math.sqrt(tmp/sampleCount) * 10000;
         out[1] = Math.sqrt(2) * out[0];
-        out[2] = calcSinAngle(out[1], input[curSamplePos]);
+        if (dx > 0)
+            out[2] = calcSinAngle(out[1], input[curSamplePos], input[curSamplePos] > input[curSamplePos - 1]);
+        else
+            out[2] = 0.0;
+
+        console.log("fresult = " + out)
 
         return out;
     }
@@ -201,20 +208,26 @@ Canvas {
     /*!
        Returns true if the color is dark and should have light content on top
      */
-    function calcSinAngle(R, Y) {
+    function calcSinAngle(R, value, updown) {
         var fresult = 0.0;
 
-        if (R > 0.0001){
-            if ( R < Math.abs(Y) )
-                return fresult;
-            fresult = Math.asin(Y/R)*180/Math.PI;
-        }
-
-        if (fresult >= 0){
-            fresult = 180 - fresult;
+        if (R > 0.00001){
+            if ( R < Math.abs(value) )
+                return NaN;
+            fresult = Math.asin(value/R)*180/Math.PI;
         }
         else
-            fresult = - 180 - fresult;
+            return NaN
+
+        if (fresult >= 0){
+            if (!updown)
+                fresult = 180 - fresult;
+        }
+        else
+        {
+            if (!updown)
+                fresult = - 180 - fresult;
+        }
 
         return fresult;
     }
@@ -296,8 +309,8 @@ Canvas {
         chartReachedPointIndex = tmp;
         sigChartInfoChanged(chartReachedPointIndex, chartGroovePosX, chartStartDataIndex, chartDisplayPointCount)
 
-        tmp = calcLatitudeAndPhase(chartData.datasets[0].data, 80, chartReachedPointIndex + chartStartDataIndex);
-        log(tmp);
+//        tmp = calcLatitudeAndPhase(chartData.datasets[0].data, 80, chartReachedPointIndex + chartStartDataIndex);
+//        log(tmp);
     }
 
     onChartDisplayPointCountChanged: {

@@ -372,23 +372,24 @@ Item {
 
             x: control.stepSize * index - width / 2//styleData.handleWidth / 2 + index * ((repeater.width - styleData.handleWidth) / (repeater.count-1))
 
-            Text {
-                text: index * stepSize / 4
+            Text { // 毫秒
+                text: index * stepSize / 4 + " ms"
 
                 x: {
-                    if (index  == 0)
-                        return - contentWidth / 2 + dp(10);
-                    else
-                        return - contentWidth / 2 - dp(10);
+                    return 0 + dp(6);
+//                    if (index  == 0)
+//                        return - contentWidth / 2 + dp(10);
+//                    else
+//                        return - contentWidth / 2 - dp(10);
                 }
-                y: contentWidth / 2 - dp(5)
+                y: 0//contentWidth / 2 - dp(5)
 
-                rotation: {
-                    if (index  == 0)
-                        return 0;
-                    else
-                        return -90;
-                }
+//                rotation: {
+//                    if (index  == 0)
+//                        return 0;
+//                    else
+//                        return -90;
+//                }
 
                 visible: !(index % 10)
             }
@@ -403,7 +404,14 @@ Item {
                     else if ((!(index % 10) && (index != 0)) && repeater.count - 1 - index < 7)
                         return - contentWidth / 2 - dp(9) - contentHeight
                     else
-                        return - contentWidth / 2 + dp(8);
+                        return - contentWidth / 2 - dp(8);
+
+//                    if (index  == 0)
+//                        return - contentWidth / 2 + dp(10);
+//                    else if ((!(index % 10) && (index != 0)) && repeater.count - 1 - index < 7)
+//                        return - contentWidth / 2 - dp(9) - contentHeight
+//                    else
+//                        return - contentWidth / 2 + dp(8);
                 }
                 y: contentWidth / 2 - dp(5)
 
@@ -427,7 +435,7 @@ Item {
 
         anchors.margins: 0
 
-        property int handleWidth: 0//handleLoader.width
+        property int handleWidth: dp(2)//handleLoader.width
         property int handleHeight: handleLoader.height
 
         property bool horizontal : true//control.orientation === Qt.Horizontal
@@ -447,25 +455,6 @@ Item {
 
         clip: true
 
-        Label {
-            id: labelUnit
-            text: "ms"
-            color: Theme.light.textColor
-
-            anchors {
-                top: parent.top
-                topMargin: dp(2)
-                left: parent.left
-                leftMargin: dp(20)
-            }
-
-            Rectangle {
-                anchors.fill: parent
-//                border.color: Theme.accentColor
-                z: -1
-            }
-        }
-
         Loader {
             id: grooveLoader
             property QtObject styleData: QtObject {
@@ -474,12 +463,12 @@ Item {
             x: 0
             sourceComponent: groove
             width: dp(900)//(panel.horizontal ? parent.width : parent.height) - (panel.handleWidth)// - padding.left - padding.right - (control.__panel.handleWidth)
-            y:  parent.height - dp(6) - (scrollbarLoader.item.visible ? scrollbarLoader.item.height : 0)
+            y:  parent.height - dp(7)// - (scrollbarLoader.item.visible ? scrollbarLoader.item.height : 0)
         }
 
         Loader {
             id: tickMarkLoader
-            x: 0//padding.left - control.minimumValue
+            x: dp(2)//padding.left - control.minimumValue
             width: (panel.horizontal ? parent.width : parent.height)// (horizontal ? parent.width : parent.height) - padding.left - padding.right + control.minimumValue
             y:  grooveLoader.y
             sourceComponent: control.tickmarksEnabled ? tickmarks : null
@@ -499,20 +488,21 @@ Item {
         }
     }
 
-    Rectangle {
-        x: 0
+//    Rectangle {
+//        x: 0
 
-        width: 2 * Units.dp
+//        width: 2 * Units.dp
 
-        y: 0
-        height: grooveLoader.y
-        color: Theme.accentColor
-    }
+//        y: 0
+//        height: grooveLoader.y
+//        color: Theme.accentColor
+//    }
 
     Loader {
         id: scrollbarLoader
         sourceComponent: scrollbar
-        anchors.bottom: panel.bottom
+//        anchors.bottom: panel.bottom
+        anchors.top: panel.top
         width: panel.width
         x: 0
         z: -1

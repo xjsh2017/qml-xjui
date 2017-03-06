@@ -71,12 +71,12 @@ var Chart = function(canvas, context) {
             scaleShowAxisX: true,
             scaleShowAxisY: true,
             scaleShowOutline: true,
-            scaleYAxisLineColor: "#00bcd4",
+            scaleYAxisLineColor: "#ff9800",
             scaleYAxisLineWidth: 1,
             scaleXAxisLineColor: "#00bcd4",
             scaleXAxisLineWidth: 1,
             scaleXAxisLineStyle: 1,     // 0 - 实线， 1 - 虚线
-            scaleOutlineColor: "#00bcd4",         // 显示纵坐标 Y
+            scaleOutlineColor: "grey",         // 显示纵坐标 Y
             scaleOutlineWidth: 1,
 
             fixedLenLabelsY: dp(32),

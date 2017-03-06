@@ -61,6 +61,8 @@ Item {
         View {
             id: toolbar
 
+            visible: false
+
             height: dp(36)
             elevation: dp(2)
             clip:false
@@ -89,19 +91,6 @@ Item {
                 }
                 spacing: dp(12)
 
-//                IconButton {
-//                    id: action_color
-//                    Layout.leftMargin: dp(8)
-
-//                    action: Action {
-//                        iconName: "image/color_lens"
-//                        name: "Chart : colors"
-//                        onTriggered: {
-//                            flickable_wave.arrayColor = random_colos(waveModel.chn_count())
-//                        }
-//                    }
-//                }
-
                 IconButton {
                     id: action_timer
                     Layout.leftMargin: dp(8)
@@ -128,49 +117,6 @@ Item {
                                 flickable_wave.arrayChart[i].chart = null;
                                 flickable_wave.arrayChart[i].requestPaint();
                                 break;
-                            }
-                        }
-                    }
-                }
-
-                IconButton {
-                    id: action_inflate
-                    Layout.rightMargin: dp(8)
-
-                    action: Action {
-                        iconName: "action/inflate"
-                        name: "Chart : Inflate look"
-                        onTriggered: {
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(-2);
-                            }
-                        }
-                    }
-                }
-
-                IconButton {
-                    id: action_inflate_default
-
-                    action: Action {
-                        iconName: "action/inflate_default"
-                        name: "Chart : default look"
-                        onTriggered: {
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(0);
-                            }
-                        }
-                    }
-                }
-
-                IconButton {
-                    id: action_deflate
-
-                    action: Action {
-                        iconName: "action/deflate"
-                        name: "Chart : Deflate look"
-                        onTriggered: {
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].stepLegend(2);
                             }
                         }
                     }
@@ -233,114 +179,175 @@ Item {
         View {
             id: axis_wave
 
-//            color: "transparent"
             elevation: 1
             height: dp(76)
-//            border.color: "black"
-//            border.width: dp(1)
 
             Layout.fillWidth: true
 
-            RowLayout {
-                anchors.fill: parent
+            Row {
+                width: parent.width
+                height: parent.height
 
-                Column {
-                    id: chart_info_title_panel
+                View {
+                    id: panel_groove
                     width: dp(160)
-
                     height: parent.height
 
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                    }
+                    elevation: 3
 
-                    spacing: dp(6)
+//                    border.color: Theme.accentColor
 
-                    Item {
-                        width: dp(160)//parent.width - dp(1)
-                        height: labelMac.height
+                    Flow {
+                        id: chart_info_title_panel
+                        width: parent.width
+                        height: parent.height
 
-                        ActionButton {
-                            width: labelMac.height - dp(2)
-                            height: width
+                        anchors {
+                            left: parent.left
+                            leftMargin: dp(10)
+                            top: parent.top
+                            topMargin: dp(10)
+//                            centerIn: parent
+                        }
+                        spacing: dp(6)
 
-                            elevation: 0
+                        IconButton {
+                            id: action_inflate
 
-                            anchors {
-                                right: labelMac.left
-                                rightMargin: dp(8)
-
-                                verticalCenter: labelMac.verticalCenter
+                            action: Action {
+                                iconName: "action/inflate"
+                                name: "Chart : Inflate look"
+                                onTriggered: {
+                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                        flickable_wave.arrayChart[i].stepLegend(-2);
+                                    }
+                                }
                             }
-
-                            backgroundColor: Theme.accentColor
-
-                            tooltip: "Send Terminal Mac Address"
-
                         }
 
-                        Label {
-                            id: labelMac
-                            text: {
-                                var tmp = "链路 :\n";
-                                if (waveModel.appid)
-                                    tmp += waveModel.appid;
-                                if (waveModel.mac2)
-                                    tmp += " " + waveModel.mac2
+                        IconButton {
+                            id: action_inflate_default
 
-                                return tmp
-                            }
-                            color: Theme.light.textColor
-
-                            anchors {
-                                horizontalCenterOffset: gr.anchors.leftMargin / 2
-                                centerIn: parent
-                            }
-
-                            MagicDivider {
-                                visible: false
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
-                                    top: parent.bottom
+                            action: Action {
+                                iconName: "action/inflate_default"
+                                name: "Chart : default look"
+                                onTriggered: {
+                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                        flickable_wave.arrayChart[i].stepLegend(0);
+                                    }
                                 }
+                            }
+                        }
 
-                                styleDivider:  2
-                                dash_len: 3
-                                color: Theme.accentColor
+                        IconButton {
+                            id: action_deflate
+
+                            action: Action {
+                                iconName: "action/deflate"
+                                name: "Chart : Deflate look"
+                                onTriggered: {
+                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                        flickable_wave.arrayChart[i].stepLegend(2);
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: chart_refresh
+
+                            action: Action {
+                                iconName: "navigation/refresh"
+                                name: "Chart: Refresh (Ctrl + R)"
+                                hoverAnimation: true
+                                onTriggered: {
+                                    for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
+                                        flickable_wave.arrayChart[i].chart = null;
+                                        flickable_wave.arrayChart[i].requestPaint();
+                                    }
+                                    snackbar.open("All Charts Refreshed !")
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: chart_setting2
+
+                            action: Action {
+                                iconName: "action/setting"
+                                name: "Chart Settings (Ctrl + I)"
+                                hoverAnimation: true
+                                onTriggered: {
+                                    chartSettings.show()
+                                }
+                            }
+                        }
+
+                        Button {
+                            id: btnValueType
+                            text: qsTr("瞬")
+
+                            property int valueType: 0   // 0 - 瞬时值， 1 - 有效值
+
+                            implicitHeight: dp(22)
+                            implicitWidth: dp(22)
+                            elevation: 0
+                            backgroundColor: Theme.accentColor
+                            Layout.alignment: Qt.AlignVCenter
+
+                            onClicked: {
+                                if (valueType == 1){
+                                    text = qsTr("瞬");
+                                    valueType = 0;
+                                    backgroundColor = Theme.accentColor
+                                }else{
+                                    text = qsTr("有")
+                                    valueType = 1;
+                                    backgroundColor = "green"
+                                }
+                                for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                    var samplePos = flickable_wave.arrayChart[i].chartReachedPointIndex;
+                                    var fresult = flickable_wave.arrayChart[i].calcLatitudeAndPhase(
+                                                flickable_wave.arrayChart[i].chartData.datasets[0].data, 80, samplePos);
+                                    var datapos = flickable_wave.arrayChartInfo[i].selDataPointIndex;
+
+                                    log("samplePos = " + samplePos + ", datapos = " + datapos)
+
+                                    var tmp1 = waveModel.y_data(flickable_wave.arrayChart[i].chart_index)[datapos];
+
+                                    log("By Btn:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
+                                    if (valueType == 1)
+                                        tmp1 = fresult[0].toFixed(2);
+
+                                    flickable_wave.arrayChartValue[i].text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
+                                }
                             }
                         }
                     }
                 }
 
-                // 坐标轴
-                Rectangle {
-                    id: axis_groove
+                // 大标尺
+                Groove {
+                    id: gr
 
-                    color: "transparent"
+                    height: parent.height
+                    width: parent.width - panel_groove.width
 
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    value: maximumValue * 0
+                    focus: true
+                    tickmarksEnabled: true
+                    numericValueLabel: true
+                    stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
+                    minimumValue: 0
+                    maximumValue: parent.width + minimumValue - gr.anchors.leftMargin  // 刻度尺的长度
+                    activeFocusOnPress: true
+                    darkBackground: false//index == 1
 
-                    Groove {
-                        id: gr
-                        anchors.fill: parent
+                    property real valueChangedDelta: 0
 
-                        value: maximumValue * 0
-                        focus: true
-                        tickmarksEnabled: true
-                        numericValueLabel: true
-                        stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
-                        minimumValue: 0
-                        maximumValue: parent.width + minimumValue - gr.anchors.leftMargin  // 刻度尺的长度
-                        activeFocusOnPress: true
-                        darkBackground: false//index == 1
+                    property bool lockValueChange: false
 
-                        property real valueChangedDelta: 0
-
-                        property bool lockValueChange: false
-
-                        onValueChanged: {
+                    onValueChanged: {
 //                            var newX = value - valueChangedDelta
 ////                            log(newX)
 
@@ -350,38 +357,38 @@ Item {
 //                                break;
 //                            }
 //                            lockValueChange = false;
-                        }
-
-                        onLeftMoveClicked: {
-
-                        }
-
-                        onRightMoveClicked: {
-                            gr.scrollbar_posx += gr.scrollbarSteps * 1
-                        }
                     }
 
-                    Connections {
-                        target: gr
+                    onLeftMoveClicked: {
 
-                        onScrollbarPosChanged : {
-                            log("scrollbar status: " + delta + ", " + pos)
-                            gr.minimumValue = gr.scrollbarSteps * pos;
-                            log("gr.min_max = (" + gr.minimumValue + ", " + gr.maximumValue + ")")
+                    }
 
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].chartStartDataIndex = (delta ? 1 : -1) * gr.scrollbarSteps * pos;
-                                if (flickable_wave.arrayChart[i].chartStartDataIndex < 0)
-                                    flickable_wave.arrayChart[i].chartStartDataIndex = 0;
-                                else if (flickable_wave.arrayChart[i].chartStartDataIndex
-                                         > waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount)
-                                    flickable_wave.arrayChart[i].chartStartDataIndex
-                                         = waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount;
-                                break;
-                            }
+                    onRightMoveClicked: {
+                        gr.scrollbar_posx += gr.scrollbarSteps * 1
+                    }
+                }
+
+                Connections {
+                    target: gr
+
+                    onScrollbarPosChanged : {
+                        log("scrollbar status: " + delta + ", " + pos)
+                        gr.minimumValue = gr.scrollbarSteps * pos;
+                        log("gr.min_max = (" + gr.minimumValue + ", " + gr.maximumValue + ")")
+
+                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                            flickable_wave.arrayChart[i].chartStartDataIndex = (delta ? 1 : -1) * gr.scrollbarSteps * pos;
+                            if (flickable_wave.arrayChart[i].chartStartDataIndex < 0)
+                                flickable_wave.arrayChart[i].chartStartDataIndex = 0;
+                            else if (flickable_wave.arrayChart[i].chartStartDataIndex
+                                     > waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount)
+                                flickable_wave.arrayChart[i].chartStartDataIndex
+                                     = waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount;
+                            break;
                         }
                     }
                 }
+
             }
         }
 
@@ -408,6 +415,7 @@ Item {
                 property variant arrayChart: []
                 property variant arrayChartInfo: []
                 property variant arrayColor: []
+                property variant arrayChartValue: []
 
                 Column {
                     id: content
@@ -482,15 +490,26 @@ Item {
                                         color: "transparent"
 
                                         Label {
-                                            id: label_chnn
+                                            id: label_chnn_value
                                             text: waveModel.y_data(index)[wave_info.selDataPointIndex]
                                                   + " ∠ "
-//                                                  + waveModel.x_data(index)[wave_info.selDataPointIndex]
-                                                  + "°"
+                                                  + waveModel.x_data(index)[wave_info.selDataPointIndex]
+                                                  + "0°"
                                             color: Theme.light.textColor
                                             anchors.centerIn: parent
                                         }
                                     }
+                                }
+
+                                onSelDataPointIndexChanged: {
+                                    var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
+                                    var fresult = chart_curve.calcLatitudeAndPhase(chart_curve.chartData.datasets[0].data, 80, chart_curve.chartReachedPointIndex);
+
+                                    log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
+
+                                    if (btnValueType.valueType == 1)
+                                        tmp1 = fresult[0].toFixed(2);
+                                    label_chnn_value.text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
                                 }
                             }
 
@@ -515,11 +534,14 @@ Item {
                                     chartGrooveColor: gr.color
 
                                     onChartGroovePosXChanged: {
-                                        label_chnn.text = waveModel.y_data(index)[wave_info.selDataPointIndex]
-                                                + " ∠ "
-                                                + chart_curve.calcLatitudeAndPhase(chartData.datasets[0].data, 80
-                                                                                   , chartReachedPointIndex + chartStartDataIndex)[2].toFixed(2)
-                                                + "°"
+                                        var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
+                                        var fresult = chart_curve.calcLatitudeAndPhase(chartData.datasets[0].data, 80, chartReachedPointIndex);
+
+                                        log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
+
+                                        if (btnValueType.valueType == 1)
+                                            tmp1 = fresult[0].toFixed(2);
+                                        label_chnn_value.text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
                                     }
 
                                     chartDatasetOptions: {
@@ -554,19 +576,20 @@ Item {
                             Component.onCompleted: {
                                 flickable_wave.arrayChart.push(chart_curve)
                                 flickable_wave.arrayChartInfo.push(wave_info)
+                                flickable_wave.arrayChartValue.push(label_chnn_value)
                             }
 
                             Connections {
                                 target: chart_curve
 
                                 onSigDrawingCompleted: {
-                                    gr.anchors.leftMargin = x - dp(2);
-                                    log("gr.anchors.leftMargin = " + gr.anchors.leftMargin)
-                                    log("gr.width = " + gr.width)
+//                                    gr.anchors.leftMargin = x - dp(2);
+                                    panel_groove.width = dp(160) + x + dp(3);
+//                                    log("gr.width = " + gr.width)
                                 }
 
                                 onSigChartInfoChanged: {
-                                    log("chartGroovePosX = " + chartGroovePosX)
+//                                    log("chartGroovePosX = " + chartGroovePosX)
                                     for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
                                         flickable_wave.arrayChartInfo[i].selDataPointIndex =
                                                 chartReachedPointIndex + chartStartDataIndex;
