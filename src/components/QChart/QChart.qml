@@ -15,6 +15,8 @@
 import QtQuick 2.0
 import "QChart.js" as Charts
 
+import "../../core"
+
 Canvas {
 
     id: canvas;
@@ -164,6 +166,59 @@ Canvas {
         preWidth = width;
     }
 
+    /*!
+       Select a color depending on whether the background is light or dark.
+
+       \c input:  输入样本.
+
+       \c out: 计算结果.
+
+       \c sampleCount: 计算所需样本点数（向前取）.
+
+       \c curSamplePos: 计算点.
+     */
+    function calcLatitudeAndPhase(input, sampleCount, curSamplePos) {
+        var out = [];
+        if (!input || input.length < 8 || sampleCount < 8)
+            return
+
+        log("input[curSamplePos] = " + input[curSamplePos])
+        var tmp = 0.0;
+        var samplearr = [];
+        for (var i = curSamplePos + 1 - sampleCount; i <= curSamplePos; i++){
+            samplearr[i - curSamplePos - 1 + sampleCount] = input[i];
+            tmp += (input[i] / 10000) * (input[i] / 10000);
+        }
+        log("sample for calc" + samplearr);
+        out[0] = Math.sqrt(tmp/sampleCount) * 10000;
+        out[1] = Math.sqrt(2) * out[0];
+        out[2] = calcSinAngle(out[1], input[curSamplePos]);
+
+        return out;
+    }
+
+
+    /*!
+       Returns true if the color is dark and should have light content on top
+     */
+    function calcSinAngle(R, Y) {
+        var fresult = 0.0;
+
+        if (R > 0.0001){
+            if ( R < Math.abs(Y) )
+                return fresult;
+            fresult = Math.asin(Y/R)*180/Math.PI;
+        }
+
+        if (fresult >= 0){
+            fresult = 180 - fresult;
+        }
+        else
+            fresult = - 180 - fresult;
+
+        return fresult;
+    }
+
     // /////////////////////////////////////////////////////////////////
     // Callbacks
     // /////////////////////////////////////////////////////////////////
@@ -241,7 +296,8 @@ Canvas {
         chartReachedPointIndex = tmp;
         sigChartInfoChanged(chartReachedPointIndex, chartGroovePosX, chartStartDataIndex, chartDisplayPointCount)
 
-//        log("findGrooveNearPoint： " + tmp)
+        tmp = calcLatitudeAndPhase(chartData.datasets[0].data, 80, chartReachedPointIndex + chartStartDataIndex);
+        log(tmp);
     }
 
     onChartDisplayPointCountChanged: {

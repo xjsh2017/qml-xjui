@@ -17,6 +17,9 @@ target.path = $$[QT_INSTALL_QML]/$$uri
 views.files += views/*
 views.path = $$[QT_INSTALL_QML]/$$uri/views
 
+core.files += core/*
+core.path = $$[QT_INSTALL_QML]/$$uri/core
+
 components.files += components/*
                 components/QChart/*
                 components/Grover/*
@@ -29,7 +32,7 @@ qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
-INSTALLS += target qmldir views components# icons
+INSTALLS += target qmldir views components core# icons
 
 #---------------------------INSTALLS FILES end -------------------------------------
 # generate QML folder

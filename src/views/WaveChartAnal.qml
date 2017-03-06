@@ -482,9 +482,11 @@ Item {
                                         color: "transparent"
 
                                         Label {
+                                            id: label_chnn
                                             text: waveModel.y_data(index)[wave_info.selDataPointIndex]
                                                   + " ∠ "
-                                                  + waveModel.x_data(index)[wave_info.selDataPointIndex] + "°"
+//                                                  + waveModel.x_data(index)[wave_info.selDataPointIndex]
+                                                  + "°"
                                             color: Theme.light.textColor
                                             anchors.centerIn: parent
                                         }
@@ -512,10 +514,13 @@ Item {
                                     chartDisplayPointCount: gr.maximumValue - gr.minimumValue
                                     chartGrooveColor: gr.color
 
-//                                    onChartDisplayPointCountChanged: {
-//                                        btnDebug.text = "Count: "
-//                                                + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
-//                                    }
+                                    onChartGroovePosXChanged: {
+                                        label_chnn.text = waveModel.y_data(index)[wave_info.selDataPointIndex]
+                                                + " ∠ "
+                                                + chart_curve.calcLatitudeAndPhase(chartData.datasets[0].data, 80
+                                                                                   , chartReachedPointIndex + chartStartDataIndex)[2].toFixed(2)
+                                                + "°"
+                                    }
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
