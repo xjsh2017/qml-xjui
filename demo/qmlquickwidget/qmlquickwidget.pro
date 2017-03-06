@@ -39,4 +39,7 @@ RESOURCES += \
 
 FORMS    += mainwindow.ui
 
-include(../../src/stores/stores.pri)
+SRC_PATH = ../../src
+INCLUDEPATH += $${SRC_PATH}
+
+include($${SRC_PATH}/stores/stores.pri)

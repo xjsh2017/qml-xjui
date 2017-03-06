@@ -14,7 +14,10 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-include(../../src/stores/stores.pri)
+SRC_PATH = ../../src
+INCLUDEPATH += $${SRC_PATH}
+
+include($${SRC_PATH}/stores/stores.pri)
 
 qmldemo.files += \
     ./*.qml \
