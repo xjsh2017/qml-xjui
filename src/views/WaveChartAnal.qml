@@ -282,9 +282,9 @@ Item {
                         Label {
                             id: labelMac
                             text: {
-                                var tmp = "链路 :";
+                                var tmp = "链路 :\n";
                                 if (waveModel.appid)
-                                    tmp += "0x" + waveModel.appid;
+                                    tmp += waveModel.appid;
                                 if (waveModel.mac2)
                                     tmp += " " + waveModel.mac2
 

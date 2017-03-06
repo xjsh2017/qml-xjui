@@ -30,7 +30,7 @@ class WaveAnalDataModel : public QObject
     QML_PROPERTY(QString, test, READ, test, WRITE, setTest, NOTIFY, testChanged)
     QML_PROPERTY(QString, mac2, READ, mac2, WRITE, setMac2, NOTIFY, mac2Changed)
     QML_PROPERTY(QString, ip2, READ, ip2, WRITE, setIp2, NOTIFY, ip2Changed)
-    QML_PROPERTY(int, appid, READ, appid, WRITE, setAppid, NOTIFY, appidChanged)
+    QML_PROPERTY(QString, appid, READ, appid, WRITE, setAppid, NOTIFY, appidChanged)
 
 public:
     explicit WaveAnalDataModel(QObject *parent = 0);

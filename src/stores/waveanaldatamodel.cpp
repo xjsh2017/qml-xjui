@@ -5,9 +5,9 @@
 WaveAnalDataModel::WaveAnalDataModel(QObject *parent)
     : QObject(parent)
     , m_test(QStringLiteral("mac address"))
-    , m_mac2(QString("34-64-a9-76-42-16"))
+    , m_mac2(QString("00-00-00-00-00-00"))
     , m_ip2(QString())
-    , m_appid(4001)
+    , m_appid(QString("SMV Ox00"))
 {
 
 }
