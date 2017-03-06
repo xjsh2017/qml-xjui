@@ -1,6 +1,6 @@
-module XjQmlUi
+module XjUi
 
-plugin XjQmlUi
+plugin XjUi
 
 # Components
 EntryCase 1.0 components/EntryCase.qml

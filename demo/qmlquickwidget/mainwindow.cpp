@@ -70,7 +70,7 @@ void MainWindow::setupUi()
     m_qwWaveAnal->setObjectName(QStringLiteral("qwWaveAnal"));
     m_qwWaveAnal->setResizeMode(QQuickWidget::SizeRootObjectToView );
     QQmlComponent *component = new QQmlComponent(m_qwWaveAnal->engine());
-    component->setData("import QtQuick 2.4\n import XjQmlUi 1.0 \n WaveChartAnal{}", QUrl());
+    component->setData("import QtQuick 2.4\n import XjUi 1.0 \n WaveChartAnal{}", QUrl());
     m_qwWaveAnal->setContent(QUrl(), component, component->create());
     m_qwWaveData = new WaveAnalDataModel();
 
@@ -96,7 +96,7 @@ void MainWindow::setupUi()
     m_qwWaveAnal2->setObjectName(QStringLiteral("qwWaveAnal"));
     m_qwWaveAnal2->setResizeMode(QQuickWidget::SizeRootObjectToView );
     component = new QQmlComponent(m_qwWaveAnal2->engine());
-    component->setData("import QtQuick 2.4\n import XjQmlUi 1.0 \n WaveChartAnal{}", QUrl());
+    component->setData("import QtQuick 2.4\n import XjUi 1.0 \n WaveChartAnal{}", QUrl());
     m_qwWaveAnal2->setContent(QUrl(), component, component->create());
     m_qwWaveData2 = new WaveAnalDataModel();
 

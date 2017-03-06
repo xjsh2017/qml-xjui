@@ -1,23 +1,13 @@
 TEMPLATE = lib
-TARGET = XjQmlUi
+TARGET = XjUi
 
 QT += qml quick
 CONFIG += qt plugin c++11
 
-TARGET = XjQmlUi#$$qtLibraryTarget($$TARGET)
-uri = XjQmlUi
+#TARGET = $$qtLibraryTarget($$TARGET)
+uri = XjUi
 
-# Input
-SOURCES += \
-    xjqmlui_plugin.cpp \
-    xjitem.cpp
-
-HEADERS += \
-    xjqmlui_plugin.h \
-    xjitem.h
-
-include(stores/stores.pri)
-
+include(core.pri)
 
 target.path = $$[QT_INSTALL_QML]/$$uri
 
@@ -33,7 +23,7 @@ components.files += components/*
 components.path = $$[QT_INSTALL_QML]/$$uri/components
 
 icons.files += icons/*
-icons.path = $$[QT_INSTALL_QML]/XjQmlUi/icons
+icons.path = $$[QT_INSTALL_QML]/XjUi/icons
 
 qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
