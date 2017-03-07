@@ -5,7 +5,6 @@ import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
 import "."
-import "./Charts"
 
 Item {
     id: me

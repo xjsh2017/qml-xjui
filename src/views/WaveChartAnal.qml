@@ -180,7 +180,7 @@ Item {
             id: axis_wave
 
             elevation: 1
-            height: dp(76)
+            height: dp(65)
 
             Layout.fillWidth: true
 
@@ -206,7 +206,7 @@ Item {
                             left: parent.left
                             leftMargin: dp(10)
                             top: parent.top
-                            topMargin: dp(10)
+                            topMargin: height / 2 - action_inflate.height / 2//dp(10)
 //                            centerIn: parent
                         }
                         spacing: dp(6)
@@ -419,7 +419,7 @@ Item {
 
                 Column {
                     id: content
-                    spacing: dp(3)
+                    spacing: dp(0)
 
                     Repeater {
                         model: waveModel.chn_count()
@@ -434,7 +434,7 @@ Item {
                                 id: wave_info
 
                                 width: dp(160)
-                                height: dp(100)
+                                height: dp(70)
 
                                 elevation: 2
 

@@ -362,7 +362,7 @@ Item {
             width: Math.round(1 * Units.dp);
             height: {
                 if (index % 10 == 0)
-                    return control.grooveBasiceHeight  *  11;
+                    return control.grooveBasiceHeight  *  8;
                 else if (index % 5 == 0)
                     return control.grooveBasiceHeight  * 3;
                 else
