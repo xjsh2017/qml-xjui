@@ -65,6 +65,15 @@ Canvas {
 //        console.log("## QChart.qml ##: " + says);
     }
 
+    function startRunningTime(start, interval) {
+        if (interval > 0)
+            runningTimer.interval = interval;
+        if (start)
+            runningTimer.start();
+        else
+            runningTimer.stop();
+    }
+
     function fetchData(arrData, idx_start, varCount) {
         var tmp = new Array;
         var len = arrData.length;
@@ -114,6 +123,23 @@ Canvas {
                 chartStartDataIndex = tmp2;
         }else
             chartStartDataIndex = tmp;
+    }
+
+    function stepChartToLast() {
+        var len = waveModel.x_data(chart_index).length;
+        var lastStartDataIndex = len - chartDisplayPointCount;
+        if (lastStartDataIndex)
+            chartStartDataIndex = lastStartDataIndex;
+        else
+            return;
+        chartGroovePosX = chartDisplayPointCount - 1;   // 显示最新的一个数据
+        sigChartInfoChanged(chartReachedPointIndex, chartGroovePosX, chartStartDataIndex, chartDisplayPointCount)
+
+        requestPaint();
+    }
+
+    function stepChartToFirst() {
+        chartStartDataIndex = 0;
     }
 
     /* 放大缩小波形 */
@@ -180,7 +206,7 @@ Canvas {
         if (!input || input.length < 8 || sampleCount < 8 || curSamplePos < sampleCount)
             return out
 
-        console.log("Click value = " + input[curSamplePos])
+//        console.log("Click value = " + input[curSamplePos])
         var tmp = 0.0;
         var ex = 0.0;
         var samplearr = [];
@@ -189,9 +215,9 @@ Canvas {
             tmp += (input[i] / 10000) * (input[i] / 10000);
             ex += input[i] / 10000;
         }
-        console.log("sample(" + samplearr.length + "):" + samplearr);
+//        console.log("sample(" + samplearr.length + "):" + samplearr);
         var dx = tmp/sampleCount * 10000 * 10000 - (ex / sampleCount * 10000) * (ex / sampleCount * 10000)
-        console.log("dx = " + dx + ", ex = " + ex)
+//        console.log("dx = " + dx + ", ex = " + ex)
         out[0] = Math.sqrt(tmp/sampleCount) * 10000;
         out[1] = Math.sqrt(2) * out[0];
         if (dx > 0)
@@ -199,7 +225,7 @@ Canvas {
         else
             out[2] = 0.0;
 
-        console.log("fresult = " + out)
+//        console.log("fresult = " + out)
 
         return out;
     }
@@ -237,15 +263,16 @@ Canvas {
     // /////////////////////////////////////////////////////////////////
 
     onPaint: {
-        log("***** ---- > >> onPaint Called: " + "chart = " + chart)
+        log("> >> ---- > >> onPaint Called: " + "chart = " + chart)
         if (chartData == undefined){
             log("chartData = " + chartData);
         }
         updateChartData()
 
         var ctx = canvas.getContext("2d");
-        if (!chart)
+//        if (!chart)
             ctx.clearRect(0, 0, canvas.width, canvas.height)
+        chart = 0;
 
         if(!chart) {
 
@@ -411,13 +438,12 @@ Canvas {
     }
 
     Timer {
-        id: timer1;
+        id: runningTimer;
         repeat: true;
-        interval: 5000;
+        interval: 3000;
         triggeredOnStart: true;
         onTriggered: {
-//            chart = null
-//            requestPaint();
+            stepChartToLast();
         }
     }
 
@@ -445,6 +471,5 @@ Canvas {
 
     Component.onCompleted: {
         init();
-//        timer1.start();
     }
 }

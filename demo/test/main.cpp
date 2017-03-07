@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     WaveAnalDataModel data;
 //    data.buildData(10, 800, 20);
-    data.buildData(12, 12000, 3800);
+    data.buildData(10, 12000, 3800);
 
     QQmlApplicationEngine engine;
 

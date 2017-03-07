@@ -100,23 +100,21 @@ Item {
                         name: "Chart : timer for data runtime.."
                         hoverAnimation: false
                         onTriggered: {
-//                            var varTmpInfo;
-//                            if (timer_waveModel.running)
-//                            {
-//                                timer_waveModel.stop();
-//                                varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
-//                            }else
-//                            {
-//                                timer_waveModel.start();
-//                                varTmpInfo = " Timer for Changing Wave Data Model is running  !";
-//                            }
-//                            snackbar.open(varTmpInfo)
-//                            log(varTmpInfo)
+                            var varTmpInfo;
+                            if (timer_waveModel.running)
+                            {
+                                timer_waveModel.stop();
+                                varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
+                            }else
+                            {
+                                timer_waveModel.start();
+                                varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+                            }
+                            snackbar.open(varTmpInfo)
+                            log(varTmpInfo)
 
                             for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].chart = null;
-                                flickable_wave.arrayChart[i].requestPaint();
-                                break;
+                                flickable_wave.arrayChart[i].startRunningTime(timer_waveModel.running);
                             }
                         }
                     }
@@ -323,6 +321,34 @@ Item {
                                 }
                             }
                         }
+
+                        IconButton {
+                            id: runInRealTime
+                            Layout.leftMargin: dp(8)
+
+                            action: Action {
+                                iconName: "action/alarm"
+                                name: "Chart : timer for data runtime.."
+                                onTriggered: {
+                                    var varTmpInfo;
+                                    if (timer_waveModel.running)
+                                    {
+                                        timer_waveModel.stop();
+                                        varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
+                                    }else
+                                    {
+                                        timer_waveModel.start();
+                                        varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+                                    }
+                                    snackbar.open(varTmpInfo)
+                                    log(varTmpInfo)
+
+                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
+                                        flickable_wave.arrayChart[i].startRunningTime(timer_waveModel.running);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -348,15 +374,6 @@ Item {
                     property bool lockValueChange: false
 
                     onValueChanged: {
-//                            var newX = value - valueChangedDelta
-////                            log(newX)
-
-//                            lockValueChange = true;
-//                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-//                                flickable_wave.arrayChart[i].chartGroovePosX = newX + dp(47);
-//                                break;
-//                            }
-//                            lockValueChange = false;
                     }
 
                     onLeftMoveClicked: {
@@ -442,6 +459,17 @@ Item {
 
                                 backgroundColor: Qt.lighter(drawColor)
 
+                                function updateChartInfo() {
+                                    var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
+                                    var fresult = chart_curve.calcLatitudeAndPhase(chart_curve.chartData.datasets[0].data, 80, chart_curve.chartReachedPointIndex);
+
+                                    log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
+
+                                    if (btnValueType.valueType == 1)
+                                        tmp1 = fresult[0].toFixed(2);
+                                    label_chnn_value.text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
+                                }
+
                                 Rectangle {
                                     anchors.fill: parent
 
@@ -459,6 +487,7 @@ Item {
                                         color: "transparent"
 
                                         View {
+                                            visible: false
                                             elevation: 1
                                             height: labelChn.height
                                             width: dp(5)
@@ -502,14 +531,7 @@ Item {
                                 }
 
                                 onSelDataPointIndexChanged: {
-                                    var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
-                                    var fresult = chart_curve.calcLatitudeAndPhase(chart_curve.chartData.datasets[0].data, 80, chart_curve.chartReachedPointIndex);
-
-                                    log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
-
-                                    if (btnValueType.valueType == 1)
-                                        tmp1 = fresult[0].toFixed(2);
-                                    label_chnn_value.text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
+                                    updateChartInfo();
                                 }
                             }
 
@@ -583,9 +605,7 @@ Item {
                                 target: chart_curve
 
                                 onSigDrawingCompleted: {
-//                                    gr.anchors.leftMargin = x - dp(2);
                                     panel_groove.width = dp(160) + x + dp(3);
-//                                    log("gr.width = " + gr.width)
                                 }
 
                                 onSigChartInfoChanged: {
@@ -595,18 +615,20 @@ Item {
                                                 chartReachedPointIndex + chartStartDataIndex;
                                         flickable_wave.arrayChart[i].chartGroovePosX = chartGroovePosX;
                                         flickable_wave.arrayChart[i].chartStartDataIndex = chartStartDataIndex;
+                                        flickable_wave.arrayChartInfo[i].updateChartInfo();
                                     }
-
-
-                                    btnDebug.text = "Count: "
-                                            + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
-                                            + ", Start = " + flickable_wave.arrayChart[0].chartStartDataIndex
-                                            + ", End = " + (flickable_wave.arrayChart[0].chartStartDataIndex
-                                            + flickable_wave.arrayChart[0].chartDisplayPointCount)
-                                            + ", Select = " + flickable_wave.arrayChartInfo[0].selDataPointIndex
-
                                     if (!gr.lockValueChange)
                                         gr.value = chartGroovePosX + gr.minimumValue
+
+
+//                                    btnDebug.text = "Count: "
+//                                            + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
+//                                            + ", Start = " + flickable_wave.arrayChart[0].chartStartDataIndex
+//                                            + ", End = " + (flickable_wave.arrayChart[0].chartStartDataIndex
+//                                            + flickable_wave.arrayChart[0].chartDisplayPointCount)
+//                                            + ", Select = " + flickable_wave.arrayChartInfo[0].selDataPointIndex
+
+
                                 }
                             }
                         }
@@ -631,17 +653,13 @@ Item {
     Timer {
         id:timer_waveModel;
         repeat: true;
-        interval: 2000;
+        interval: 3000;
         triggeredOnStart: true;
         onTriggered: {
             log("Wave Data Model has changed again...")
 //            waveModel.buildData(10, 100, 20);
-            waveModel.queenNewData(100, 1); // 插入一个新数据， 并删除原队列中第一个数据
+            waveModel.queenNewData(5000, 50); // 插入一个新数据， 并删除原队列中第一个数据
             btnDebug.text = waveModel.test + ": " + waveModel.x_data(0)
-
-            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                flickable_wave.arrayChart[i].requestPaint();
-            }
         }
     }
 
