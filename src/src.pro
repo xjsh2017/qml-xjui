@@ -7,7 +7,7 @@ CONFIG += qt plugin c++11
 #TARGET = $$qtLibraryTarget($$TARGET)
 uri = XjUi
 
-include(core.pri)
+include(corelib.pri)
 
 target.path = $$[QT_INSTALL_QML]/$$uri
 

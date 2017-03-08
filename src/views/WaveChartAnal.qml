@@ -9,6 +9,7 @@ import "../components"
 import "../components/Grover"
 import "../components/QChart"
 import "../components/QChart/QChart.js"         as Charts
+import "../core"
 
 Item {
     id: root
@@ -20,7 +21,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## WaveAnalDemo.qml ##: " + says);
+        console.log("## WaveChartAnal.qml ##: " + says);
     }
 
     function dp(di){
@@ -370,23 +371,7 @@ Item {
                     darkBackground: false//index == 1
 
                     property real valueChangedDelta: 0
-
                     property bool lockValueChange: false
-
-                    onValueChanged: {
-                    }
-
-                    onLeftMoveClicked: {
-
-                    }
-
-                    onRightMoveClicked: {
-                        gr.scrollbar_posx += gr.scrollbarSteps * 1
-                    }
-                }
-
-                Connections {
-                    target: gr
 
                     onScrollbarPosChanged : {
                         log("scrollbar status: " + delta + ", " + pos)
@@ -439,7 +424,7 @@ Item {
                     spacing: dp(0)
 
                     Repeater {
-                        model: waveModel.chn_count()
+                        model: 1//waveModel.chn_count()
 
                         Row {
                             id: rowChart
@@ -463,7 +448,7 @@ Item {
                                     var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
                                     var fresult = chart_curve.calcLatitudeAndPhase(chart_curve.chartData.datasets[0].data, 80, chart_curve.chartReachedPointIndex);
 
-                                    log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
+//                                    log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
 
                                     if (btnValueType.valueType == 1)
                                         tmp1 = fresult[0].toFixed(2);
@@ -813,6 +798,10 @@ Item {
 
 
     Component.onCompleted: {
-        log("gr.lockValueChange = " + gr.lockValueChange)
+        var tmp;
+        tmp = Matlab.serialize(0, 0.1, 1);
+        tmp.print();
+        tmp = Matlab.random(2, 15, -100, 100, {type: Matlab.type_DOUBLE});
+        tmp.print();
     }    
 }

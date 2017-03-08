@@ -53,6 +53,8 @@ void WaveAnalDataModel::append_y(int idx, qreal value)
 QList<int> WaveAnalDataModel::random(int nMax, int nCount)
 {
     QList<int> intList;
+
+    intList.reserve(nCount);
     int   i=0, m=0;
     QTime time;
     for(i=0;;)

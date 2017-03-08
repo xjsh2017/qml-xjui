@@ -17,6 +17,7 @@ TimeDisperAnal 1.0 views/TimeDisperAnal.qml
 HarmonicAnal 1.0 views/HarmonicAnal.qml
 
 # core
-#singleton XJElecCalculator 0.1 core/XJElecCalculator.qml
+singleton Calculator 1.0 core/Calculator.qml
+singleton Matlab 1.0 core/Matlab.qml
 
 typeinfo plugin.qmltypes
