@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
 
-SUBDIRS = src demo# tests
+SUBDIRS = src demo
 
 OTHER_FILES = $$PWD/README.md $$PWD/CHANGELOG.md

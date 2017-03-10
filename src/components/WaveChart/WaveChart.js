@@ -84,8 +84,8 @@ var Chart = function(canvas, context) {
             scaleAnchors:  {
                 leftMargin: dp(5),
                 rightMargin: dp(0),
-                topMargin: dp(1),
-                bottomMargin: dp(1)
+                topMargin: dp(5),
+                bottomMargin: dp(5)
             }
         };
 
@@ -237,9 +237,10 @@ var Chart = function(canvas, context) {
                 ctx.moveTo(posx, posy - animPc*(calculateOffset(data.datasets[i].data[0],calculatedScale, valueHopY)))
 
                 for (var j=1; j<data.datasets[i].data.length; j++) {
-                    if (config.bezierCurve) {
-                        ctx.bezierCurveTo(xPos(j-0.5),yPos(i,j-1),xPos(j-0.5),yPos(i,j),xPos(j),yPos(i,j));
-                    } else{
+//                    if (config.bezierCurve) {
+//                        ctx.bezierCurveTo(xPos(j-0.5),yPos(i,j-1),xPos(j-0.5),yPos(i,j),xPos(j),yPos(i,j));
+//                    } else
+                    {
                         ctx.lineTo(xPos(j),yPos(i,j));
                     }
                 }
@@ -518,7 +519,6 @@ var Chart = function(canvas, context) {
         }
 
         function getValueBounds() { // 获取 data.datasets 最大最小值，即纵坐标的范围
-
             var upperValue = Number.MIN_VALUE;
             var lowerValue = Number.MAX_VALUE;
 
@@ -528,12 +528,14 @@ var Chart = function(canvas, context) {
                     if ( data.datasets[i].data[j] < lowerValue) { lowerValue = data.datasets[i].data[j] };
                 }
             };
-            log("upperValue = " + upperValue + ", lowerValue = " + lowerValue)
 
             var yLen = height - config.scaleAnchors.bottomMargin - config.scaleAnchors.topMargin - xLabelMaxheight;
             var maxSteps = Math.floor((yLen / (labelFontHeight*0.66)));
             var minSteps = Math.floor((yLen / labelFontHeight*0.5));
-            log("maxSteps = " + maxSteps + ", minSteps = " + minSteps)
+
+            log("index = " + canvas.index + " : "
+                        + "\n\t lowerValue = " + lowerValue + ", upperValue = " + upperValue
+                        + "\n\t minSteps = " + minSteps + ", maxSteps = " + maxSteps)
 
             return {
                 maxValue: upperValue,
@@ -590,7 +592,6 @@ var Chart = function(canvas, context) {
                 width: scaleVertex.width,
                 height: scaleVertex.height
             }
-            canvas.plotDataCount = scaleVertex.width
         }
     }
 
@@ -627,12 +628,10 @@ var Chart = function(canvas, context) {
 
         graphMin = Math.floor(minValue / (1 * Math.pow(10, rangeOrderOfMagnitude))) * Math.pow(10, rangeOrderOfMagnitude);
         graphMax = Math.ceil(maxValue / (1 * Math.pow(10, rangeOrderOfMagnitude))) * Math.pow(10, rangeOrderOfMagnitude);
-        log("graphMax = " + graphMax + ", graphMin = " + graphMin)
 
         graphRange = graphMax - graphMin;
         stepValue = Math.pow(10, rangeOrderOfMagnitude);
         numberOfSteps = Math.round(graphRange / stepValue);
-        log("stepValue = " + stepValue + ", numberOfSteps = " + numberOfSteps)
 
 //        while(numberOfSteps < minSteps || numberOfSteps > maxSteps) {
 //            if (numberOfSteps < minSteps) {
@@ -648,7 +647,12 @@ var Chart = function(canvas, context) {
         var labels = [];
 
         populateLabels(labelTemplateString, labels, numberOfSteps, graphMin, stepValue);
-        log("labels = " + labels)
+
+
+        log("index = " + canvas.index + " : "
+                    + "\n\t stepValue = " + stepValue + ", numberOfSteps = " + numberOfSteps
+                    + "\n\t graphMin = " + graphMin + ", graphMax = " + graphMax
+                    + "\n\t labels = " + labels)
 
         return {
             steps: numberOfSteps,   // 步数

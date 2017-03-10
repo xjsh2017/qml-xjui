@@ -5,18 +5,71 @@ import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
 import "."
-import "../components"
-import "../components/Grover"
-import "../components/QChart"
-import "../components/QChart/QChart.js"         as Charts
 import "../core"
+import "../components/Grover"
+import "../components/WaveChart"
 
 Item {
     id: root
 
-
     // ///////////////////////////////////////////////////////////////
 
+    property var model: { "x": Matlab.serialize(0, 1, 1599),
+//                          "y": Matlab.random(3, 1600, -200, 200),
+                          "y": Matlab.sampleSin(23, 1601, 0, 1599, -20, 20, 20),
+                          "name": ["通道延时"
+                                   , "保护A相电流1", "保护A相电流2"
+                                   , "保护B相电流1", "保护B相电流2"
+                                   , "保护C相电流1", "保护C相电流2"
+                                   , "计量A相电流", "计量B相电流", "计量C相电流"
+                                   , "零序电流I01", "零序电流I02"
+                                   , "间隙电流Ij1", "间隙电流Ij2"
+                                   , "保护A相电压1", "保护A相电压2"
+                                   , "B相电压采样值1", "B相电压采样值2"
+                                   , "C相电压采样值1", "C相电压采样值2"
+                                   , "线路抽取电压1", "线路抽取电压2"
+                                   , "零序电压1", "零序电压2"
+                                   , "计量A相电压", "计量B相电压", "计量C相电压"],
+                          "unit": [""
+                                   , "A", "A"
+                                   , "A", "A"
+                                   , "A", "A"
+                                   , "A", "A", "A"
+                                   , "A", "A"
+                                   , "A", "A"
+                                   , "V", "V"
+                                   , "V", "V"
+                                   , "V", "V"
+                                   , "V", "V"
+                                   , "V", "V"
+                                   , "V", "V", "V"],
+                          "phase": [""
+                                    , "A", "A"
+                                    , "B", "B"
+                                    , "C", "C"
+                                    , "A", "B", "C"
+                                    , "N", "N"
+                                    , "", ""
+                                    , "A", "A"
+                                    , "B", "B"
+                                    , "C", "C"
+                                    , "", ""
+                                    , "N", "N"
+                                    , "A", "B", "C"],
+                          rms: [""],
+                          angle: [""]
+    }
+
+    property int selectDataIndex: 0
+    property int wavePannelWidth: dp(160)
+    property int wavePannelHeight: dp(80)
+
+    property variant curvelist: []
+    property variant wavePanelist: []
+
+    onModelChanged: {
+        log("WaveChartAnal Model Changed!")
+    }
 
     // ///////////////////////////////////////////////////////////////
 
@@ -28,25 +81,6 @@ Item {
         return di;
     }
 
-    function random_scalingFactor() {
-        return Math.round(Math.random() * 100);
-    }
-
-    function random_color() {
-        return Qt.rgba(Math.random(),
-                       Math.random(), Math.random(), 1);
-    }
-
-    function random_colos(clrCount) {
-        var arrClr = new Array;
-        for (var i = 0; i < clrCount; i++)
-            arrClr.push(random_color());
-
-        log(arrClr);
-
-        return arrClr;
-    }
-
     // ///////////////////////////////////////////////////////////////
 
     ColumnLayout {
@@ -56,127 +90,11 @@ Item {
             fill: parent
             margins: dp(0)
         }
-        spacing: dp(6)
-
-        // 工具栏
-        View {
-            id: toolbar
-
-            visible: false
-
-            height: dp(36)
-            elevation: dp(2)
-            clip:false
-//            backgroundColor: Theme.backgroundColor
-
-            Layout.fillWidth: true
-
-            Rectangle { // 渐变色
-                anchors.fill: parent
-                gradient: Gradient {
-                        GradientStop { position: 0.0; color: "white" }
-                        GradientStop { position: 0.73; color: "lightgrey" }
-                        GradientStop { position: 1.0; color: "lightgrey" }
-                    }
-            }
-
-            // 按钮
-            RowLayout {
-                width: parent.width
-                height: parent.height
-
-                anchors {
-                    margins: dp(11)
-                    bottomMargin: dp(8)
-                    leftMargin: dp(8)
-                }
-                spacing: dp(12)
-
-                IconButton {
-                    id: action_timer
-                    Layout.leftMargin: dp(8)
-
-                    action: Action {
-                        iconName: "action/alarm"
-                        name: "Chart : timer for data runtime.."
-                        hoverAnimation: false
-                        onTriggered: {
-                            var varTmpInfo;
-                            if (timer_waveModel.running)
-                            {
-                                timer_waveModel.stop();
-                                varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
-                            }else
-                            {
-                                timer_waveModel.start();
-                                varTmpInfo = " Timer for Changing Wave Data Model is running  !";
-                            }
-                            snackbar.open(varTmpInfo)
-                            log(varTmpInfo)
-
-                            for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                flickable_wave.arrayChart[i].startRunningTime(timer_waveModel.running);
-                            }
-                        }
-                    }
-                }
-
-                Button {
-                    id: btnDebug1
-
-                    visible: false
-
-                    text: "Mouse: X: " + 0 + ", Y: " + 0
-                    implicitHeight: dp(30)
-                    elevation: 1
-                    activeFocusOnPress: true
-                    backgroundColor: Theme.accentColor
-                    Layout.alignment: Qt.AlignVCenter
-
-                    onClicked: {
-//                        actionSheet.visible = !actionSheet.visible
-                    }
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                Button {
-                    id: btnDebug
-                    text: ""/*waveModel.test*/
-
-                    visible: text.length > 0
-
-                    implicitHeight: dp(28)
-                    elevation: 1
-                    //                    activeFocusOnPress: true
-                    backgroundColor: Theme.accentColor
-                    //                    anchors.horizontalCenter: parent.horizontalCenter
-                    Layout.alignment: Qt.AlignVCenter
-
-                    onClicked: snackbar.open("That button is colored!")
-                }
-
-                IconButton {
-                    id: chart_setting
-                    Layout.rightMargin: dp(8)
-
-                    action: Action {
-                        iconName: "action/settings"
-                        name: "Settings"
-                        hoverAnimation: true
-                        onTriggered: {
-                            chartSettings.show()
-                        }
-                    }
-                }
-            }
-        }
+        spacing: dp(3)
 
         // 波形标尺
         View {
-            id: axis_wave
+            id: grooveView
 
             elevation: 1
             height: dp(65)
@@ -188,14 +106,13 @@ Item {
                 height: parent.height
 
                 View {
-                    id: panel_groove
+                    id: groovePannel
                     width: dp(160)
                     height: parent.height
 
                     elevation: 3
 
-//                    border.color: Theme.accentColor
-
+                    // 面板工具
                     Flow {
                         id: chart_info_title_panel
                         width: parent.width
@@ -203,84 +120,13 @@ Item {
 
                         anchors {
                             left: parent.left
-                            leftMargin: dp(10)
+                            leftMargin: dp(8)
                             top: parent.top
-                            topMargin: height / 2 - action_inflate.height / 2//dp(10)
-//                            centerIn: parent
+                            topMargin: dp(5)
+//                            topMargin: height / 2 - action_inflate.height / 2//dp(10)
                         }
                         spacing: dp(6)
 
-                        IconButton {
-                            id: action_inflate
-
-                            action: Action {
-                                iconName: "action/inflate"
-                                name: "Chart : Inflate look"
-                                onTriggered: {
-                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                        flickable_wave.arrayChart[i].stepLegend(-2);
-                                    }
-                                }
-                            }
-                        }
-
-                        IconButton {
-                            id: action_inflate_default
-
-                            action: Action {
-                                iconName: "action/inflate_default"
-                                name: "Chart : default look"
-                                onTriggered: {
-                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                        flickable_wave.arrayChart[i].stepLegend(0);
-                                    }
-                                }
-                            }
-                        }
-
-                        IconButton {
-                            id: action_deflate
-
-                            action: Action {
-                                iconName: "action/deflate"
-                                name: "Chart : Deflate look"
-                                onTriggered: {
-                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                        flickable_wave.arrayChart[i].stepLegend(2);
-                                    }
-                                }
-                            }
-                        }
-
-                        IconButton {
-                            id: chart_refresh
-
-                            action: Action {
-                                iconName: "navigation/refresh"
-                                name: "Chart: Refresh (Ctrl + R)"
-                                hoverAnimation: true
-                                onTriggered: {
-                                    for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
-                                        flickable_wave.arrayChart[i].chart = null;
-                                        flickable_wave.arrayChart[i].requestPaint();
-                                    }
-                                    snackbar.open("All Charts Refreshed !")
-                                }
-                            }
-                        }
-
-                        IconButton {
-                            id: chart_setting2
-
-                            action: Action {
-                                iconName: "action/setting"
-                                name: "Chart Settings (Ctrl + I)"
-                                hoverAnimation: true
-                                onTriggered: {
-                                    chartSettings.show()
-                                }
-                            }
-                        }
 
                         Button {
                             id: btnValueType
@@ -290,7 +136,7 @@ Item {
 
                             implicitHeight: dp(22)
                             implicitWidth: dp(22)
-                            elevation: 0
+                            elevation: 1
                             backgroundColor: Theme.accentColor
                             Layout.alignment: Qt.AlignVCenter
 
@@ -304,24 +150,45 @@ Item {
                                     valueType = 1;
                                     backgroundColor = "green"
                                 }
-                                for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                    var samplePos = flickable_wave.arrayChart[i].chartReachedPointIndex;
-                                    var fresult = flickable_wave.arrayChart[i].calcLatitudeAndPhase(
-                                                flickable_wave.arrayChart[i].chartData.datasets[0].data, 80, samplePos);
-                                    var datapos = flickable_wave.arrayChartInfo[i].selDataPointIndex;
 
-                                    log("samplePos = " + samplePos + ", datapos = " + datapos)
-
-                                    var tmp1 = waveModel.y_data(flickable_wave.arrayChart[i].chart_index)[datapos];
-
-                                    log("By Btn:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
-                                    if (valueType == 1)
-                                        tmp1 = fresult[0].toFixed(2);
-
-                                    flickable_wave.arrayChartValue[i].text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
+                                for (var i in root.wavePanelist){
+                                    root.wavePanelist[i].updateWavePanel();
                                 }
+
                             }
                         }
+
+                        Button {
+                            id: btnGrooveMode
+                            text: qsTr("采")
+
+                            property int valueType: 0   // 0 - 采样点模式， 1 - 时间模式
+
+                            implicitHeight: dp(22)
+                            implicitWidth: dp(22)
+                            elevation: 1
+                            backgroundColor: Theme.accentColor
+                            Layout.alignment: Qt.AlignVCenter
+
+                            onClicked: {
+                                if (valueType == 1){
+                                    text = qsTr("采");
+                                    valueType = 0;
+                                    backgroundColor = Theme.accentColor
+                                }else{
+                                    text = qsTr("时")
+                                    valueType = 1;
+                                    backgroundColor = "green"
+                                }
+
+//                                for (var i in root.wavePanelist){
+//                                    root.wavePanelist[i].updateWavePanel();
+//                                }
+
+                            }
+                        }
+
+
 
                         IconButton {
                             id: runInRealTime
@@ -329,7 +196,8 @@ Item {
 
                             action: Action {
                                 iconName: "action/alarm"
-                                name: "Chart : timer for data runtime.."
+                                name: "Go to Running Time Mode"
+
                                 onTriggered: {
                                     var varTmpInfo;
                                     if (timer_waveModel.running)
@@ -344,21 +212,157 @@ Item {
                                     snackbar.open(varTmpInfo)
                                     log(varTmpInfo)
 
-                                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                                        flickable_wave.arrayChart[i].startRunningTime(timer_waveModel.running);
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].startRunningTime(timer_waveModel.running);
                                     }
                                 }
                             }
                         }
+
+                        IconButton {
+                            id: chart_setting
+
+                            action: Action {
+                                iconName: "action/setting"
+                                name: qsTr("Chart Settings (Ctrl + I)")
+                                hoverAnimation: true
+                                onTriggered: {
+                                    chartSettings.show()
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: chart_refresh
+
+                            action: Action {
+                                iconName: "navigation/refresh"
+                                name: qsTr("Refresh (Ctrl + R)")
+                                hoverAnimation: true
+                                onTriggered: {
+                                    for (var i = 0; i < root.wavePanelist.length; ++i){
+                                        root.curvelist[i].plotHandler = null;
+                                        root.curvelist[i].requestPaint();
+                                    }
+                                    snackbar.open("All Charts Refreshed !")
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: dp(20)
+                        }
+
+                        IconButton {
+                            id: action_inflate
+
+                            action: Action {
+                                iconName: "action/inflate"
+                                name: "Inflate View"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].scaleChart(2);
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: action_inflate_default
+
+                            action: Action {
+                                iconName: "action/inflate_default"
+                                name: "Default View"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].scaleChartToDefault();
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: action_deflate
+
+                            action: Action {
+                                iconName: "action/deflate"
+                                name: "Deflate View"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].scaleChart(-2);
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: action_left_end
+
+                            action: Action {
+                                iconName: "navigation/chevron_left"
+                                name: "To Left End"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].stepChart(-1999);
+                                        log(root.curvelist[i].startDataIndex)
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: action_left
+
+                            action: Action {
+                                iconName: "navigation/chevron_left"
+                                name: "Left Move"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].stepChart(-2);
+                                        log(root.curvelist[i].startDataIndex)
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: action_right
+
+                            action: Action {
+                                iconName: "navigation/chevron_right"
+                                name: "Right Move"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].stepChart(2);
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: action_right_end
+
+                            action: Action {
+                                iconName: "navigation/chevron_right"
+                                name: "Right End"
+                                onTriggered: {
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].stepChart(1999);
+                                        log(root.curvelist[i].startDataIndex)
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
 
                 // 大标尺
                 Groove {
-                    id: gr
+                    id: groove
 
                     height: parent.height
-                    width: parent.width - panel_groove.width
+                    width: parent.width - groovePannel.width
 
                     value: maximumValue * 0
                     focus: true
@@ -366,28 +370,25 @@ Item {
                     numericValueLabel: true
                     stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
                     minimumValue: 0
-                    maximumValue: parent.width + minimumValue - gr.anchors.leftMargin  // 刻度尺的长度
+                    maximumValue: parent.width + minimumValue - groove.anchors.leftMargin  // 刻度尺的长度
                     activeFocusOnPress: true
-                    darkBackground: false//index == 1
-
-                    property real valueChangedDelta: 0
-                    property bool lockValueChange: false
+                    darkBackground: false
 
                     onScrollbarPosChanged : {
                         log("scrollbar status: " + delta + ", " + pos)
-                        gr.minimumValue = gr.scrollbarSteps * pos;
-                        log("gr.min_max = (" + gr.minimumValue + ", " + gr.maximumValue + ")")
+                        groove.minimumValue = groove.scrollbarSteps * pos;
+                        log("groove.min_max = (" + groove.minimumValue + ", " + groove.maximumValue + ")")
 
-                        for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                            flickable_wave.arrayChart[i].chartStartDataIndex = (delta ? 1 : -1) * gr.scrollbarSteps * pos;
-                            if (flickable_wave.arrayChart[i].chartStartDataIndex < 0)
-                                flickable_wave.arrayChart[i].chartStartDataIndex = 0;
-                            else if (flickable_wave.arrayChart[i].chartStartDataIndex
-                                     > waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount)
-                                flickable_wave.arrayChart[i].chartStartDataIndex
-                                     = waveModel.cols() - flickable_wave.arrayChart[i].chartDisplayPointCount;
-                            break;
-                        }
+//                        for (var i = 0; i < root.curvelist.length; ++i){
+//                            root.curvelist[i].startDataIndex = (delta ? 1 : -1) * groove.scrollbarSteps * pos;
+//                            if (root.curvelist[i].startDataIndex < 0)
+//                                root.curvelist[i].startDataIndex = 0;
+//                            else if (root.curvelist[i].startDataIndex
+//                                     > waveModel.cols() - root.curvelist[i].chartDisplayPointCount)
+//                                root.curvelist[i].startDataIndex
+//                                     = waveModel.cols() - root.curvelist[i].chartDisplayPointCount;
+//                            break;
+//                        }
                     }
                 }
 
@@ -396,63 +397,61 @@ Item {
 
         // 波形列表
         View {
-            id: wave
+            id: waveView
 
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            backgroundColor: Theme.backgroundColor;
+
             elevation: 1
-            backgroundColor: Qt.lighter(Theme.backgroundColor);
 
             Flickable {
                 id: flickable_wave
 
-                clip: true
-                visible: true
                 anchors.fill: parent
+                clip: true
 
                 contentHeight: content.childrenRect.height
-//                contentWidth: content.childrenRect.width
-
-                property variant arrayChart: []
-                property variant arrayChartInfo: []
-                property variant arrayColor: []
-                property variant arrayChartValue: []
 
                 Column {
                     id: content
+
                     spacing: dp(0)
 
                     Repeater {
-                        model: 1//waveModel.chn_count()
+                        model: root.model.y.rows
 
                         Row {
-                            id: rowChart
-                            spacing: dp(3)
+                            spacing: dp(2)
 
-                            property color drawColor: root.random_color();
+                            property color drawColor: Global.phaseTypeColor(root.model.phase[index]);
 
+                            // 波形图面板
                             View {
-                                id: wave_info
+                                id: wavePanel
 
-                                width: dp(160)
-                                height: dp(70)
+                                elevation: 1
 
-                                elevation: 2
-
-                                property   int selDataPointIndex: 0
-
+                                width: root.wavePannelWidth
+                                height: root.wavePannelHeight
                                 backgroundColor: Qt.lighter(drawColor)
 
-                                function updateChartInfo() {
-                                    var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
-                                    var fresult = chart_curve.calcLatitudeAndPhase(chart_curve.chartData.datasets[0].data, 80, chart_curve.chartReachedPointIndex);
+                                function updateWavePanel() {
+                                    var tmp = root.model.y.row(index);
 
-//                                    log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
+                                    var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
+                                    tmp = root.model.y.row(index)[curve.selectDataIndex];
+                                    if (btnValueType.valueType == 1){
+                                        tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
+                                    }
 
-                                    if (btnValueType.valueType == 1)
-                                        tmp1 = fresult[0].toFixed(2);
-                                    label_chnn_value.text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
+                                    label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.phase.toFixed(2) : "#") + "°"
+
+                                    root.model.rms[index] = (fresult ? fresult.RMS.toFixed(2) : "#");
+                                    root.model.angle[index] = (fresult ? fresult.phase.toFixed(2) : "#");
+
+                                    root.modelChanged()
                                 }
 
                                 Rectangle {
@@ -471,28 +470,23 @@ Item {
 
                                         color: "transparent"
 
-                                        View {
-                                            visible: false
-                                            elevation: 1
-                                            height: labelChn.height
-                                            width: dp(5)
-
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
-
                                         Label {
                                             id: labelChn
-                                            text: "通道： " + (index + 1)
+                                            text: "通道 " + (index + 1) + "： " + root.model.name[index]
                                             color: Theme.light.textColor
                                             anchors.centerIn: parent
+
+                                            font {
+                                                family: "微软雅黑"
+                                                weight: Font.Light
+                                                pixelSize: dp(12)
+                                            }
                                         }
 
                                     }
 
                                     MagicDivider {
                                         width: parent.width
-
-//                                        styleDivider: 2
                                         dash_len: 4
                                         color: drawColor
                                     }
@@ -505,51 +499,35 @@ Item {
 
                                         Label {
                                             id: label_chnn_value
-                                            text: waveModel.y_data(index)[wave_info.selDataPointIndex]
-                                                  + " ∠ "
-                                                  + waveModel.x_data(index)[wave_info.selDataPointIndex]
-                                                  + "0°"
+                                            text: "# ∠ #°"
                                             color: Theme.light.textColor
                                             anchors.centerIn: parent
                                         }
                                     }
                                 }
 
-                                onSelDataPointIndexChanged: {
-                                    updateChartInfo();
-                                }
                             }
 
                             View {
-                                id: wave_chart
+                                id: waveChartView
 
-                                height: wave_info.height
-                                width: wave.width - wave_info.width - rowChart.spacing
+                                height: wavePanel.height
+                                width: waveView.width - wavePanel.width - parent.spacing
 
                                 backgroundColor: "#263238"
 
-                                QChart {
-                                    id: chart_curve;
+                                WaveChart {
+                                    id: curve;
 
                                     anchors.fill: parent
 
                                     chartAnimated: false;
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
-                                    chart_index: index
-                                    chartDisplayPointCount: gr.maximumValue - gr.minimumValue
-                                    chartGrooveColor: gr.color
 
-                                    onChartGroovePosXChanged: {
-                                        var tmp1 = waveModel.y_data(index)[wave_info.selDataPointIndex];
-                                        var fresult = chart_curve.calcLatitudeAndPhase(chartData.datasets[0].data, 80, chartReachedPointIndex);
-
-                                        log("By Click:  Instant = " + tmp1 + ", real = " + fresult[0].toFixed(2));
-
-                                        if (btnValueType.valueType == 1)
-                                            tmp1 = fresult[0].toFixed(2);
-                                        label_chnn_value.text = tmp1 + " ∠ " + fresult[2].toFixed(2) + "°"
-                                    }
+                                    model: root.model
+                                    index: modelData
+                                    grooveColor: Theme.accentColor
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -559,62 +537,63 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : false,
+                                        "pointDot" : true,
                                         "scaleShowLabelsX" : false,
                                         "scaleShowLabelsY" : true,
                                         "scaleShowGridLines" : false,
                                         "fixedLenLabelsY": dp(40)
                                     }
 
-                                    chartType: Charts.ChartType.LINE;
-
                                     Rectangle {
                                         anchors.fill: parent
                                         border.color: Qt.lighter(drawColor)
                                         color: "transparent"
                                     }
+
+                                    onSigDrawingCompleted: {
+                                        groovePannel.width = root.wavePannelWidth + x + dp(3);
+                                    }
+
+                                    onGrooveXPlotChanged: {
+                                        for (var i = 0; i < root.curvelist.length; ++i){
+                                            if (root.curvelist[i] == curve)
+                                                continue;
+                                            if (curve.grooveXPlot == root.curvelist[i].grooveXPlot)
+                                                continue;
+
+                                            root.curvelist[i].grooveXPlot = curve.grooveXPlot; // grooveXPlot在内部已经更改自己的selectDataIndex
+
+//                                            console.log(root.curvelist[i]);
+                                        }
+                                        console.log(curve);
+                                        groove.value = curve.grooveXPlot + groove.minimumValue
+//                                        root.selectDataIndex = curve.selectDataIndex;
+
+//                                    btnDebug.text = "Count: "
+//                                            + curve.chartDisplayPointCount + "/" + waveModel.cols()
+//                                            + ", Start = " + root.curvelist[0].startDataIndex
+//                                            + ", End = " + (root.curvelist[0].startDataIndex
+//                                            + root.curvelist[0].chartDisplayPointCount)
+//                                            + ", Select = " + root.wavePanelist[0].selDataPointIndex
+                                    }
+
+                                    onSelectDataIndexChanged: {
+                                        root.log("index = " + index )
+                                        wavePanel.updateWavePanel();
+//                                        for (var i = 0; i < root.curvelist.length; ++i){
+//                                            root.curvelist[i].selectDataIndex = curve.selectDataIndex;
+//                                            root.wavePanelist[i].updateWavePanel();
+//                                        }
+//                                        groove.value = curve.grooveXPlot + groove.minimumValue
+//                                        root.selectDataIndex = curve.selectDataIndex;
+                                    }
                                 }
 
-                                Component.onCompleted: {
-//                                    log(wave_chart.width)
-                                }
                             }
 
                             Component.onCompleted: {
-                                flickable_wave.arrayChart.push(chart_curve)
-                                flickable_wave.arrayChartInfo.push(wave_info)
-                                flickable_wave.arrayChartValue.push(label_chnn_value)
-                            }
-
-                            Connections {
-                                target: chart_curve
-
-                                onSigDrawingCompleted: {
-                                    panel_groove.width = dp(160) + x + dp(3);
-                                }
-
-                                onSigChartInfoChanged: {
-//                                    log("chartGroovePosX = " + chartGroovePosX)
-                                    for (var i = 0; i < flickable_wave.arrayChartInfo.length; ++i){
-                                        flickable_wave.arrayChartInfo[i].selDataPointIndex =
-                                                chartReachedPointIndex + chartStartDataIndex;
-                                        flickable_wave.arrayChart[i].chartGroovePosX = chartGroovePosX;
-                                        flickable_wave.arrayChart[i].chartStartDataIndex = chartStartDataIndex;
-                                        flickable_wave.arrayChartInfo[i].updateChartInfo();
-                                    }
-                                    if (!gr.lockValueChange)
-                                        gr.value = chartGroovePosX + gr.minimumValue
-
-
-//                                    btnDebug.text = "Count: "
-//                                            + chart_curve.chartDisplayPointCount + "/" + waveModel.cols()
-//                                            + ", Start = " + flickable_wave.arrayChart[0].chartStartDataIndex
-//                                            + ", End = " + (flickable_wave.arrayChart[0].chartStartDataIndex
-//                                            + flickable_wave.arrayChart[0].chartDisplayPointCount)
-//                                            + ", Select = " + flickable_wave.arrayChartInfo[0].selDataPointIndex
-
-
-                                }
+                                root.curvelist.push(curve)
+                                root.wavePanelist.push(wavePanel)
                             }
                         }
                     }
@@ -624,11 +603,6 @@ Item {
             Scrollbar {
                 flickableItem: flickable_wave
                 orientation: Qt.Vertical
-            }
-
-            Scrollbar {
-                flickableItem: flickable_wave
-                orientation: Qt.Horizontal
             }
         }
 
@@ -672,13 +646,13 @@ Item {
 
             CheckBox {
                 checked: false
-                text: "Show Points: " + flickable_wave.arrayChart.length
+                text: "Show Points: " + root.curvelist.length
                 darkBackground: false
 
                 onCheckedChanged: {
-                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                        flickable_wave.arrayChart[i].chartOptions.pointDot = checked;
-                        flickable_wave.arrayChart[i].requestPaint();
+                    for (var i = 0; i < root.curvelist.length; ++i){
+                        root.curvelist[i].chartOptions.pointDot = checked;
+                        root.curvelist[i].requestPaint();
                     }
                 }
             }
@@ -687,49 +661,49 @@ Item {
 
             CheckBox {
                 checked: false
-                text: "Show X Labels: " + flickable_wave.arrayChart.length
+                text: "Show X Labels: " + root.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                        flickable_wave.arrayChart[i].chartOptions.scaleShowLabelsX = checked;
-                        flickable_wave.arrayChart[i].requestPaint();
+                    for (var i = 0; i < root.curvelist.length; ++i){
+                        root.curvelist[i].chartOptions.scaleShowLabelsX = checked;
+                        root.curvelist[i].requestPaint();
                     }
                 }
             }
 
             CheckBox {
                 checked: false
-                text: "Show Y Labels: " + flickable_wave.arrayChart.length
+                text: "Show Y Labels: " + root.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                        flickable_wave.arrayChart[i].chartOptions.scaleShowLabelsY = checked;
-                        flickable_wave.arrayChart[i].requestPaint();
+                    for (var i = 0; i < root.curvelist.length; ++i){
+                        root.curvelist[i].chartOptions.scaleShowLabelsY = checked;
+                        root.curvelist[i].requestPaint();
                     }
                 }
             }
 
             CheckBox {
                 checked: true
-                text: "Show Y Labels: " + flickable_wave.arrayChart.length
+                text: "Show Y Labels: " + root.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                        flickable_wave.arrayChart[i].chartOptions.scaleShowAxisX = checked;
-                        flickable_wave.arrayChart[i].chartOptions.scaleShowAxisY = checked;
-                        flickable_wave.arrayChart[i].requestPaint();
+                    for (var i = 0; i < root.curvelist.length; ++i){
+                        root.curvelist[i].chartOptions.scaleShowAxisX = checked;
+                        root.curvelist[i].chartOptions.scaleShowAxisY = checked;
+                        root.curvelist[i].requestPaint();
                     }
                 }
             }
 
             CheckBox {
                 checked: false
-                text: "Show Y Labels: " + flickable_wave.arrayChart.length
+                text: "Show Y Labels: " + root.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < flickable_wave.arrayChart.length; ++i){
-                        flickable_wave.arrayChart[i].chartOptions.scaleShowGridLines = checked;
-                        flickable_wave.arrayChart[i].requestPaint();
+                    for (var i = 0; i < root.curvelist.length; ++i){
+                        root.curvelist[i].chartOptions.scaleShowGridLines = checked;
+                        root.curvelist[i].requestPaint();
                     }
                 }
             }
@@ -797,11 +771,43 @@ Item {
     }
 
 
+    function updateModel() {
+        waveModel.cols();
+        var Rows = waveModel.rows();
+        var Cols = waveModel.cols();
+        model.y = Matlab.matrix(Rows, Cols);
+        for (var i = 0; i < Rows; i ++){
+            model.y.data[i] = waveModel.y_data(i);
+        }
+
+        return 0;
+    }
+
     Component.onCompleted: {
-        var tmp;
-        tmp = Matlab.serialize(0, 0.1, 1);
-        tmp.print();
-        tmp = Matlab.random(2, 15, -100, 100, {type: Matlab.type_DOUBLE});
-        tmp.print();
+//        updateModel();
+//        model.x.print();
+//        model.y.print();
+//        console.log("pi = " + Math.PI)
+//        var tmp;
+//        tmp = Matlab.sampleSin(1, 9, 2*180, 4*180, -2, 4, 1);
+//        tmp.print();
+        console.log(typeof root.model.y.value(0, 1))
+        console.log(Math.random(2))
+        console.log(Math.random(2))
+        console.log(Math.random(2))
+        console.log(Math.random(2))
+
+        console.log(Math.max([0.1, -2, 3, 0.9, 2.8, -7]));
+//        var tmp = Matlab.random(5, 8, -10, 10);
+//        tmp.print();
+
+//        tmp = Matlab.matrix(5, 21, 5);
+//        tmp.print();
+//        tmp = Matlab.serialize(0, 2, 10);
+//        tmp.print();
+
+//        Matlab.findBound(3.7, 2.6, tmp);
+
+//        console.log(tmp.row(2));
     }    
 }

@@ -27,7 +27,7 @@ QtObject {
     /*!
       result for calc
       */
-    property var calc_result
+    property var fresult;
 
     /*!
    Select a color depending on whether the background is light or dark.
@@ -40,33 +40,59 @@ QtObject {
 
    \c curSamplePos: 计算点.
  */
-    function calcLatitudeAndPhase(input, sampleCount, curSamplePos) {
-        var out = [NaN, NaN, NaN];
-        if (!input || input.length < 8 || sampleCount < 8 || curSamplePos < sampleCount)
-            return out
+    function calcRMS(input, curSamplePos, count) {
+//        if (typeof input[0] != "number"){
+//            log("Error using calcRMS (line 46) \n The 1st argument must be number array type.");
+//            return NaN;
+//        }
+        var fInput = input.map(parseFloat)
 
-        //        console.log("Click value = " + input[curSamplePos])
+        if (arguments.length < 3){
+            log("Error using calcRMS (line 46) \nThere should be 3 arguments at least.");
+            return NaN;
+        }
+
+        if (!input || input.length < 8 || count < 8 || curSamplePos < count)
+            return NaN;
+
+        count = arguments[2] != undefined ? arguments[2] : 80;
+
+        var RMS;
+        var amplitude;
+        var phase;
+
         var tmp = 0.0;
         var ex = 0.0;
+        var dx;
         var samplearr = [];
-        for (var i = curSamplePos + 1 - sampleCount; i <= curSamplePos; i++){
-            samplearr[i - curSamplePos - 1 + sampleCount] = input[i];
-            tmp += (input[i] / 10000) * (input[i] / 10000);
-            ex += input[i] / 10000;
+        for (var i = curSamplePos + 1 - count; i <= curSamplePos; i++){
+            samplearr[i - curSamplePos - 1 + count] = fInput[i];
+            tmp += (fInput[i] / 1) * (fInput[i] / 1);
+            ex += fInput[i] / 1;
         }
-        //        console.log("sample(" + samplearr.length + "):" + samplearr);
-        var dx = tmp/sampleCount * 10000 * 10000 - (ex / sampleCount * 10000) * (ex / sampleCount * 10000)
-        //        console.log("dx = " + dx + ", ex = " + ex)
-        out[0] = Math.sqrt(tmp/sampleCount) * 10000;
-        out[1] = Math.sqrt(2) * out[0];
+        ex = ex / count;
+
+        var dx = Math.sqrt(tmp/count - ex * ex)
+        RMS = Math.sqrt(tmp/count);
+        amplitude = Math.sqrt(2) * RMS;
         if (dx > 0)
-            out[2] = calcSinAngle(out[1], input[curSamplePos], input[curSamplePos] > input[curSamplePos - 1]);
+            phase = calcSinAngle(amplitude, fInput[curSamplePos], fInput[curSamplePos] > fInput[curSamplePos - 1]);
         else
-            out[2] = 0.0;
+            phase = 0.0;
 
-        //        console.log("fresult = " + out)
+        log ("calcRMS: "
+             + "\n\t sample(" + samplearr.length + ") = " + samplearr
+             + "\n\t dx = " + dx + ", ex = " + ex
+             + "\n\t RMS = " + RMS
+             + "\n\t amplitude = " + amplitude
+             + "\n\t phase =" + phase
+        )
 
-        return out;
+        return {
+            RMS: RMS,
+            amplitude: amplitude,
+            phase: phase
+        };
     }
 
     /*!
@@ -96,12 +122,12 @@ QtObject {
         return fresult;
     }
 
+    function log(says) {
+//        console.log("## Calculator.qml ##: " + says);
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
     Component.onCompleted: {
-//        try {
-//            var code = 'import Material.Fonts 0.1; MaterialFontLoader {}'
-//            Qt.createQmlObject(code, theme, "MaterialFontLoader")
-//        } catch (error) {
-//            // Ignore the error; it only means that the fonts were not enabled
-//        }
     }
 }

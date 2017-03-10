@@ -1,20 +1,6 @@
-/* QChart.qml ---
- *
- * Author: William Woo
- * Created: Thu Feb 13 20:59:40 2017 (+0100)
- * Version:
- * Last-Updated: jeu. mars  6 12:55:14 2014 (+0100)
- *           By: William Woo
- *     Update #: 69
- */
-
-/* Change Log:
- *
- */
-
 import QtQuick 2.0
 
-import "QChart.js" as Charts
+import "WaveChart.js" as Charts
 import "../../core"
 
 Canvas {
@@ -30,7 +16,6 @@ Canvas {
     property   var plotHandler;
     property   var plotArea;        // 绘图区域
     property   var plotData;
-    property   int plotDataCount: 20;
     property   int startDataIndex: 0;
     property   int selectDataIndex: 0;
 
@@ -41,7 +26,7 @@ Canvas {
     property   int plotMode: 1;         // 绘图模式： 0 - 时间模式、 1 - 采样点模式
     property  real timeRate: 20;        // 1ms间隔等同4像素， 取整取浮点都可以。
     property  real timeWidth: (width - 58) / timeRate;        // 单位： ms
-    property  real sampleRate: 20;       // 采样点间隔等同2个像素，  取整取浮点都可以。
+    property  real sampleRate: 1;       // 采样点间隔等同2个像素，  取整取浮点都可以。
     property  real sampleWidth: (width - 58) / sampleRate;      // 单位： 个数c
 
     // ///////////////////////////////////////////////////////////////
@@ -83,12 +68,12 @@ Canvas {
     }
 
     function repaint() {
-        plotHandler = null;
+        chartAnimationProgress = 100;
         requestPaint();
     }
 
     function log(says) {
-//        console.log("# QChart.qml: # " + says);
+//        console.log("# WaveChart.qml: # " + says);
     }
 
     function debug(de) {
@@ -199,26 +184,7 @@ Canvas {
                 }else
                     startDataIndex = tmp;
             }
-            log("startDataIndex = " + startDataIndex);
         }
-    }
-
-    function stepChartToLast() {
-        var len = model.x.cols;
-        var lastStartDataIndex = len - plotDataCount;
-        if (lastStartDataIndex)
-            startDataIndex = lastStartDataIndex;
-        else
-            return;
-
-        grooveXPlot = plotDataCount - 1;   // 显示最新的一个数据
-//        sigChartInfoChanged(selectDataIndex, grooveXPlot, startDataIndex, plotDataCount)
-
-        requestPaint();
-    }
-
-    function stepChartToFirst() {
-        startDataIndex = 0;
     }
 
     /* 放大缩小波形 */
@@ -230,7 +196,6 @@ Canvas {
                 sampleRate = 1;
             }else
                 sampleRate = tmp;
-            updateSampleWidth();
         }else{
             tmp = timeRate + steps;
             if (tmp < 4){
@@ -238,25 +203,16 @@ Canvas {
             }else{
                 timeRate = tmp
             }
-            updateTimeWidth();
         }
-
-
-        repaint();
     }
 
     function scaleChartToDefault() {
         var tmp;
         if (plotMode == 1){
             sampleRate = 1;
-            updateSampleWidth();
         }else{
             timeRate = 4;
-            updateTimeWidth();
         }
-
-
-        repaint();
     }
 
     /*! 找到离游标刻度线最近的点， xPlot 为曲线Outline范围内的横坐标 */
@@ -286,6 +242,8 @@ Canvas {
         return xPlot;
     }
 
+    // ///////////////////////////////////////////////////////////////
+
     Rectangle {
         id: groove
         width: dp(1)
@@ -302,8 +260,10 @@ Canvas {
     }
 
 
+    // ///////////////////////////////////////////////////////////////
+
     onPaint: {
-        log("----------------> onPaint Called: " + "plotHandler = " + plotHandler)
+        log("---------------- onPaint Called: " + "plotHandler = " + plotHandler)
         if (plotData == undefined){
             log("plotData = " + plotData);
             init();
@@ -346,7 +306,7 @@ Canvas {
                 chartAnimationProgress = 100;
         }
 
-        if (plotHandler.draw){
+        if (plotHandler && plotHandler.draw){
             plotHandler.draw(chartAnimationProgress/100, chartOptions);
 
             sigDrawingCompleted(plotArea.leftTop.x)
@@ -367,11 +327,23 @@ Canvas {
 
         var tmp = findSelDataIndex(grooveXPlot);
         selectDataIndex = tmp;
-        log("select index = " + selectDataIndex)
     }
 
-    onSelectDataIndexChanged: {
+    onSampleRateChanged: {
+        updateSampleWidth();
 
+        selectDataIndex = findSelDataIndex(grooveXPlot);
+
+        repaint();
+    }
+
+    onTimeRateChanged: {
+        updateTimeWidth();
+
+        selectDataIndex = findSelDataIndex(grooveXPlot);
+
+
+        repaint();
     }
 
     onHeightChanged: {
@@ -383,10 +355,11 @@ Canvas {
     }
 
     onChartAnimationProgressChanged: {
-        repaint();
+//        repaint();
     }
 
     onStartDataIndexChanged: {
+        selectDataIndex = findSelDataIndex(grooveXPlot);
         repaint();
     }
 

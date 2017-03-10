@@ -19,5 +19,6 @@ HarmonicAnal 1.0 views/HarmonicAnal.qml
 # core
 singleton Calculator 1.0 core/Calculator.qml
 singleton Matlab 1.0 core/Matlab.qml
+singleton Global 1.0 core/Global.qml
 
 typeinfo plugin.qmltypes
