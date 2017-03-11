@@ -10,7 +10,10 @@
  */
 
 import QtQuick 2.4
+
 import Material 0.3
+
+import "../../core"
 
 /*!
    \qmltype Slider
@@ -40,7 +43,7 @@ Item {
     /*!
        The label to display within the value label knob, by default the sliders current value
      */
-    property string knobLabel: control.value.toFixed(0)/4 + "\n" + control.value.toFixed(0)
+    property string knobLabel;
 
     /*!
        The width of the value label knob
@@ -50,7 +53,9 @@ Item {
     /*!
        The height of the value label knob
      */
-    property int knobHeight: 44 * Units.dp
+    property int knobHeight: 32 * Units.dp
+
+    property int grooveBottomGap: dp(7)
 
     property int moveRate: 5;
 
@@ -74,14 +79,21 @@ Item {
     property real minimumValue
     property real maximumValue
 
-    property int stepSize: 1
+    property      int samplecount: 1;
+    property   string plotMode: Global.g_plotMode;                      // 绘图模式： 0 - 时间模式、 1 - 采样点模式
+    property     real timeRate: Global.g_timeRate;                      // 1ms间隔等同4像素， 取整取浮点都可以。
+    property     real timeWidth: (width - 58) / timeRate;               // 单位： ms
+    property     real sampleRate: Global.g_sampleRate;                  // 采样点间隔等同2个像素，  取整取浮点都可以。
+    property     real sampleWidth: (width - 58) / sampleRate;           // 单位： 个数c
+
+    property real ratedWith:  (samplecount - 1) * sampleRate;
+
+    property int stepSize: 10 * sampleRate
 
     property bool activeFocusOnPress: true
 
     implicitHeight: numericValueLabel ? 54 * Units.dp : 32 * Units.dp
     implicitWidth: 200 * Units.dp
-
-
 
     // /////////////////////////////////////////////////////////////////
 
@@ -101,7 +113,7 @@ Item {
         width: parent.width
         height: 14 * Units.dp
 
-        visible: handleScroll.width > 0 && handleScroll.width <= width
+        visible: handleScroll.width > 0 && handleScroll.width < width
 
         radius: height / 2
 
@@ -151,7 +163,11 @@ Item {
             height: parent.height - dp(2)
 
             radius: height / 2
-            width: control.valueRange - (waveModel.cols() - control.valueRange) / control.scrollbarSteps
+//            width: control.valueRange - (waveModel.cols() - control.valueRange) / control.scrollbarSteps
+            width: Math.max(parent.width * parent.width / (control.ratedWith * control.sampleRate), implicitWidth)
+            implicitWidth: dp(50)
+
+            property real velocity: (control.ratedWith - parent.width) / (parent.width - width)
 
             color: "#9e9e9e"//Theme.accentColor
             border.color: Qt.lighter(color)
@@ -183,12 +199,13 @@ Item {
                 if (x > parent.width - width - dp(0))
                     x = parent.width - width - dp(0)
 
-                panel.tickMarkLoader.x -= control.scrollbarSteps * (x - lastX)
+                var deltaX = x - lastX;
 
-                panel.grooveLoader.x -= control.scrollbarSteps * (x - lastX)
+                panel.tickMarkLoader.x -= velocity * deltaX;
+                panel.grooveLoader.x -= velocity * deltaX;
 
 //                log("X = " + x)
-                scrollbarPosChanged(x - lastX, x)
+//                scrollbarPosChanged(x - lastX, x)
                 lastX  = x;
             }
         }
@@ -204,10 +221,7 @@ Item {
         Label {
             anchors {
                 fill: parent
-                topMargin: 4 * Units.dp
-                bottomMargin: 4 * Units.dp
-                leftMargin: 4 * Units.dp
-                rightMargin: 4 * Units.dp
+                centerIn: parent
             }
 
             horizontalAlignment: Qt.AlignHCenter
@@ -236,7 +250,7 @@ Item {
             implicitHeight: parent.height
             implicitWidth: parent.width
             radius: implicitWidth / 5
-            color: control.color
+            color: Global.g_modeColor//control.color
             opacity: 0.8
             antialiasing: true
 //            clip: true
@@ -251,15 +265,8 @@ Item {
 
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: dp(20)
-                anchors.horizontalCenterOffset: dp(4)
-
-                transform: [
-                    Rotation {
-                        origin { x: parent.width / 2; y: parent.height / 2 }
-                        angle: -45;
-                    }
-                ]
+                anchors.bottomMargin: -height / 2
+                rotation: 45;
             }
         }
 
@@ -277,6 +284,13 @@ Item {
         implicitHeight: 8 * Units.dp
         implicitWidth: 8 * Units.dp
 
+        Rectangle {
+            visible: false
+            anchors.fill: parent
+            color: "transparent"
+            border.color: "red"
+        }
+
         Loader {
             id: knobLoader
             anchors.horizontalCenter: parent.horizontalCenter
@@ -293,7 +307,7 @@ Item {
             implicitHeight: 28 * Units.dp
             implicitWidth: 28 * Units.dp
             color: control.focus ?
-                       Theme.alpha(control.color, 0.20) :
+                       Theme.alpha(Global.g_modeColor, 0.20) :
                        "transparent"
             radius: implicitHeight / 2
             opacity: 0.8
@@ -302,12 +316,12 @@ Item {
                 property var diameter: control.enabled ? 10 * Units.dp : 8 * Units.dp
                 anchors.centerIn: parent
                 color: control.value === control.minimumValue ?
-                           Theme.backgroundColor : control.color
+                           Theme.backgroundColor : Global.g_modeColor
 
                 border.color: control.value === control.minimumValue
                               ? control.darkBackground ? Theme.alpha("#FFFFFF", 0.3)
                                                        : Theme.alpha("#000000", 0.26)
-                              : control.color
+                              : Global.g_modeColor
 
                 border.width: 2 * Units.dp
 
@@ -337,7 +351,7 @@ Item {
         implicitWidth: 200
         implicitHeight: 2 * Units.dp
 
-        width: control.maximumValue
+        width: control.ratedWith
 
         anchors.verticalCenter: parent.verticalCenter
 
@@ -349,13 +363,15 @@ Item {
             width: styleData.handlePosition
             implicitHeight: 2 * Units.dp
             implicitWidth: 200
-            color: control.color
+            color: Global.g_modeColor
         }
     }
 
     property Component tickmarks: Repeater {
         id: repeater
-        model: control.stepSize > 0 ? 1 + (control.maximumValue/* -  control.minimumValue*/) / control.stepSize : 0
+
+//        model: control.stepSize > 0 ? 1 + (control.maximumValue/* -  control.minimumValue*/) / control.stepSize : 0
+        model: control.ratedWith / control.stepSize;
 
         Rectangle {
             color: control.darkBackground ? "#FFFFFF" : "#000000"
@@ -375,6 +391,8 @@ Item {
             Text { // 毫秒
                 text: index * stepSize / 4 + " ms"
 
+                color: Global.g_timeModeColor
+
                 x: {
                     return 0 + dp(6);
 //                    if (index  == 0)
@@ -391,12 +409,12 @@ Item {
 //                        return -90;
 //                }
 
-                visible: !(index % 10)
+                visible: !(index % 10) && control.plotMode == Global.enTimeMode
             }
 
             Text {
-                color: Theme.accentColor
-                text: index * stepSize / 1
+                color: Global.g_sampleModeColor
+                text: (index * stepSize) / sampleRate
 
                 x: {
                     if (index  == 0)
@@ -422,11 +440,10 @@ Item {
                         return -90;
                 }
 
-                visible: !(index % 10) && (index != 0)
+                visible: !(index % 10)/* && (index != 0)*/ && control.plotMode == Global.enSampleMode
             }
         }
     }
-
 
     Item {
         id: panel
@@ -434,8 +451,9 @@ Item {
         anchors.fill: parent
 
         anchors.margins: 0
+        anchors.leftMargin: dp(2)
 
-        property int handleWidth: dp(2)//handleLoader.width
+        property int handleWidth: dp(0)
         property int handleHeight: handleLoader.height
 
         property bool horizontal : true//control.orientation === Qt.Horizontal
@@ -450,7 +468,6 @@ Item {
         transformOrigin: Item.TopLeft
 
         property alias grooveLoader: grooveLoader
-
         property alias tickMarkLoader: tickMarkLoader
 
         clip: true
@@ -460,15 +477,12 @@ Item {
             property QtObject styleData: QtObject {
                 readonly property int handlePosition: handleLoader.x
             }
-            x: 0
             sourceComponent: groove
-            width: dp(900)//(panel.horizontal ? parent.width : parent.height) - (panel.handleWidth)// - padding.left - padding.right - (control.__panel.handleWidth)
-            y:  parent.height - dp(7)// - (scrollbarLoader.item.visible ? scrollbarLoader.item.height : 0)
+            y:  parent.height - grooveBottomGap// - (scrollbarLoader.item.visible ? scrollbarLoader.item.height : 0)
         }
 
         Loader {
             id: tickMarkLoader
-            x: dp(2)//padding.left - control.minimumValue
             width: (panel.horizontal ? parent.width : parent.height)// (horizontal ? parent.width : parent.height) - padding.left - padding.right + control.minimumValue
             y:  grooveLoader.y
             sourceComponent: control.tickmarksEnabled ? tickmarks : null
@@ -488,23 +502,20 @@ Item {
         }
     }
 
-//    Rectangle {
-//        x: 0
+    Rectangle {
+        width: 2 * Units.dp
 
-//        width: 2 * Units.dp
-
-//        y: 0
-//        height: grooveLoader.y
-//        color: Theme.accentColor
-//    }
+        y: scrollbarLoader.height
+        z: -1
+        height: parent.height
+        color: Global.g_modeColor
+    }
 
     Loader {
         id: scrollbarLoader
         sourceComponent: scrollbar
-//        anchors.bottom: panel.bottom
         anchors.top: panel.top
         width: panel.width
-        x: 0
         z: -1
 
         Behavior on x {

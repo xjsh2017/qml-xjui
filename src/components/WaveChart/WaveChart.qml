@@ -23,10 +23,10 @@ Canvas {
     property  real grooveXPlot: 0;
     property color grooveColor: "yellow"
 
-    property   int plotMode: 1;         // 绘图模式： 0 - 时间模式、 1 - 采样点模式
-    property  real timeRate: 20;        // 1ms间隔等同4像素， 取整取浮点都可以。
-    property  real timeWidth: (width - 58) / timeRate;        // 单位： ms
-    property  real sampleRate: 1;       // 采样点间隔等同2个像素，  取整取浮点都可以。
+    property  string plotMode: Global.g_plotMode;                   // 绘图模式： 0 - 时间模式、 1 - 采样点模式
+    property  real timeRate: Global.g_timeRate;                   // 1ms间隔等同4像素， 取整取浮点都可以。
+    property  real timeWidth: (width - 58) / timeRate;          // 单位： ms
+    property  real sampleRate: Global.g_sampleRate;               // 采样点间隔等同2个像素，  取整取浮点都可以。
     property  real sampleWidth: (width - 58) / sampleRate;      // 单位： 个数c
 
     // ///////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ Canvas {
     property alias chartAnimationDuration: chartAnimator.duration;
     property   int chartAnimationProgress: 0;
 
-    /* 图形数据在整个数据中开始的位置 */
+    property  real lastX: 0
 
     // ///////////////////////////////////////////////////////////////
 
@@ -83,14 +83,6 @@ Canvas {
             log("-------------" + de + "------------")
     }
 
-    function yData(dataIndex) {
-        return model.y.value(index, dataIndex);
-    }
-
-    function xData(dataIndex) {
-        return model.x.value(dataIndex);
-    }
-
     function updatePlotDataBySample(start) {
         if (!plotData){
             init();
@@ -99,8 +91,8 @@ Canvas {
         updateSampleWidth();
 //        log("sampleWidth = " + sampleWidth)
 
-        plotData.labels = model.x.row(0, start, start + sampleWidth);
-        plotData.datasets[0].data = model.y.row(index, start, start + sampleWidth);
+        plotData.labels = model.data.x_row(0, start, start + sampleWidth);
+        plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth);
     }
 
     function updateSampleWidth() {
@@ -159,9 +151,9 @@ Canvas {
             return;
         }
 
-        if (plotMode == 1){
-            if (sampleWidth + tmp > model.x.cols - 1){
-                var tmpLast = model.x.cols - sampleWidth
+        if (plotMode == Global.enSampleMode){
+            if (sampleWidth + tmp > cols() - 1){
+                var tmpLast = cols() - sampleWidth
                 if (tmpLast)
                     startDataIndex = tmpLast;
                 else
@@ -170,16 +162,16 @@ Canvas {
                 startDataIndex = tmp;
             }
         }else{
-            var maxTimeEnd = parseFloat(model.x.value(0, model.x.cols-1));
+            var maxTimeEnd = parseFloat(xData(0, cols()-1));
             var maxStartTime = maxTimeEnd - timeWidth;
             var bound;
-            if ( tmp > model.x.cols - 1){
-                bound = Matlab.findBound(maxStartTime, 0, model.x);
+            if ( tmp > cols() - 1){
+                bound = Matlab.findBound(maxStartTime, 0, model.data.x);
                 startDataIndex = bound.start;
             }else{
-                var newStartTime = parseFloat(model.x.value(0, tmp));
+                var newStartTime = parseFloat(xData(0, tmp));
                 if (newStartTime > maxStartTime){
-                    bound = Matlab.findBound(maxStartTime, 0, model.x);
+                    bound = Matlab.findBound(maxStartTime, 0, model.data.x);
                     startDataIndex = bound.start;
                 }else
                     startDataIndex = tmp;
@@ -187,19 +179,35 @@ Canvas {
         }
     }
 
+    function rows() {
+        return model.data.rows;
+    }
+
+    function cols() {
+        return model.data.cols;
+    }
+
+    function yData(dataIndex) {
+        return model.data.y_data(index, dataIndex);
+    }
+
+    function xData(dataIndex) {
+        return model.data.x_data(0, dataIndex);
+    }
+
     /* 放大缩小波形 */
     function scaleChart(steps) {
         var tmp;
-        if (plotMode == 1){
+        if (plotMode == Global.enSampleMode){
             tmp = sampleRate + steps;
-            if (tmp < 1){
-                sampleRate = 1;
+            if (tmp < Global.g_DefaultSampleRate){
+                sampleRate = Global.g_DefaultSampleRate;
             }else
                 sampleRate = tmp;
         }else{
             tmp = timeRate + steps;
-            if (tmp < 4){
-                timeRate = 4;
+            if (tmp < Global.g_DefaultTimeRate){
+                timeRate = Global.g_DefaultTimeRate;
             }else{
                 timeRate = tmp
             }
@@ -208,10 +216,10 @@ Canvas {
 
     function scaleChartToDefault() {
         var tmp;
-        if (plotMode == 1){
-            sampleRate = 1;
+        if (plotMode == Global.enSampleMode){
+            sampleRate = Global.g_DefaultSampleRate;
         }else{
-            timeRate = 4;
+            timeRate = Global.g_DefaultTimeRate;
         }
     }
 
@@ -221,9 +229,17 @@ Canvas {
             return NaN;
 
         var tmp;
-        if (plotMode == 1){
+        if (plotMode == Global.enSampleMode){
             tmp = xPlot * sampleWidth / plotArea.width;
         }
+
+        console.log("findSelDataIndex = "
+                    + "\n\t mouseX = " + lastX
+                    + "\n\t xPlot = " + xPlot
+                    + "\n\t sampleRate = " + Global.g_sampleRate
+                    + "\n\t point index = " + tmp
+                    + "\n\t select data index = " + Math.round(tmp + startDataIndex) + " (" + (tmp + startDataIndex).toFixed(4) + ")"
+                    )
 
         tmp = Math.round(tmp)
 
@@ -232,6 +248,7 @@ Canvas {
 
     /*! 画布横坐标转曲线区域坐标 */
     function mouseXPos2Plot(mouseX) {
+        lastX = mouseX;
         var xPlot = plotArea.rightBottom.x - mouseX;
         if (xPlot < 0)
             return NaN;
@@ -269,10 +286,11 @@ Canvas {
             init();
         }
 
-        if (plotMode == 0)
-            updatePlotDataByTime(model.x.value(0, startDataIndex));
-        else if (plotMode == 1)
+        if (plotMode == Global.enSampleMode)
             updatePlotDataBySample(startDataIndex);
+        else
+            updatePlotDataByTime(model.x.value(0, startDataIndex));
+
 
         if(!plotHandler) {
             switch(plotType) {

@@ -14,9 +14,10 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    property var model: { "x": Matlab.serialize(0, 1, 1599),
-//                          "y": Matlab.random(3, 1600, -200, 200),
-                          "y": Matlab.sampleSin(23, 1601, 0, 1599, -20, 20, 20),
+    property var model: {
+//                          "data": Matlab.sampleSin(1, 16001, 0, 16000, -20, 20, 200),
+                          "data": Matlab.sampleSin(12, 1001, 0, 500, -20, 20, 10),
+
                           "name": ["通道延时"
                                    , "保护A相电流1", "保护A相电流2"
                                    , "保护B相电流1", "保护B相电流2"
@@ -105,6 +106,8 @@ Item {
                 width: parent.width
                 height: parent.height
 
+                spacing: dp(0)
+
                 View {
                     id: groovePannel
                     width: dp(160)
@@ -127,132 +130,6 @@ Item {
                         }
                         spacing: dp(6)
 
-
-                        Button {
-                            id: btnValueType
-                            text: qsTr("瞬")
-
-                            property int valueType: 0   // 0 - 瞬时值， 1 - 有效值
-
-                            implicitHeight: dp(22)
-                            implicitWidth: dp(22)
-                            elevation: 1
-                            backgroundColor: Theme.accentColor
-                            Layout.alignment: Qt.AlignVCenter
-
-                            onClicked: {
-                                if (valueType == 1){
-                                    text = qsTr("瞬");
-                                    valueType = 0;
-                                    backgroundColor = Theme.accentColor
-                                }else{
-                                    text = qsTr("有")
-                                    valueType = 1;
-                                    backgroundColor = "green"
-                                }
-
-                                for (var i in root.wavePanelist){
-                                    root.wavePanelist[i].updateWavePanel();
-                                }
-
-                            }
-                        }
-
-                        Button {
-                            id: btnGrooveMode
-                            text: qsTr("采")
-
-                            property int valueType: 0   // 0 - 采样点模式， 1 - 时间模式
-
-                            implicitHeight: dp(22)
-                            implicitWidth: dp(22)
-                            elevation: 1
-                            backgroundColor: Theme.accentColor
-                            Layout.alignment: Qt.AlignVCenter
-
-                            onClicked: {
-                                if (valueType == 1){
-                                    text = qsTr("采");
-                                    valueType = 0;
-                                    backgroundColor = Theme.accentColor
-                                }else{
-                                    text = qsTr("时")
-                                    valueType = 1;
-                                    backgroundColor = "green"
-                                }
-
-//                                for (var i in root.wavePanelist){
-//                                    root.wavePanelist[i].updateWavePanel();
-//                                }
-
-                            }
-                        }
-
-
-
-                        IconButton {
-                            id: runInRealTime
-                            Layout.leftMargin: dp(8)
-
-                            action: Action {
-                                iconName: "action/alarm"
-                                name: "Go to Running Time Mode"
-
-                                onTriggered: {
-                                    var varTmpInfo;
-                                    if (timer_waveModel.running)
-                                    {
-                                        timer_waveModel.stop();
-                                        varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
-                                    }else
-                                    {
-                                        timer_waveModel.start();
-                                        varTmpInfo = " Timer for Changing Wave Data Model is running  !";
-                                    }
-                                    snackbar.open(varTmpInfo)
-                                    log(varTmpInfo)
-
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].startRunningTime(timer_waveModel.running);
-                                    }
-                                }
-                            }
-                        }
-
-                        IconButton {
-                            id: chart_setting
-
-                            action: Action {
-                                iconName: "action/setting"
-                                name: qsTr("Chart Settings (Ctrl + I)")
-                                hoverAnimation: true
-                                onTriggered: {
-                                    chartSettings.show()
-                                }
-                            }
-                        }
-
-                        IconButton {
-                            id: chart_refresh
-
-                            action: Action {
-                                iconName: "navigation/refresh"
-                                name: qsTr("Refresh (Ctrl + R)")
-                                hoverAnimation: true
-                                onTriggered: {
-                                    for (var i = 0; i < root.wavePanelist.length; ++i){
-                                        root.curvelist[i].plotHandler = null;
-                                        root.curvelist[i].requestPaint();
-                                    }
-                                    snackbar.open("All Charts Refreshed !")
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: dp(20)
-                        }
-
                         IconButton {
                             id: action_inflate
 
@@ -260,9 +137,8 @@ Item {
                                 iconName: "action/inflate"
                                 name: "Inflate View"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].scaleChart(2);
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode)
+                                        Global.g_sampleRate +=0.5;
                                 }
                             }
                         }
@@ -274,9 +150,8 @@ Item {
                                 iconName: "action/inflate_default"
                                 name: "Default View"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].scaleChartToDefault();
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode)
+                                        Global.g_sampleRate = Global.g_DefaultSampleRate;
                                 }
                             }
                         }
@@ -288,9 +163,8 @@ Item {
                                 iconName: "action/deflate"
                                 name: "Deflate View"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].scaleChart(-2);
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode && Global.g_sampleRate > 1)
+                                        Global.g_sampleRate -= 0.5;
                                 }
                             }
                         }
@@ -354,6 +228,124 @@ Item {
                             }
                         }
 
+                        Item {
+                            width: dp(20)
+                        }
+
+                        Button {
+                            id: btnValueType
+                            text: qsTr("瞬")
+
+                            property int valueType: 0   // 0 - 瞬时值， 1 - 有效值
+
+                            implicitHeight: dp(22)
+                            implicitWidth: dp(22)
+                            elevation: 1
+                            backgroundColor: Theme.accentColor
+                            Layout.alignment: Qt.AlignVCenter
+
+                            onClicked: {
+                                if (valueType == 1){
+                                    text = qsTr("瞬");
+                                    valueType = 0;
+                                    backgroundColor = Theme.accentColor
+                                }else{
+                                    text = qsTr("有")
+                                    valueType = 1;
+                                    backgroundColor = "green"
+                                }
+
+                                for (var i in root.wavePanelist){
+                                    root.wavePanelist[i].updateWavePanel();
+                                }
+
+                            }
+                        }
+
+                        Button {
+                            id: btnGrooveMode
+                            text: qsTr("采")
+
+                            implicitHeight: dp(22)
+                            implicitWidth: dp(22)
+                            elevation: 1
+                            backgroundColor: Theme.accentColor
+                            Layout.alignment: Qt.AlignVCenter
+
+                            onClicked: {
+                                if (Global.g_plotMode == Global.enTimeMode){
+                                    text = qsTr("采");
+                                    Global.g_plotMode = Global.enSampleMode;
+                                    backgroundColor = Global.g_sampleModeColor
+                                }else{
+                                    text = qsTr("时")
+                                    Global.g_plotMode = Global.enTimeMode;
+                                    backgroundColor = Global.g_timeModeColor
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: runInRealTime
+                            Layout.leftMargin: dp(8)
+
+                            action: Action {
+                                iconName: "action/alarm"
+                                name: "Go to Running Time Mode"
+
+                                onTriggered: {
+                                    var varTmpInfo;
+                                    if (timer_waveModel.running)
+                                    {
+                                        timer_waveModel.stop();
+                                        varTmpInfo = " Timer for Changing Wave Data Model is stopped  !";
+                                    }else
+                                    {
+                                        timer_waveModel.start();
+                                        varTmpInfo = " Timer for Changing Wave Data Model is running  !";
+                                    }
+                                    snackbar.open(varTmpInfo)
+                                    log(varTmpInfo)
+
+                                    for (var i = 0; i < root.curvelist.length; ++i){
+                                        root.curvelist[i].startRunningTime(timer_waveModel.running);
+                                    }
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: chart_setting
+
+                            action: Action {
+                                iconName: "action/setting"
+                                name: qsTr("Chart Settings (Ctrl + I)")
+                                hoverAnimation: true
+                                onTriggered: {
+                                    chartSettings.show()
+                                }
+                            }
+                        }
+
+                        IconButton {
+                            id: chart_refresh
+
+                            action: Action {
+                                iconName: "navigation/refresh"
+                                name: qsTr("Refresh (Ctrl + R)")
+                                hoverAnimation: true
+                                onTriggered: {
+                                    for (var i = 0; i < root.wavePanelist.length; ++i){
+                                        root.curvelist[i].plotHandler = null;
+                                        root.curvelist[i].requestPaint();
+                                    }
+                                    snackbar.open("All Charts Refreshed !")
+                                }
+                            }
+                        }
+
+
+
                     }
                 }
 
@@ -365,17 +357,23 @@ Item {
                     width: parent.width - groovePannel.width
 
                     value: maximumValue * 0
+                    minimumValue: 0
+                    maximumValue: parent.width + minimumValue - groove.anchors.leftMargin  // 刻度尺的长度
+//                    stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
+
                     focus: true
                     tickmarksEnabled: true
                     numericValueLabel: true
-                    stepSize: dp(10)    // 10个像素绘制一个小刻度， 50个像素绘制一个中刻度， 100个像素绘制一个大刻度
-                    minimumValue: 0
-                    maximumValue: parent.width + minimumValue - groove.anchors.leftMargin  // 刻度尺的长度
                     activeFocusOnPress: true
                     darkBackground: false
+                    samplecount: root.model.data.cols;
+
+                    onValueChanged: {
+                        root.log("groove.width = " + groove.width)
+                    }
 
                     onScrollbarPosChanged : {
-                        log("scrollbar status: " + delta + ", " + pos)
+                        root.log("scrollbar status: " + delta + ", " + pos)
                         groove.minimumValue = groove.scrollbarSteps * pos;
                         log("groove.min_max = (" + groove.minimumValue + ", " + groove.maximumValue + ")")
 
@@ -420,7 +418,7 @@ Item {
                     spacing: dp(0)
 
                     Repeater {
-                        model: root.model.y.rows
+                        model: root.model.data.rows
 
                         Row {
                             spacing: dp(2)
@@ -438,10 +436,10 @@ Item {
                                 backgroundColor: Qt.lighter(drawColor)
 
                                 function updateWavePanel() {
-                                    var tmp = root.model.y.row(index);
+                                    var tmp = root.model.data.y_row(index);
 
                                     var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
-                                    tmp = root.model.y.row(index)[curve.selectDataIndex];
+                                    tmp = root.model.data.y_row(index)[curve.selectDataIndex];
                                     if (btnValueType.valueType == 1){
                                         tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
                                     }
@@ -527,7 +525,7 @@ Item {
 
                                     model: root.model
                                     index: modelData
-                                    grooveColor: Theme.accentColor
+                                    grooveColor: Global.g_modeColor
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -551,7 +549,7 @@ Item {
                                     }
 
                                     onSigDrawingCompleted: {
-                                        groovePannel.width = root.wavePannelWidth + x + dp(3);
+                                        groovePannel.width = root.wavePannelWidth + x;
                                     }
 
                                     onGrooveXPlotChanged: {
@@ -567,25 +565,17 @@ Item {
                                         }
                                         console.log(curve);
                                         groove.value = curve.grooveXPlot + groove.minimumValue
-//                                        root.selectDataIndex = curve.selectDataIndex;
-
-//                                    btnDebug.text = "Count: "
-//                                            + curve.chartDisplayPointCount + "/" + waveModel.cols()
-//                                            + ", Start = " + root.curvelist[0].startDataIndex
-//                                            + ", End = " + (root.curvelist[0].startDataIndex
-//                                            + root.curvelist[0].chartDisplayPointCount)
-//                                            + ", Select = " + root.wavePanelist[0].selDataPointIndex
+                                        if (plotMode == Global.enSampleMode)
+                                            groove.knobLabel = selectDataIndex;
                                     }
 
                                     onSelectDataIndexChanged: {
-                                        root.log("index = " + index )
+                                        root.log("Event: onSelectDataIndexChanged --> index = " + index + ", select data index = " + selectDataIndex
+                                                 + ", curve.grooveXPlot = " + curve.grooveXPlot)
                                         wavePanel.updateWavePanel();
-//                                        for (var i = 0; i < root.curvelist.length; ++i){
-//                                            root.curvelist[i].selectDataIndex = curve.selectDataIndex;
-//                                            root.wavePanelist[i].updateWavePanel();
-//                                        }
-//                                        groove.value = curve.grooveXPlot + groove.minimumValue
-//                                        root.selectDataIndex = curve.selectDataIndex;
+                                        groove.value = curve.grooveXPlot + groove.minimumValue
+                                        if (plotMode == Global.enSampleMode)
+                                            groove.knobLabel = selectDataIndex;
                                     }
                                 }
 
@@ -787,27 +777,18 @@ Item {
 //        updateModel();
 //        model.x.print();
 //        model.y.print();
-//        console.log("pi = " + Math.PI)
-//        var tmp;
-//        tmp = Matlab.sampleSin(1, 9, 2*180, 4*180, -2, 4, 1);
-//        tmp.print();
-        console.log(typeof root.model.y.value(0, 1))
-        console.log(Math.random(2))
-        console.log(Math.random(2))
-        console.log(Math.random(2))
-        console.log(Math.random(2))
+        var x = new Array(1);
+        console.log(x.length);
+        console.log(x[0])
 
-        console.log(Math.max([0.1, -2, 3, 0.9, 2.8, -7]));
-//        var tmp = Matlab.random(5, 8, -10, 10);
-//        tmp.print();
+        var tmp =  Matlab.sampleSin(2, 101, 0, 50, -20, 20, 1);
+        tmp.print()
 
-//        tmp = Matlab.matrix(5, 21, 5);
-//        tmp.print();
-//        tmp = Matlab.serialize(0, 2, 10);
-//        tmp.print();
+        var aa = tmp.subdata(-1, 2, 3, 4);
+        aa.print()
 
-//        Matlab.findBound(3.7, 2.6, tmp);
+        console.log("aa.y_row(1) = " + aa.y_row(2))
+        console.log("aa.x_row(0) = " + aa.x_row(0))
 
-//        console.log(tmp.row(2));
-    }    
+    }
 }

@@ -35,8 +35,9 @@ Item {
 
         VectorChart {
 
-            visible: false
+//            visible: false
             Layout.fillWidth: true
+            Layout.minimumWidth: 300;
             width: parent.width * 2 / 5
         }
     }

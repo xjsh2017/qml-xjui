@@ -22,7 +22,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## XJTableView.qml ##: " + says);
+//        console.log("## XJTableView.qml ##: " + says);
     }
 
     function dp(di){
@@ -66,15 +66,15 @@ Item {
 
         function updateModel() {
             clear();
-            for (var i = 0; i < model.y.rows; i++){
+            for (var i = 0; i < model.data.rows; i++){
                 append({
                                    name: root.model.name[i],
                                    unit: root.model.unit[i],
                                    phase: root.model.phase[i],
                                    rms: root.model.rms[i],
                                    angle: root.model.angle[i],
-                                   "x": root.model.x,
-                                   data: root.model.y.row(i)
+                                   "x": root.model.data.x,
+                                   "y": root.model.data.y_row(i)
                                }
                                )
             }

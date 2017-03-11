@@ -84,8 +84,8 @@ var Chart = function(canvas, context) {
             scaleAnchors:  {
                 leftMargin: dp(5),
                 rightMargin: dp(0),
-                topMargin: dp(5),
-                bottomMargin: dp(5)
+                topMargin: dp(1),
+                bottomMargin: dp(1)
             }
         };
 
@@ -157,14 +157,14 @@ var Chart = function(canvas, context) {
             config = (drawOptions) ? mergeChartConfig(config,drawOptions) : config;
 
             if(config.scaleOverlay) {
-                if (canvas.plotMode == 0)
+                if (canvas.plotMode == Global.enTimeMode)
                     drawLinesBySample(progress)
                 else
                     drawLinesByTime(progress);
                 drawScale();
             } else {
                 drawScale();
-                if (canvas.plotMode == 1)
+                if (canvas.plotMode == Global.enSampleMode)
                     drawLinesBySample(progress)
                 else
                     drawLinesByTime(progress);
@@ -415,7 +415,7 @@ var Chart = function(canvas, context) {
                 posx = scaleVertex.leftBottom.x + i * valueHopX;
 
                 // 绘制横坐标的刻度数值
-                if (config.scaleShowLabels && config.scaleShowLabelsX && canvas.plotMode == 1) {
+                if (config.scaleShowLabels && config.scaleShowLabelsX && canvas.plotMode == Global.enSampleMode) {
                     if (config.scaleFontColorX)
                         ctx.fillStyle = config.scaleFontColorX;
 

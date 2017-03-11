@@ -10,6 +10,8 @@
 
 import QtQuick 2.4
 
+import Material 0.3
+
 pragma Singleton
 
 /*!
@@ -24,6 +26,22 @@ pragma Singleton
 
 QtObject {
     id: global
+
+    // ///////////////////////////////////////////////////////////////
+
+    property   string enTimeMode: "time mode"           // 时间模式
+    property   string enSampleMode: "sample mode"       // 采样点模式
+    property     real g_DefaultSampleRate: 1
+    property     real g_DefaultTimeRate: 4
+
+    property   string g_plotMode: enSampleMode;         // 绘图模式： 0 - 时间模式、 1 - 采样点模式
+    property     real g_timeRate: g_DefaultTimeRate;         // 单位时间间隔（1ms）等同4像素， 取整取浮点都可以。
+    property     real g_sampleRate: g_DefaultSampleRate;       // 采样点间隔等同1个像素，  取整取浮点都可以。
+    property    color g_sampleModeColor: Theme.accentColor
+    property    color g_timeModeColor: "green"
+    property    color g_modeColor: g_plotMode == enTimeMode ? g_timeModeColor : g_sampleModeColor
+
+    // ///////////////////////////////////////////////////////////////
 
     function mergeFlags(defaults,userDefined) {
         var returnObj = {};
