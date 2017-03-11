@@ -103,7 +103,8 @@ Item {
 
     // /////////////////////////////////////////////////////////////////
 
-    signal scrollbarPosChanged(var delta, var pos)
+    signal scrollbarPosChanged(var xLastPos, var xPos
+                               , var deltaX, var delta, var velocity)
     signal leftMoveClicked();
     signal rightMoveClicked();
 
@@ -201,11 +202,11 @@ Item {
 
                 var deltaX = x - lastX;
 
-                panel.tickMarkLoader.x -= velocity * deltaX;
-                panel.grooveLoader.x -= velocity * deltaX;
+                var delta = velocity * deltaX;
+                panel.tickMarkLoader.x -= delta;
+                panel.grooveLoader.x -= delta;
 
-//                log("X = " + x)
-//                scrollbarPosChanged(x - lastX, x)
+                scrollbarPosChanged(lastX, x, deltaX, delta, velocity);
                 lastX  = x;
             }
         }

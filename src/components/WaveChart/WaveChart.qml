@@ -16,7 +16,7 @@ Canvas {
     property   var plotHandler;
     property   var plotArea;        // 绘图区域
     property   var plotData;
-    property   int startDataIndex: 0;
+    property  real startDataIndex: 0;
     property   int selectDataIndex: 0;
 
     property   int pressedButton: Qt.LeftButton
@@ -27,7 +27,8 @@ Canvas {
     property  real timeRate: Global.g_timeRate;                   // 1ms间隔等同4像素， 取整取浮点都可以。
     property  real timeWidth: (width - 58) / timeRate;          // 单位： ms
     property  real sampleRate: Global.g_sampleRate;               // 采样点间隔等同2个像素，  取整取浮点都可以。
-    property  real sampleWidth: (width - 58) / sampleRate;      // 单位： 个数c
+    property  real sampleWidth: Math.floor((width - xPlotOffset - 58) / sampleRate);      // 单位： 个数c
+    property  real xPlotOffset: (Math.ceil(startDataIndex) - startDataIndex) * sampleRate
 
     // ///////////////////////////////////////////////////////////////
 
@@ -90,6 +91,7 @@ Canvas {
         updateSampleWidth();
 //        log("sampleWidth = " + sampleWidth)
 
+        start = Math.ceil(start);
         plotData.labels = model.data.x_row(0, start, start + sampleWidth).data;
         plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth).data;
     }
@@ -99,7 +101,7 @@ Canvas {
             return;
 
 //        sampleWidth = Math.floor((plotArea.rightBottom.x - plotArea.leftTop.x) / sampleRate);
-        sampleWidth = Math.floor((width - dp(58)) / sampleRate);
+        sampleWidth = Math.floor((width - xPlotOffset - dp(58)) / sampleRate);
 
 //        log("sampleWidth = " + sampleWidth)
     }
@@ -150,13 +152,18 @@ Canvas {
             return;
         }
 
+//        console.log("\n\t Sample Width = " + sampleWidth
+//                    + "\n \t tmpLast = " + (cols() - sampleWidth))
+
         if (plotMode == Global.enSampleMode){
             if (sampleWidth + tmp > cols() - 1){
                 var tmpLast = cols() - sampleWidth
-                if (tmpLast)
+                if (tmpLast > 0)
                     startDataIndex = tmpLast;
-                else
-                    startDataIndex = 0;
+                else// if(tmpLast < 0)
+                    startDataIndex = startDataIndex;
+//                else
+//                    startDataIndex = 0;
             }else{
                 startDataIndex = tmp;
             }
@@ -176,6 +183,9 @@ Canvas {
                     startDataIndex = tmp;
             }
         }
+
+        console.log(" startDataIndex = " + startDataIndex
+                    + "\n\t xPlotOffset = " + xPlotOffset);
     }
 
     function rows() {
@@ -230,19 +240,19 @@ Canvas {
         var tmp;
         if (plotMode == Global.enSampleMode){
             tmp = xPlot * sampleWidth / plotArea.width;
+
+            console.log("findSelDataIndex = "
+                        + "\n\t mouseX = " + lastX
+                        + "\n\t xPlot = " + xPlot
+                        + "\n\t sampleRate = " + Global.g_sampleRate
+                        + "\n\t point index = " + tmp
+                        + "\n\t select data index = " + Math.round(tmp + startDataIndex) + " (" + (tmp + startDataIndex).toFixed(4) + ")"
+                        )
         }
 
-        console.log("findSelDataIndex = "
-                    + "\n\t mouseX = " + lastX
-                    + "\n\t xPlot = " + xPlot
-                    + "\n\t sampleRate = " + Global.g_sampleRate
-                    + "\n\t point index = " + tmp
-                    + "\n\t select data index = " + Math.round(tmp + startDataIndex) + " (" + (tmp + startDataIndex).toFixed(4) + ")"
-                    )
+        tmp += startDataIndex;
 
-        tmp = Math.round(tmp)
-
-        return tmp + startDataIndex;
+        return Math.round(tmp)
     }
 
     /*! 画布横坐标转曲线区域坐标 */
@@ -289,6 +299,9 @@ Canvas {
             updatePlotDataBySample(startDataIndex);
         else
             updatePlotDataByTime(model.x.value(0, startDataIndex));
+
+//        console.log("plotData.labels = " + plotData.labels)
+//        console.log("plotData.y = " + plotData.datasets[0].data)
 
 
         if(!plotHandler) {
@@ -342,8 +355,7 @@ Canvas {
     onGrooveXPlotChanged: {
         groove.x = grooveXPlot + plotArea.leftTop.x;
 
-        var tmp = findSelDataIndex(grooveXPlot);
-        selectDataIndex = tmp;
+        selectDataIndex = findSelDataIndex(grooveXPlot);
     }
 
     onSampleRateChanged: {
@@ -377,6 +389,8 @@ Canvas {
 
     onStartDataIndexChanged: {
         selectDataIndex = findSelDataIndex(grooveXPlot);
+
+        console.log("selectDataIndex = " + selectDataIndex);
 
         repaint();
     }

@@ -228,7 +228,7 @@ var Chart = function(canvas, context) {
 
         function drawLinesBySample(animPc) {
 
-            var posx = scaleVertex.leftBottom.x
+            var posx = scaleVertex.leftBottom.x + canvas.xPlotOffset
             var posy = scaleVertex.leftBottom.y
             for (var i=0; i<data.datasets.length; i++) {
                 ctx.strokeStyle = data.datasets[i].strokeColor;

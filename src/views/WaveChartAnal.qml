@@ -173,11 +173,11 @@ Item {
                             id: action_left_end
 
                             action: Action {
-                                iconName: "navigation/chevron_left"
+                                iconName: "action/scroll_leftend"
                                 name: "To Left End"
                                 onTriggered: {
                                     for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(-1999);
+                                        root.curvelist[i].stepChart(-19999);
                                         log(root.curvelist[i].startDataIndex)
                                     }
                                 }
@@ -192,7 +192,7 @@ Item {
                                 name: "Left Move"
                                 onTriggered: {
                                     for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(-2);
+                                        root.curvelist[i].stepChart(-1);
                                         log(root.curvelist[i].startDataIndex)
                                     }
                                 }
@@ -207,7 +207,7 @@ Item {
                                 name: "Right Move"
                                 onTriggered: {
                                     for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(2);
+                                        root.curvelist[i].stepChart(1);
                                     }
                                 }
                             }
@@ -217,11 +217,11 @@ Item {
                             id: action_right_end
 
                             action: Action {
-                                iconName: "navigation/chevron_right"
+                                iconName: "action/scroll_rightend"
                                 name: "Right End"
                                 onTriggered: {
                                     for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(1999);
+                                        root.curvelist[i].stepChart(19999);
                                         log(root.curvelist[i].startDataIndex)
                                     }
                                 }
@@ -373,20 +373,25 @@ Item {
                     }
 
                     onScrollbarPosChanged : {
-                        root.log("scrollbar status: " + delta + ", " + pos)
-                        groove.minimumValue = groove.scrollbarSteps * pos;
-                        log("groove.min_max = (" + groove.minimumValue + ", " + groove.maximumValue + ")")
+                        root.log(" Scroll bar : "
+                                 + "\n\t pos: x = " + xLastPos
+                                 + "\n\t pos: x = " + xPos
+                                 + "\n\t deltaX = " + deltaX
+                                 + "\n\t move delta = " + delta
+                                 + "\n\t move velocity = " + velocity
+                                 + "\n\t move data count = " + (delta / Global.g_sampleRate).toFixed(3)
+                                 + "\n\t all move data count = " + (velocity * xPos / Global.g_sampleRate)
+                                 + "\n\t groove.width = " + groove.width
+                                 + "\n\t sample count = " + root.model.data.cols
+                                 + "\n");
 
-//                        for (var i = 0; i < root.curvelist.length; ++i){
-//                            root.curvelist[i].startDataIndex = (delta ? 1 : -1) * groove.scrollbarSteps * pos;
-//                            if (root.curvelist[i].startDataIndex < 0)
-//                                root.curvelist[i].startDataIndex = 0;
-//                            else if (root.curvelist[i].startDataIndex
-//                                     > waveModel.cols() - root.curvelist[i].chartDisplayPointCount)
-//                                root.curvelist[i].startDataIndex
-//                                     = waveModel.cols() - root.curvelist[i].chartDisplayPointCount;
-//                            break;
-//                        }
+                        var deltaStartDataIndex = delta / Global.g_sampleRate;
+
+                        for (var i = 0; i < root.curvelist.length; ++i){
+                            root.curvelist[i].startDataIndex +=
+                                    (delta ? 1 : -1) * deltaStartDataIndex;
+                            break;
+                        }
                     }
                 }
 
