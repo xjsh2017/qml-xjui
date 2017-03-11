@@ -15,8 +15,9 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     property var model: {
-//                          "data": Matlab.sampleSin(1, 16001, 0, 16000, -20, 20, 200),
-                          "data": Matlab.sampleSin(2, 1001, 0, 500, -20, 20, 10),
+//                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
+                          "data": Matlab.sampleSin(1, 16001, 0, 16000, -20, 20, 200),
+//                          "data": Matlab.sampleSin(1, 1001, 0, 500, -20, 20, 10),
 
                           "name": ["通道延时"
                                    , "保护A相电流1", "保护A相电流2"
@@ -176,10 +177,12 @@ Item {
                                 iconName: "action/scroll_leftend"
                                 name: "To Left End"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(-19999);
-                                        log(root.curvelist[i].startDataIndex)
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode)
+                                        groove.scroller.move(-999999 * Global.g_sampleRate);
+//                                    for (var i = 0; i < root.curvelist.length; ++i){
+//                                        root.curvelist[i].stepChart(-19999);
+//                                        log(root.curvelist[i].startDataIndex)
+//                                    }
                                 }
                             }
                         }
@@ -191,10 +194,12 @@ Item {
                                 iconName: "navigation/chevron_left"
                                 name: "Left Move"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(-1);
-                                        log(root.curvelist[i].startDataIndex)
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode)
+                                        groove.scroller.move(-1 * Global.g_sampleRate);
+//                                    for (var i = 0; i < root.curvelist.length; ++i){
+//                                        root.curvelist[i].stepChart(-1);
+//                                        log(root.curvelist[i].startDataIndex)
+//                                    }
                                 }
                             }
                         }
@@ -206,9 +211,13 @@ Item {
                                 iconName: "navigation/chevron_right"
                                 name: "Right Move"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(1);
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode)
+                                        groove.scroller.move(1 * Global.g_sampleRate);
+//                                    groove.scrollbarLoader.item.x_move_delta = 1 * Global.g_sampleRate
+//                                    console.log("groove.scrollbarLoader.item.x_move_delta = " + groove.scrollbarLoader.item.x_move_delta)
+//                                    for (var i = 0; i < root.curvelist.length; ++i){
+//                                        root.curvelist[i].stepChart(1);
+//                                    }
                                 }
                             }
                         }
@@ -220,10 +229,12 @@ Item {
                                 iconName: "action/scroll_rightend"
                                 name: "Right End"
                                 onTriggered: {
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].stepChart(19999);
-                                        log(root.curvelist[i].startDataIndex)
-                                    }
+                                    if (Global.g_plotMode == Global.enSampleMode)
+                                        groove.scroller.move(999999 * Global.g_sampleRate);
+//                                    for (var i = 0; i < root.curvelist.length; ++i){
+//                                        root.curvelist[i].stepChart(19999);
+//                                        log(root.curvelist[i].startDataIndex)
+//                                    }
                                 }
                             }
                         }
@@ -373,17 +384,17 @@ Item {
                     }
 
                     onScrollbarPosChanged : {
-                        root.log(" Scroll bar : "
-                                 + "\n\t pos: x = " + xLastPos
-                                 + "\n\t pos: x = " + xPos
-                                 + "\n\t deltaX = " + deltaX
-                                 + "\n\t move delta = " + delta
-                                 + "\n\t move velocity = " + velocity
-                                 + "\n\t move data count = " + (delta / Global.g_sampleRate).toFixed(3)
-                                 + "\n\t all move data count = " + (velocity * xPos / Global.g_sampleRate)
-                                 + "\n\t groove.width = " + groove.width
-                                 + "\n\t sample count = " + root.model.data.cols
-                                 + "\n");
+//                        root.log(" Scroll bar : "
+//                                 + "\n\t pos: x = " + xLastPos
+//                                 + "\n\t pos: x = " + xPos
+//                                 + "\n\t deltaX = " + deltaX
+//                                 + "\n\t move delta = " + delta
+//                                 + "\n\t move velocity = " + velocity
+//                                 + "\n\t move data count = " + (delta / Global.g_sampleRate).toFixed(3)
+//                                 + "\n\t all move data count = " + (velocity * xPos / Global.g_sampleRate)
+//                                 + "\n\t groove.width = " + groove.width
+//                                 + "\n\t sample count = " + root.model.data.cols
+//                                 + "\n");
 
                         var deltaStartDataIndex = delta / Global.g_sampleRate;
 
@@ -539,7 +550,7 @@ Item {
                                     }
 
                                     chartOptions: {
-                                        "pointDot" : true,
+                                        "pointDot" : false,
                                         "scaleShowLabelsX" : false,
                                         "scaleShowLabelsY" : true,
                                         "scaleShowGridLines" : false,
@@ -782,8 +793,8 @@ Item {
 //        model.x.print();
 //        model.y.print();
 
-        var tmp = Matlab.matrix(2, 5, 1);
-        tmp.print();
-        tmp.y_row(1).print();
+//        var tmp = Matlab.matrix(2, 5, 1);
+//        tmp.print();
+//        tmp.y_row(1).print();
     }
 }

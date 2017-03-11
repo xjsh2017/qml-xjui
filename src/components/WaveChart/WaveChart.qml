@@ -300,6 +300,8 @@ Canvas {
         else
             updatePlotDataByTime(model.x.value(0, startDataIndex));
 
+
+
 //        console.log("plotData.labels = " + plotData.labels)
 //        console.log("plotData.y = " + plotData.datasets[0].data)
 

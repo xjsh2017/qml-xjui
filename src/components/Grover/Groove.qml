@@ -124,6 +124,16 @@ Item {
 
         border.color: "lightgrey"
 
+        // delta 为移动的像素长度
+        function move(delta) {
+            var tmp = delta / handleScroll.velocity
+            tmp = handleScroll.x + tmp
+            if (tmp >= 0)
+                handleScroll.x = tmp
+            else
+                handleScroll.x = 0;
+        }
+
         IconButton {
             id: moveleft
             iconName: "navigation/arrow_drop_up"
@@ -136,8 +146,10 @@ Item {
             onClicked: {
                 var tmp = handleScroll.x
                 tmp -= control.scrollbarSteps * 1
-                if (tmp >= 0)
+                if (tmp >= 0){
+                    handleScroll.lastX = handleScroll.x;
                     handleScroll.x = tmp
+                }
             }
         }
 
@@ -195,10 +207,12 @@ Item {
             }
 
             onXChanged: {
-                if (x <  dp(1))
+                if (x <  dp(0))
                     x =  0;
                 if (x > parent.width - width - dp(0))
                     x = parent.width - width - dp(0)
+
+                console.log("onXChanged: x = " + x + ", lastX = " + lastX)
 
                 var deltaX = x - lastX;
 
@@ -445,6 +459,9 @@ Item {
             }
         }
     }
+
+
+    property alias scroller: scrollbarLoader.item
 
     Item {
         id: panel
