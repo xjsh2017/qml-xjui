@@ -16,7 +16,7 @@ Item {
 
     property var model: {
 //                          "data": Matlab.sampleSin(1, 16001, 0, 16000, -20, 20, 200),
-                          "data": Matlab.sampleSin(1, 1001, 0, 500, -20, 20, 10),
+                          "data": Matlab.sampleSin(2, 1001, 0, 500, -20, 20, 10),
 
                           "name": ["通道延时"
                                    , "保护A相电流1", "保护A相电流2"
@@ -390,7 +390,6 @@ Item {
                         for (var i = 0; i < root.curvelist.length; ++i){
                             root.curvelist[i].startDataIndex +=
                                     (delta ? 1 : -1) * deltaStartDataIndex;
-                            break;
                         }
                     }
                 }
