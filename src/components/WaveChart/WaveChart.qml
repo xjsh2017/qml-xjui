@@ -63,8 +63,7 @@ Canvas {
             ]
         }
 
-        if (timeRate)
-            timeWidth = (width - 58) / timeRate;
+        selectDataIndex = 0;
     }
 
     function repaint() {
@@ -91,8 +90,8 @@ Canvas {
         updateSampleWidth();
 //        log("sampleWidth = " + sampleWidth)
 
-        plotData.labels = model.data.x_row(0, start, start + sampleWidth);
-        plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth);
+        plotData.labels = model.data.x_row(0, start, start + sampleWidth).data;
+        plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth).data;
     }
 
     function updateSampleWidth() {
@@ -116,8 +115,8 @@ Canvas {
         console.assert(bound.end >= bound.start)
 //        log("bound = " + bound.start + ", " + bound.end);
 
-        plotData.labels = model.x.row(0, bound.start, bound.end);
-        plotData.datasets[0].data = model.y.row(index, bound.start, bound.end);
+        plotData.labels = model.x.row(0, bound.start, bound.end).data;
+        plotData.datasets[0].data = model.y.row(index, bound.start, bound.end).data;
 
 //        log(plotData.labels.length)
 //        log(plotData.labels)
@@ -378,6 +377,7 @@ Canvas {
 
     onStartDataIndexChanged: {
         selectDataIndex = findSelDataIndex(grooveXPlot);
+
         repaint();
     }
 

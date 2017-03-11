@@ -16,7 +16,7 @@ Item {
 
     property var model: {
 //                          "data": Matlab.sampleSin(1, 16001, 0, 16000, -20, 20, 200),
-                          "data": Matlab.sampleSin(12, 1001, 0, 500, -20, 20, 10),
+                          "data": Matlab.sampleSin(1, 1001, 0, 500, -20, 20, 10),
 
                           "name": ["通道延时"
                                    , "保护A相电流1", "保护A相电流2"
@@ -436,10 +436,10 @@ Item {
                                 backgroundColor: Qt.lighter(drawColor)
 
                                 function updateWavePanel() {
-                                    var tmp = root.model.data.y_row(index);
+                                    var tmp = root.model.data.y_row(index).data;
 
                                     var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
-                                    tmp = root.model.data.y_row(index)[curve.selectDataIndex];
+                                    tmp = root.model.data.y_row(index).data[curve.selectDataIndex];
                                     if (btnValueType.valueType == 1){
                                         tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
                                     }
@@ -777,18 +777,9 @@ Item {
 //        updateModel();
 //        model.x.print();
 //        model.y.print();
-        var x = new Array(1);
-        console.log(x.length);
-        console.log(x[0])
 
-        var tmp =  Matlab.sampleSin(2, 101, 0, 50, -20, 20, 1);
-        tmp.print()
-
-        var aa = tmp.subdata(-1, 2, 3, 4);
-        aa.print()
-
-        console.log("aa.y_row(1) = " + aa.y_row(2))
-        console.log("aa.x_row(0) = " + aa.x_row(0))
-
+        var tmp = Matlab.matrix(2, 5, 1);
+        tmp.print();
+        tmp.y_row(1).print();
     }
 }

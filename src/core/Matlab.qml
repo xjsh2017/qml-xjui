@@ -26,8 +26,18 @@ pragma Singleton
 QtObject {
     id: matlab
 
+    // ///////////////////////////////////////////////////////////////
+
     property string type_INT: "int"
     property string type_DOUBLE: "double"
+
+    property string en_Sample_Sin: "sin";
+    property string en_Sample_random: "random"
+    property string en_Sample_Serialize: "serialize"
+
+
+    // ///////////////////////////////////////////////////////////////
+
 
     /*!
         产生指定步长的等距数列.
@@ -334,13 +344,16 @@ QtObject {
         }
 
         return {
-            data: data,
+            y: data,
             rows: Rows,
             cols: Cols,
 
-            print: print,
-            value: value,
-            row: row
+            // Functions
+            print: matrix_print,
+            subdata: matrix_subdata,
+
+            y_data: y_data,
+            y_row: y_row
         }
     }
 
@@ -377,13 +390,13 @@ QtObject {
         var xRange = xMax - xMin;
         var yRange = yMax - yMin;
 
-        log("xRange type: " + (typeof xRange))
+//        log("xRange type: " + (typeof xRange))
 
         var hopX = xRange / (Cols - 1);
         var offset = yMax - yRange / 2;
         var Tx = (xMax - xMin) / nT;
 
-        log("hopX = " + hopX + ", offset = " + offset + ", Tx = " + Tx)
+//        log("hopX = " + hopX + ", offset = " + offset + ", Tx = " + Tx)
 
         var x = new Array(1);
         var y = new Array(Rows);
@@ -413,12 +426,12 @@ QtObject {
             matrix_print();
         }
 
-        log("\n\t x type: " + (typeof x)
-            + "\n\t x[0] type: " + (typeof x[0])
-            + "\n\t x[0][0] type: " + (typeof x[0][0])
-            + "\n\t y type: " + (typeof y)
-            + "\n\t y[0] type: " + (typeof y[0])
-            + "\n\t y[0][0] type: " + (typeof y[0][0]));
+//        log("\n\t x type: " + (typeof x)
+//            + "\n\t x[0] type: " + (typeof x[0])
+//            + "\n\t x[0][0] type: " + (typeof x[0][0])
+//            + "\n\t y type: " + (typeof y)
+//            + "\n\t y[0] type: " + (typeof y[0])
+//            + "\n\t y[0][0] type: " + (typeof y[0][0]));
 
         return {
             // data:
@@ -438,7 +451,6 @@ QtObject {
             y_row: y_row
         }
     }
-
 
 
     // ///////////////////////////////////////////////////////////////
@@ -522,7 +534,11 @@ QtObject {
         for (var i = start; i <= end; i++)
             tmp[i - start] = who.x[index][i];
 
-        return tmp;
+        return {
+            data: tmp,
+
+            print: matrix_print_row
+        }
     }
 
     function y_row(index, start, end, who) {
@@ -543,7 +559,11 @@ QtObject {
         for (var i = start; i <= end; i++)
             tmp[i - start] = who.y[index][i];
 
-        return tmp;
+        return {
+            data: tmp,
+
+            print: matrix_print_row
+        }
     }
 
     function x_data(rowIndex, colIndex, who) {
@@ -561,7 +581,6 @@ QtObject {
     function matrix_print(who) {
         if (!who)
             who = this;
-        console.log("this = " + this);
         var says = "\ntype: " + typeof this + " { x: " + (typeof who.x) + ", y " + (typeof who.y)
                 + ", rows: " + (typeof who.rows) + "(" + who.rows + ")"
                 + ", cols: " + (typeof who.cols) + "(" + who.cols + ")" + " }\n";
@@ -580,22 +599,27 @@ QtObject {
             }
         }
 
-        log(says);
+        if (says)
+            log(says);
+    }
+
+    function matrix_print_row(who) {
+        if (!who)
+            who = this;
+
+        var says;
+        if (who.data) {
+            says = "\n Matrix Row: " + 1 + " x " + who.data.length +" = "
+                + " [ " + who.data + " ]\n";
+        }
+
+        if (says)
+            log(says);
     }
 
     // ///////////////////////////////////////////////////////////////
 
-    function printMatrix(mat){
-        var says;
-        if (mat && mat[0]) {
-            says += "\nmat (Matrix: " + mat.length + " x " + mat[0].length +")=\n";
-            for (var k = 0; k < mat.length; k++){
-                says += "\t[" + k + "]: " + mat[k] + "\n";
-            }
-        }
-        if (says)
-            log(says);
-    }
+
 
     function findBound(startTime, timeWidth, matrix) {
         var start = 0;
