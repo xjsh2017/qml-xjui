@@ -21,6 +21,10 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
+    signal modelCheckedChanged();
+
+    // ///////////////////////////////////////////////////////////////
+
     function log(says) {
 //        console.log("## XJTableView.qml ##: " + says);
     }
@@ -33,20 +37,8 @@ Item {
 
     onModelChanged: {
         log("Model Changed detected!")
+        modelCheckedChanged();
         update();
-    }
-
-    onSelectDataIndexChanged: {
-//        log(root.model.rms)
-//        log(root.model.angle)
-////        modelChannel.updateModel();
-
-////        modelChannel.set(1, {"rms": 100})
-//        for (var i = 0; i < modelChannel.count; i++){
-//            modelChannel.setProperty(i, "rms", root.model.rms[i])
-//            modelChannel.setProperty(i, "angle", root.model.angle[i] ? "∠ " + root.model.angle[i] + "°": "NaN")
-//            log(modelChannel.get(i).angle);
-//        }
     }
 
     function update() {
@@ -227,6 +219,12 @@ Item {
 
                     color: Theme.primaryColor
                     text: styleData.row + 1
+
+                    onCheckedChanged: {
+                        console.log(styleData.row + ", Checked: " + checked);
+                        root.model.check[styleData.row] = checked;
+                        root.modelCheckedChanged()
+                    }
                 }
             }
         }

@@ -1,295 +1,407 @@
-import QtQuick 2.4
-import Material 0.2
+import QtQuick 2.0
 
-import QtQuick.Controls 1.3 as Controls
-import QtQuick.Layouts 1.1
-import Material.ListItems 0.1 as ListItem
+import "VectorChart.js" as Charts
+import "../../core"
 
-import "."
+import Material 0.3
 
-Item {
-    id: me
+Canvas {
 
-    function dp(di){
-        return di;
+    id: canvas;
+
+    // ///////////////////////////////////////////////////////////////
+
+    property    var model;
+
+    property    var ctx: getContext("2d")
+    property    var plotArea;        // 绘图区域
+    property    var plotMargins: {
+                    "leftMargin": dp(10),
+                    "rightMargin": dp(10),
+                    "topMargin": dp(10),
+                    "bottomMargin": dp(10)
+    };
+
+    property    real fontSize: 12;
+    property    real maxRMS: 0;
+    property    real refAngle: 0;
+
+    // ///////////////////////////////////////////////////////////////
+
+    function init() {
+//        model = {
+//            data: {
+//                "rms": [10, 5, 8.5],
+//                "angle": [0, 110, -130],
+//                "color": ["red", "blue", "green"]
+//            }
+//        }
     }
 
-    function randomScalingFactor() {
-        return Math.round(Math.random() * 100);
+    function repaint() {
+        ctx.clearRect(0, 0, width, height);
+        requestPaint();
     }
 
-    // 工具栏
+    function log(says) {
+        console.log("# VectorChart.qml: # " + says);
+    }
+
+    function debug(de) {
+        if (!de)
+            log("-------------debug------------")
+        else
+            log("-------------" + de + "------------")
+    }
+
+    function getRBound() {
+        if (!canvas.model)
+            return;
+
+        if (canvas.model.rms.length < 0)
+            return;
+
+        var len = canvas.model.rms.length;
+
+        var tmp = 0;
+        for (var i = 0; i < len; i++){
+            if (!model.check[i])
+                continue;
+
+            if (parseFloat(model.rms[i]) > tmp){
+                tmp = parseFloat(model.rms[i]);
+                log("index = " + i + ", model.rms = " + parseFloat(model.rms[i]));
+            }
+        }
+
+        maxRMS = tmp;
+
+        console.log("max RMS = " + maxRMS);
+
+        return tmp;
+    }
+
+    // ///////////////////////////////////////////////////////////////
 
 
-    // 离散度分析
-    View{
+    onPaint: {
+        initSize();
+
+        drawScale();
+
+        drawVectors();
+    }
+
+    onRefAngleChanged: {
+        repaint();
+    }
+
+
+    // ///////////////////////////////////////////////////////////////
+
+    function initSize() {
+        var leftTop, rightBottom, center, plotWidth, plotHeight;
+
+        var actWidth = width - plotMargins.leftMargin - plotMargins.rightMargin;
+        var actHeight = height - plotMargins.topMargin - plotMargins.bottomMargin;
+        if (actHeight < actWidth){
+            leftTop = Qt.point((actWidth - actHeight) / 2, plotMargins.topMargin);
+            rightBottom = Qt.point((actWidth + actHeight) / 2, height - plotMargins.bottomMargin);
+        }else{
+            leftTop = Qt.point(plotMargins.leftMargin, (actHeight - actWidth) / 2 + plotMargins.topMargin);
+            rightBottom = Qt.point(width - plotMargins.rightMargin,  (actHeight + actWidth)/2 - plotMargins.bottomMargin);
+        }
+        plotWidth = rightBottom.x - leftTop.x;
+        plotHeight = rightBottom.y - leftTop.y;
+        center = Qt.point(leftTop.x + plotWidth / 2, leftTop.y + plotHeight / 2);
+
+        plotArea = {
+            leftTop: leftTop,
+            rightBottom: rightBottom,
+            center: center,
+            width: plotWidth,
+            height: plotHeight,
+            r: plotWidth / 2 - fontSize - dp(3)
+        }
+
+        var says = "init size: "
+                + "\n\t Canvas: width = " + width.toFixed(3) + ", height = " + height.toFixed(3)
+                + "\n\t Margins: (" + plotMargins.leftMargin + ", " + plotMargins.rightMargin + ", "
+                    + plotMargins.topMargin + ", " + plotMargins.bottomMargin + ")"
+                + "\n\t Plot Area: width = " + plotArea.width.toFixed(3) + ", height = " + plotArea.height.toFixed(3)
+                + "\n\t\t leftTop = (" + plotArea.leftTop.x.toFixed(3) + ", " + plotArea.leftTop.y.toFixed(3) + ")"
+                + "\n\t\t rightBottom = (" + plotArea.rightBottom.x.toFixed(3) + ", " + plotArea.rightBottom.y.toFixed(3) + ")"
+                + "\n\t\t center = (" + plotArea.center.x.toFixed(3) + ", " + plotArea.center.y.toFixed(3) + ")"
+
+        log(says)
+    }
+
+    function drawScale() {
+        var posx1, posx2, posy1, posy2, outlen, polarR;
+        var ctx = getContext("2d")
+
+        outlen = dp(5);
+
+        polarR = plotArea.r + outlen;
+
+        var widthfont = ctx.measureText("90").width / 2;
+
+        ctx.clearRect(0, 0, width, height);
+        // 设置画笔
+        ctx.lineWidth = 1
+        ctx.strokeStyle = "grey"
+        ctx.fillStyle = "black"//Qt.rgba(0, 0, 0, 0.5)
+
+//        ctx.fillRect(plotMargins.leftMargin, plotMargins.topMargin
+//                     , width - plotMargins.rightMargin - plotMargins.leftMargin
+//                     , height - plotMargins.bottomMargin - plotMargins.topMargin);
+        ctx.fillRect(dp(3), dp(3), width - dp(6), height-dp(6));
+
+        getRBound();
+
+        ctx.beginPath();
+        ctx.arc(plotArea.center.x, plotArea.center.y, plotArea.r, 2 * Math.PI, false);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(plotArea.center.x, plotArea.center.y, plotArea.r * 2/3, 2 * Math.PI, false);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(plotArea.center.x, plotArea.center.y, plotArea.r * 1/3, 2 * Math.PI, false);
+        ctx.stroke();
+
+        ctx.fillStyle = "white"
+        ctx.font = fontSize + "px 微软雅黑"
+        if (maxRMS > 0){
+            ctx.save();
+            ctx.font = fontSize * 5/6 + "px 微软雅黑"
+            ctx.fillStyle = Theme.accentColor
+
+            ctx.fillText("0", plotArea.center.x + dp(4), plotArea.center.y + fontSize * 2);
+            ctx.fillText(maxRMS, plotArea.center.x + dp(2), plotArea.leftTop.y + fontSize * 2);
+            ctx.fillText((maxRMS * 2/3).toFixed(2), plotArea.center.x + dp(2), plotArea.leftTop.y + plotArea.r / 3 + fontSize * 2);
+            ctx.fillText((maxRMS * 1/3).toFixed(2), plotArea.center.x + dp(2), plotArea.leftTop.y + plotArea.r * 2 / 3 + fontSize * 2);
+
+            ctx.restore();
+        }
+
+
+        ctx.beginPath();
+        ctx.moveTo(plotArea.leftTop.x, plotArea.center.y);
+        ctx.lineTo(plotArea.rightBottom.x, plotArea.center.y);
+        ctx.stroke();
+
+        ctx.fillText("180°", plotArea.leftTop.x - widthfont * 2, plotArea.center.y + fontSize / 3);
+        ctx.fillText("0°", plotArea.rightBottom.x - widthfont, plotArea.center.y + fontSize / 3);
+
+        ctx.beginPath();
+        ctx.moveTo(plotArea.center.x, plotArea.leftTop.y);
+        ctx.lineTo(plotArea.center.x, plotArea.rightBottom.y);
+        ctx.stroke();
+        ctx.fillText("90°", plotArea.center.x - widthfont, plotArea.leftTop.y + fontSize / 2);
+        ctx.fillText("-90°", plotArea.center.x - widthfont * 2, plotArea.rightBottom.y + fontSize / 2);
+
+        posx1 = plotArea.center.x + polarR * Math.sin(Math.PI / 3);
+        posy1 = plotArea.center.y - polarR * Math.cos(Math.PI / 3);
+        posx2 = plotArea.center.x + polarR * Math.sin(-Math.PI * 2 / 3);
+        posy2 = plotArea.center.y - polarR * Math.cos(-Math.PI * 2 / 3);
+
+        ctx.beginPath();
+        ctx.moveTo(posx1, posy1);
+        ctx.lineTo(posx2, posy2);
+        ctx.stroke();
+
+        ctx.fillText("30°", posx1 + widthfont / 2, posy1 + fontSize / 4);
+        ctx.fillText("-150°", posx2 - widthfont * 4, posy2 + fontSize);
+
+
+        posx1 = plotArea.center.x + polarR * Math.sin(Math.PI / 6);
+        posy1 = plotArea.center.y - polarR * Math.cos(Math.PI / 6);
+        posx2 = plotArea.center.x + polarR * Math.sin(-Math.PI * 5 / 6);
+        posy2 = plotArea.center.y - polarR * Math.cos(-Math.PI * 5 / 6);
+
+        ctx.beginPath();
+        ctx.moveTo(posx1, posy1);
+        ctx.lineTo(posx2, posy2);
+        ctx.stroke();
+
+        ctx.fillText("60°", posx1, posy1);
+        ctx.fillText("-120°", posx2 - widthfont * 3, posy2 + fontSize);
+
+
+        posx1 = plotArea.center.x + polarR * Math.sin(-Math.PI / 3);
+        posy1 = plotArea.center.y - polarR * Math.cos(-Math.PI / 3);
+        posx2 = plotArea.center.x + polarR * Math.sin(Math.PI * 2 / 3);
+        posy2 = plotArea.center.y - polarR * Math.cos(Math.PI * 2 / 3);
+        ctx.beginPath();
+        ctx.moveTo(posx1, posy1);
+        ctx.lineTo(posx2, posy2);
+        ctx.stroke();
+
+        ctx.fillText("-30°", posx2, posy2 + fontSize / 2);
+        ctx.fillText("150°", posx1 - widthfont * 3, posy1 - fontSize / 2);
+
+        posx1 = plotArea.center.x + polarR * Math.sin(-Math.PI / 6);
+        posy1 = plotArea.center.y - polarR * Math.cos(-Math.PI / 6);
+        posx2 = plotArea.center.x + polarR * Math.sin(Math.PI * 5 / 6);
+        posy2 = plotArea.center.y - polarR * Math.cos(Math.PI * 5 / 6);
+        ctx.beginPath();
+        ctx.moveTo(posx1, posy1);
+        ctx.lineTo(posx2, posy2);
+        ctx.stroke();
+
+        ctx.fillText("-60°", posx2 , posy2 + fontSize);
+        ctx.fillText("120°", posx1 - widthfont * 2, posy1 - fontSize / 2);
+
+    }
+
+    function drawVectors() {
+        if (!canvas.model)
+            return;
+
+        if (canvas.model.rms.length < 0)
+            return;
+
+        var len = canvas.model.rms.length;
+
+        for (var i = 0; i < len; i++){
+            if (!model.check[i])
+                continue;
+
+            var color = Global.phaseTypeColor(model.phase[i]);
+            drawVector(ctx, parseFloat(model.rms[i]), parseFloat(model.angle[i]), color)
+        }
+    }
+
+    function calcArrowPoints(x0, y0, x, y, r, angle){
+        angle = angle * Math.PI / 180;
+
+        var c = Math.cos(angle) * r * Math.sqrt((x-x0)*(x-x0) + (y - y0)*(y - y0));
+
+        var d = Math.sqrt(-c*c + r*r*x*x - 2*r*r*x*x0 + r*r*x0*x0 + r*r*y*y - 2*r*r*y*y0 + r*r *y0*y0);
+        var e = (x*x - 2*x*x0 + x0*x0 + y*y - 2*y*y0 + y0*y0);
+
+        var v1 = (x*x*x - 2*x0*x*x + (x0*x0 + y*y-2*y*y0+y0*y0-c) *x + y0*d - y*d + c*x0) / e;
+        var v2 = (x*x*x - 2*x0*x*x + (x0*x0 + y*y-2*y*y0+y0*y0-c) *x + y*d - y0*d + c*x0) / e;
+
+        var x1 = { 1: v1, 2: v2, 3: v1, 4: v2 }
+        var x2 = { 1: v1, 2: v1, 3: v2, 4: v2 }
+
+        var m1 = (y*x*x + (d - 2*x0*y) *x + c*y0 - c*y - x0*d + x0*x0*y + y*y0*y0 - 2*y*y*y0 + y*y*y) / e ;
+        var m2 = (y*x*x + (-d - 2*x0*y) *x + x0*d - c*y + c*y0 + x0*x0*y + y*y0*y0 - 2*y*y*y0 + y*y*y) / e ;
+
+        var y1 = { 1: m1, 2: m2, 3: m1, 4: m2 }
+        var y2 = { 1: m1, 2: m1, 3: m2, 4: m2 }
+
+        console.log("p0: " + Qt.point(x0, y0) + ", p: " + Qt.point(x,y)
+                    + "\n\t r = " + r + ", angle = " + (angle * 180 / Math.PI).toFixed(3)
+                    + "\n\t c = " + c
+                    + "\n\t d = " + d
+                    + "\n\t e = " + e
+                    + "\n\t v1 = " + v1
+                    + "\n\t v2 = " + v2
+                    + "\n\t m1 = " + m1
+                    + "\n\t m2 = " + m2
+                    + "\n\t p1 = " + Qt.point(x1[2], y1[2])
+                    + "\n\t p1 = " + Qt.point(x2[2], y2[2])
+                    )
+
+        return {
+            p1: Qt.point(x1[2], y1[2]),
+            p2: Qt.point(x2[2], y2[2])
+        }
+    }
+
+    function drawVector(ctx, r, angle, color) {
+        console.log("r = " + r + ", angle = " + angle)
+        console.log(typeof r + ", " + typeof angle)
+
+        r = parseFloat(r);
+        angle = parseFloat(angle) - refAngle;
+        var posx0, posy0, posx, posy
+
+        r = maxRMS > 0 ? plotArea.r * r / maxRMS : 2;
+
+        console.log(r);
+
+        angle = angle * Math.PI / 180;
+
+        ctx.lineWidth = 2
+        ctx.strokeStyle = color
+        ctx.fillStyle = color
+
+        ctx.beginPath();
+        posx0 = plotArea.center.x;
+        posy0 = plotArea.center.y;
+        posx = plotArea.center.x + r * Math.cos(angle);
+        posy = plotArea.center.y - r * Math.sin(angle);
+        ctx.moveTo(posx0, posy0);
+        ctx.lineTo(posx, posy);
+
+        ctx.stroke();
+
+        var p = calcArrowPoints(posx0, posy0, posx, posy, dp(10), 20);
+
+        ctx.beginPath();
+        ctx.moveTo(posx, posy);
+        ctx.lineTo(p.p1.x, p.p1.y);
+        ctx.lineTo(p.p2.x, p.p2.y);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
+    Rectangle {
+        width: plotArea ? plotArea.width : 0
+        height: plotArea ? plotArea.height : 0
+        x: plotArea && plotArea.leftTop ? plotArea.leftTop.x : 0
+        y: plotArea && plotArea.leftTop ? plotArea.leftTop.y : 0
+
+        border.color: Theme.accentColor
+        color: "transparent"
+
+        visible: false
+    }
+
+    Timer {
+        id: runningTimer;
+        repeat: true;
+        interval: 3000;
+        triggeredOnStart: true;
+        onTriggered: {
+            stepChartToLast();
+        }
+    }
+
+    PropertyAnimation {
+        id: chartAnimator;
+        target: canvas;
+        property: "chartAnimationProgress";
+        to: 100;
+        duration: 500;
+        easing.type: Easing.InOutElastic;
+    }
+
+    ActionButton {
+        visible: false
+        width: dp(36)
+        height: dp(36)
+
         anchors {
-            fill: parent
-            margins: dp(0)
+            right: parent.right
+            bottom: parent.bottom
+            margins: dp(16)
         }
 
-        elevation: 1
-//        backgroundColor: "#263238"
+        iconName: "action/view_list"
 
-        Rectangle {
-            id: outerCircle
-            anchors {
-                centerIn: parent
-                margins: dp(16)
-            }
-
-            height: parent.height - dp(48)
-            width: height
-
-            radius: width / 2
-
-            border.color: "lightgray"
-            color: "transparent"
-
-            Rectangle {
-                id: axisX
-                anchors.centerIn: parent
-                height: dp(1)
-                width: parent.width + dp (8)
-
-                border.color: "lightgray"
-                color: "lightgray"
-            }
-
-            Label {
-                text: "180°"
-                color: Theme.light.textColor
-                x: axisX.x - dp(28)
-                anchors.verticalCenter: axisX.verticalCenter
-            }
-
-            Label {
-                text: "0°"
-                color: Theme.light.textColor
-                x: axisX.x + axisX.width
-                anchors.verticalCenter: axisX.verticalCenter
-            }
-
-            Rectangle {
-                anchors.centerIn: parent
-                height: dp(1)
-                width: parent.width + dp (8)
-
-                border.color: "lightgray"
-                color: "lightgray"
-
-                Label {
-                    text: "135°"
-                    color: Theme.light.textColor
-                    x: parent.x - dp(20)
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    rotation: -90
-                }
-
-                Label {
-                    text: "-45°"
-                    color: Theme.light.textColor
-                    x: parent.x + parent.width + dp(3)
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    rotation: -90
-                }
-
-                rotation: 45
-            }
-
-            Rectangle {
-                id: axisY
-                anchors.centerIn: parent
-                width: dp(1)
-                height: parent.height + dp (8)
-
-                border.color: "lightgray"
-                color: "lightgray"
-
-                Label {
-                    text: "90°"
-                    color: Theme.light.textColor
-                    y: axisY.y - dp(12)
-                    anchors.horizontalCenter: axisY.horizontalCenter
-                }
-
-                Label {
-                    text: "-90°"
-                    color: Theme.light.textColor
-                    y: axisY.y + axisY.height + dp(3)
-                    anchors.horizontalCenter: axisY.horizontalCenter
-                }
-
-                Label {
-                    text: "0"
-                    color: Theme.light.textColor
-                    y: axisY.y + axisY.height / 8 * 4 + dp(2)
-                    anchors.horizontalCenter: axisY.horizontalCenter
-                    anchors.horizontalCenterOffset: dp(6)
-                }
-
-                Label {
-                    text: "0.25"
-                    color: Theme.light.textColor
-                    y: axisY.y + axisY.height / 8 * 3
-                    anchors.horizontalCenter: axisY.horizontalCenter
-                }
-
-                Label {
-                    text: "0.50"
-                    color: Theme.light.textColor
-                    y: axisY.y + axisY.height / 8 * 2
-                    anchors.horizontalCenter: axisY.horizontalCenter
-                }
-
-                Label {
-                    text: "0.75"
-                    color: Theme.light.textColor
-                    y: axisY.y + axisY.height / 8 * 1
-                    anchors.horizontalCenter: axisY.horizontalCenter
-                }
-            }
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: dp(1)
-                height: parent.height + dp (8)
-
-                border.color: "lightgray"
-                color: "lightgray"
-
-                Label {
-                    text: "45°"
-                    color: Theme.light.textColor
-                    y: parent.y - dp(12)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                Label {
-                    text: "-135°"
-                    color: Theme.light.textColor
-                    y: parent.y + parent.height + dp(3)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                rotation: 45
-            }
-
-            // 示例
-
-            Rectangle {
-                height: dp(8)
-                width: height
-
-                radius: height / 2
-
-                border.color: "lightgray"
-                color: "red"
-
-                x: dp(72)
-                y: dp(72)
-            }
-
-            Rectangle {
-                height: dp(8)
-                width: height
-
-                radius: height / 2
-
-                border.color: "lightgray"
-                color: "blue"
-
-                x: axisX.x + axisX.width *0.25
-                y: axisX.y - axisY.height / 2 * 0.3
-            }
-
-            Rectangle {
-                height: dp(8)
-                width: height
-
-                radius: height / 2
-
-                border.color: "lightgray"
-                color: "yellow"
-
-                x: axisY.x
-                y: axisX.y + axisY.height / 2 * 0.7
-            }
-
-            Canvas {
-                anchors.fill: parent
-
-                onPaint: {
-                    var ctx = getContext('2d')
-                    ctx.lineWidth = dp(2)
-                    ctx.strokeStyle = "red"
-                    ctx.beginPath()
-                    ctx.moveTo(outerCircle.width/2, outerCircle.width/2)
-                    ctx.lineTo(dp(80), dp(80))
-
-                    ctx.stroke()
-                    ctx.beginPath()
-                    ctx.moveTo(dp(80), dp(80))
-                    ctx.lineTo(dp(83), dp(87))
-                    ctx.lineTo(dp(87), dp(83))
-                    ctx.closePath();
-                    ctx.stroke()
-                }
-            }
-        }
-
-        Rectangle {
-            anchors {
-                centerIn: parent
-                margins: dp(16)
-            }
-
-            height: outerCircle.height * 3 / 4
-            width: height
-
-            radius: width / 2
-
-            border.color: "lightgray"
-            color: "transparent"
-        }
-
-        Rectangle {
-            anchors {
-                centerIn: parent
-                margins: dp(16)
-            }
-
-            height: outerCircle.height * 2 / 4
-            width: height
-
-            radius: width / 2
-
-            border.color: "lightgray"
-            color: "transparent"
-
+        onClicked: {
 
         }
-
-        Rectangle {
-            anchors {
-                centerIn: parent
-                margins: dp(16)
-            }
-
-            height: outerCircle.height * 1 / 4
-            width: height
-
-            radius: width / 2
-
-            border.color: "lightgray"
-            color: "transparent"
-        }
-
-
-
-
     }
 
+
+    Component.onCompleted: {
+        init();
+    }
 }

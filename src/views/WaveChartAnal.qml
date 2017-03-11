@@ -16,8 +16,8 @@ Item {
 
     property var model: {
 //                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
-                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
-//                          "data": Matlab.sampleSin(1, 1001, 0, 500, -20, 20, 10),
+//                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
+                          "data": Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10),
 
                           "name": ["通道延时"
                                    , "保护A相电流1", "保护A相电流2"
@@ -59,7 +59,8 @@ Item {
                                     , "N", "N"
                                     , "A", "B", "C"],
                           rms: [""],
-                          angle: [""]
+                          angle: [""],
+                          check: [false]
     }
 
     property int selectDataIndex: 0

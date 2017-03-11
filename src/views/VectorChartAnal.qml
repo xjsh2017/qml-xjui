@@ -34,11 +34,20 @@ Item {
         }
 
         VectorChart {
-
+            id: vec
+            model: table.model
 //            visible: false
             Layout.fillWidth: true
             Layout.minimumWidth: 300;
-            width: parent.width * 2 / 5
+            width: parent.width * 1 / 5
+        }
+
+        Connections {
+            target: table
+
+            onModelCheckedChanged: {
+                vec.repaint();
+            }
         }
     }
 }
