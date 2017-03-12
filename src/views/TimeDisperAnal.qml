@@ -4,22 +4,71 @@ import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
-import "."
+//import "."
 import "../components/Charts"
+import "../core"
+//import XjUi 1.0
 
 Item {
     id: me
 
-    function dp(di){
-        return di;
+
+    // ///////////////////////////////////////////////////////////////
+
+    property var model: Calculator.model
+    property bool isModelUpdate: Calculator.isNeedUpdate
+
+    // ///////////////////////////////////////////////////////////////
+
+
+    function updateChartData() {
+        var result = Calculator.analTimeDisper();
+
+        chart.chartData.labels = ["<-10","-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","0"
+                                   ,"1","2","3","4","5","6","7","8","9","10",">10"];
+
+        chart.chartData.datasets[0].data = [
+                    result.static.neg_nup11us,
+                    result.static.neg_n10us,
+                    result.static.neg_n9us,
+                    result.static.neg_n8us,
+                    result.static.neg_n7us,
+                    result.static.neg_n6us,
+                    result.static.neg_n5us,
+                    result.static.neg_n4us,
+                    result.static.neg_n3us,
+                    result.static.neg_n2us,
+                    result.static.neg_n1us,
+                    result.static.n0us,
+                    result.static.n1us,
+                    result.static.n2us,
+                    result.static.n3us,
+                    result.static.n4us,
+                    result.static.n5us,
+                    result.static.n6us,
+                    result.static.n7us,
+                    result.static.n8us,
+                    result.static.n9us,
+                    result.static.n10us,
+                    result.static.nup11us
+                ]
+        for　(var i = 0; i < chart.chartData.labels.length; i++){
+            chart.chartData.datasets[0].backgroundColor[i] = Global.randomColor();
+        }
+
+        chart.chartData.datasets[0].label = result.title;
+
+        console.log("Title = " + result.title)
     }
 
-    function randomScalingFactor() {
-        return Math.round(Math.random() * 100);
+    function update() {
+        updateChartData()
+
+        chart.repaint();
     }
 
-    // 工具栏
 
+    // ///////////////////////////////////////////////////////////////
 
     // 离散度分析
     View{
@@ -32,6 +81,8 @@ Item {
 
 
         Chart{
+            id: chart
+
             anchors.fill: parent
             chartType: ChartType.bar;
 
@@ -39,66 +90,57 @@ Item {
                 console.log(width);
             }
 
-            function randomScalingFactor() {
-                return Math.round(Math.random() * 100);
-            }
-
-            function randomColor() {
-                return Qt.rgba(Math.random(),
-                               Math.random(), Math.random(), 1);
-            }
-
             chartData: {
                 "datasets": [{
-                                 "data": [randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor()
+                                 "data": [0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0
                                  ],
-                                 "backgroundColor": [randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor()
+                                 "backgroundColor": [Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor(),
+                                     Global.randomColor()
                                  ],
-                                 "label": '0x4001 总帧数： 99685  合格帧数： 99685  合格率： 100.0% （帧间差 -250us ≤ 10us）  帧速： 4000帧/s  流量： 9.125 Mb/s  持续时间： 24.921 s'
+                                 "label": ' -- '
                              }],
                 "labels": ["<-10","-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","0"
                            ,"1","2","3","4","5","6","7","8","9","10",">10"]
@@ -106,6 +148,11 @@ Item {
 
         }
 
+    }
+
+    Component.onCompleted: {
+        console.log("hehe")
+        update();
     }
 
 }

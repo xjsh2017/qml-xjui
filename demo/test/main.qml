@@ -13,22 +13,26 @@ ApplicationWindow {
     width: dp(1000)
 
     theme {
-        primaryColor: "Teal"
-        accentColor: "#FF9800"
+        primaryColor: "cyan"
+        accentColor: "#66bb6a"
         tabHighlightColor: "white"
     }
+    
+    property var homeComponents: [
+        "Page1"
+    ]
 
     property var styles: [
-            "Custom Icons", "Color Palette", "Typography"
+        "Custom Icons", "Color Palette", "Typography"
     ]
 
-    property var homeComponents: [
-            "Page1", "Page2", "Page3", "Page4"
-            //, "Button", "CheckBox", "Progress Bar", "Radio Button", "Slider", "Switch", "TextField"
-    ]
+//    property var homeComponents: [
+//        "Page1", "Page2", "Page3", "Page4"
+//        //, "Button", "CheckBox", "Progress Bar", "Radio Button", "Slider", "Switch", "TextField"
+//    ]
 
     property var compoundComponents: [
-            "Bottom Sheet", "Dialog", "Forms", "List Items", "Page Stack", "Time Picker", "Date Picker"
+        "Bottom Sheet", "Dialog", "Forms", "List Items", "Page Stack", "Time Picker", "Date Picker"
     ]
 
     property var sections: [ homeComponents, styles, compoundComponents ]
@@ -141,6 +145,7 @@ ApplicationWindow {
 
         Loader {
             id: smallLoader
+            property bool showSiderbar: true
             anchors.fill: parent
             sourceComponent: tabDelegate
 
@@ -188,15 +193,15 @@ ApplicationWindow {
 
                         onPressed: {
                             switch(selection.selectedIndex) {
-                                case 0:
-                                    theme.primaryColor = parent.color
-                                    break;
-                                case 1:
-                                    theme.accentColor = parent.color
-                                    break;
-                                case 2:
-                                    theme.backgroundColor = parent.color
-                                    break;
+                            case 0:
+                                theme.primaryColor = parent.color
+                                break;
+                            case 1:
+                                theme.accentColor = parent.color
+                                break;
+                            case 2:
+                                theme.backgroundColor = parent.color
+                                break;
                             }
                         }
                     }
@@ -218,6 +223,7 @@ ApplicationWindow {
                 id: sidebar
 
                 expanded: !navDrawer.enabled
+                visible:  section.length > 1 && smallLoader.showSiderbar
 
                 Column {
                     width: parent.width
@@ -235,7 +241,7 @@ ApplicationWindow {
             Flickable {
                 id: flickable
                 anchors {
-                    left: sidebar.right
+                    left: sidebar.visible ? sidebar.right : parent.left
                     right: parent.right
                     top: parent.top
                     bottom: parent.bottom
@@ -268,4 +274,7 @@ ApplicationWindow {
         }
     }
 
+    Snackbar {
+        id: snackbar
+    }
 }

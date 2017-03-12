@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
 import Material 0.3
-//import XjQmlUi 1.0
-import "../../../src/views"
+import XjUi 1.0
+
 import QtQuick.Layouts 1.1
 
 Item {

@@ -19,6 +19,7 @@ import QtQuick 2.4
 import Material 0.2
 import Material.ListItems 0.1 as ListItem
 
+//import XjUi 1.0
 import "../../../src/views"
 
 TabbedPage {
@@ -28,8 +29,6 @@ TabbedPage {
 
     actionBar.backgroundColor: Palette.colors.grey['200']
     actionBar.decorationColor: Palette.colors.grey['300']
-
-    property var model;
 
     onGoBack: {
         confirmationDialog.show()
@@ -74,7 +73,6 @@ TabbedPage {
 
         sourceComponent: VectorChartAnal {
             id: vec
-            model: page.model
         }
     }
 

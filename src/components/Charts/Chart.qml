@@ -13,6 +13,10 @@ Item {
     property var model;
     property var chartData;
 
+    function repaint() {
+        canvas.chartInstance = null;
+        canvas.requestPaint();
+    }
 
     Canvas{
         id: canvas

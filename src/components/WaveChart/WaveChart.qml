@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
-import "WaveChart.js" as Charts
 import "../../core"
+import "WaveChart.js" as Charts
 
 Canvas {
 
@@ -184,7 +184,7 @@ Canvas {
             }
         }
 
-        console.log(" startDataIndex = " + startDataIndex
+        log(" startDataIndex = " + startDataIndex
                     + "\n\t xPlotOffset = " + xPlotOffset);
     }
 
@@ -241,7 +241,7 @@ Canvas {
         if (plotMode == Global.enSampleMode){
             tmp = xPlot * sampleWidth / plotArea.width;
 
-            console.log("findSelDataIndex = "
+            log("findSelDataIndex = "
                         + "\n\t mouseX = " + lastX
                         + "\n\t xPlot = " + xPlot
                         + "\n\t sampleRate = " + Global.g_sampleRate
@@ -392,7 +392,7 @@ Canvas {
     onStartDataIndexChanged: {
         selectDataIndex = findSelDataIndex(grooveXPlot);
 
-        console.log("selectDataIndex = " + selectDataIndex);
+//        console.log("selectDataIndex = " + selectDataIndex);
 
         repaint();
     }

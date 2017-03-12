@@ -1,16 +1,7 @@
-/*
- * QML Material - An application framework implementing Material Design.
- *
- * Copyright (C) 2014-2016 Michael Spencer <sonrisesoftware@gmail.com>
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-
-import QtQuick 2.4
-
 pragma Singleton
+
+import "."
+import QtQuick 2.4
 
 /*!
    \qmltype XJElecCalculator
@@ -24,10 +15,127 @@ pragma Singleton
 QtObject {
     id: calculator
 
-    /*!
-      result for calc
-      */
-    property var fresult;
+    // ///////////////////////////////////////////////////////////////
+
+    property var model: {
+                // 采样数据
+//                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
+//                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
+                "data": Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20),
+                //                          "data": Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10),
+
+                // 通道数据
+                "name": ["通道延时"
+                         , "保护A相电流1", "保护A相电流2"
+                         , "保护B相电流1", "保护B相电流2"
+                         , "保护C相电流1", "保护C相电流2"
+                         , "计量A相电流", "计量B相电流", "计量C相电流"
+                         , "零序电流I01", "零序电流I02"
+                         , "间隙电流Ij1", "间隙电流Ij2"
+                         , "保护A相电压1", "保护A相电压2"
+                         , "B相电压采样值1", "B相电压采样值2"
+                         , "C相电压采样值1", "C相电压采样值2"
+                         , "线路抽取电压1", "线路抽取电压2"
+                         , "零序电压1", "零序电压2"
+                         , "计量A相电压", "计量B相电压", "计量C相电压"],
+                "unit": [""
+                         , "A", "A"
+                         , "A", "A"
+                         , "A", "A"
+                         , "A", "A", "A"
+                         , "A", "A"
+                         , "A", "A"
+                         , "V", "V"
+                         , "V", "V"
+                         , "V", "V"
+                         , "V", "V"
+                         , "V", "V"
+                         , "V", "V", "V"],
+                "phase": [""
+                          , "A", "A"
+                          , "B", "B"
+                          , "C", "C"
+                          , "A", "B", "C"
+                          , "N", "N"
+                          , "", ""
+                          , "A", "A"
+                          , "B", "B"
+                          , "C", "C"
+                          , "", ""
+                          , "N", "N"
+                          , "A", "B", "C"],
+
+                ncapp_id: 0,    // 链路appid
+
+                // 数据分析
+                curSamplePos: 0, // 当前分析采样点索引位置
+                maxHarmonicTimes: 19, // 谐波分析的最大谐波次数： 直流、一次谐波（基本分量）、二次谐波....nMax次谐波
+                check: [false],   // 当前通道的分析数据是否可见
+                isAnal: [true],   // 当前通道的分析数据是否分析
+                periodSampleCount: 80, // 一个周波点数
+                analSampleCount: 80, // 谐波分析需要的采样点数，从当前采样点索引位置向前数，一般一个周波点数
+
+                amp: [""],        // 每个通道当前索引位置采样点的幅值
+                rms: [""],        // 每个通道当前索引位置采样点的有效值
+                angle: [""],      // 每个通道当前索引位置采样点的相角
+                harmonic: [[]],    // 每个通道当前索引位置采样点的maxHarmonicTimes次谐波分析的结果， 通道数 X maxHarmonicTimes
+
+                // 离散度分析相关
+                timeRelastStatic: {},    // 本链路时间均匀度统计
+                ftime_relative_first: 0,    // 本链路第一帧报文与采样与采样文件中第一帧的时间差，见CAPCONNECTINFO，单位：秒
+                ftime_relative_last:0,   // 最后一帧报文与采样文件中第一帧的时间差
+                lTotalCapLenth: 0       // 本链路字节数
+    }
+
+    property  bool isNeedUpdate: false;
+
+
+    // ///////////////////////////////////////////////////////////////
+
+
+    function log(says) {
+        console.log("## Calculator.qml ##: " + says);
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
+    function initModelData() { log("initModelData")
+        var channel_count = model.name.length;
+
+        model.check = new Array(channel_count);
+        model.isAnal = new Array(channel_count);
+        model.amp = new Array(channel_count);
+        model.rms = new Array(channel_count);
+        model.angle = new Array(channel_count);
+        model.harmonic = new Array(channel_count);
+        for (var i = 0; i < channel_count; i++){
+            model.check[i] = false;
+            model.isAnal[i] = true;
+            model.amp[i] = 0.0;
+            model.rms[i] = 0.0;
+            model.angle[i] = 0.0;
+
+            model.harmonic[i] = new Array(19);
+            for (var j = 0; j < 19; j++){
+                model.harmonic[i][j] = {
+                    n: j,
+                    real: 0.0,
+                    img: 0.0,
+                    amp: 0.0,
+                    angle: 0.0,
+                    percentage: 0.0
+                }
+            }
+        }
+
+        model.timeRelastStatic = {
+            n0us: 0, n1us: 0, n2us: 0, n3us: 0, n4us: 0, n5us: 0, n6us: 0, n7us:0, n8us:0, n9us: 0, n10us:0, nup11us:0,
+            neg_n1us: 0, neg_n2us: 0, neg_n3us: 0, neg_n4us: 0, neg_n5us: 0, neg_n6us: 0, neg_n7us:0,
+            neg_n8us:0, neg_n9us: 0, neg_n10us:0, neg_nup11us:0,
+
+            n4to10us:0, n11to25us:0, n25tous:0
+        }
+    }
 
     /*!
    Select a color depending on whether the background is light or dark.
@@ -80,13 +188,13 @@ QtObject {
         else
             phase = 0.0;
 
-        log ("calcRMS: "
-             + "\n\t sample(" + samplearr.length + ") = " + samplearr
-             + "\n\t dx = " + dx + ", ex = " + ex
-             + "\n\t RMS = " + RMS
-             + "\n\t amplitude = " + amplitude
-             + "\n\t phase =" + phase
-        )
+//        log ("calcRMS: "
+//             + "\n\t sample(" + samplearr.length + ") = " + samplearr
+//             + "\n\t dx = " + dx + ", ex = " + ex
+//             + "\n\t RMS = " + RMS
+//             + "\n\t amplitude = " + amplitude
+//             + "\n\t phase =" + phase
+//        )
 
         return {
             RMS: RMS,
@@ -122,12 +230,287 @@ QtObject {
         return fresult;
     }
 
-    function log(says) {
-//        console.log("## Calculator.qml ##: " + says);
+    /*!
+      n次谐波计算 - 傅氏全波差分计算方法
+
+      \c model: 分析数据模型，其数据结构如下
+
+        property var model: {
+                          // 采样数据
+                          "data": Matlab.sampleSin(15, 1601, 0, 16000, -20, 20, 20),
+
+                          // 通道数据
+                          "name": ["计量A相电流", "计量B相电流", "计量C相电流"...],
+                          "unit": [ "V", "A", "V"...],
+                          "phase": ["A", "B", "C"...],
+
+                          // 数据分析
+                          curSamplePos: 0, // 当前分析采样点索引位置
+                          maxHarmonicTimes: 7, // 谐波分析的最大谐波次数： 直流、一次谐波（基本分量）、二次谐波....nMax次谐波
+                          check: [false],   // 当前通道的分析数据是否可见
+                          periodSampleCount: 80, // 一个周波点数
+                          analSampleCount: 80, // 谐波分析需要的采样点数，从当前采样点索引位置向前数，一般一个周波点数
+
+                          rms: [""],        // 每个通道当前索引位置采样点的有效值
+                          angle: [""],      // 每个通道当前索引位置采样点的相角
+                          harmonic: [[]]    // 每个通道当前索引位置采样点的maxHarmonicTimes次谐波分析的结果， 通道数 X maxHarmonicTimes
+        }
+
+        采样数据 data 的数据结构如下： { -- 见Matlab定义
+            // 数据部分:
+            x: x,               // matrix: 1 x Cols
+            y: y,               // matrix: rows x Cols
+            rows: Rows,
+            cols: Cols,
+
+            // Functions
+            y_row: ...
+        }
+
+        \c index, 通道索引， 为空时，表示计算所有通道
+
+      */
+    function analHarmonic(model, index) {
+        log("index = " + index)
+        if (arguments.length < 1){
+            log("Error using analHarmonic (line 46) \nThere should be 1 arguments at least.");
+            return NaN;
+        }
+        index = (arguments[1] || arguments[1] == 0) ? arguments[1] : -1;
+
+        console.log("rows = " + model.data.rows + ", cols = " + model.data.cols)
+        if (!isModelValid(model)
+                || model.data.cols < model.periodSampleCount
+                || model.curSamplePos < model.periodSampleCount)
+            return NaN;
+        log("index = " + index)
+        log("curSamplePos = " + model.curSamplePos)
+
+        var period = model.periodSampleCount;
+        var pos = model.curSamplePos;
+        var nMax = model.maxHarmonicTimes;
+
+        // 逐个通道分析
+        for (var i = 0; i < model.data.rows; i++){
+            if (index != -1 && i != index)
+                continue;
+
+            if (model.isAnal[i] == false)
+                continue;
+
+            log("harmonic: " + i + ", anal started ...");
+
+            var input = model.data.y_row(i, pos - period, pos).data;
+
+            model.harmonic[i][0] = analDC(input);
+            for (var j = 1; j <= nMax; j++){
+                model.harmonic[i][j] = analPeriodHarmonic(input, j);
+                if (j == 1) // 基波幅值作为通道在该索引点的幅值
+                    model.amp[i] = model.harmonic[i][j].amp;
+            }
+
+            // 谐波百分比计算， 各谐波的amp与基波的amp的比值百分数， 所以基波永远是100%
+            for (j = 0; j <= nMax; j++){
+                if (model.amp[i] > 1.0)
+                    model.harmonic[i][j].percentage = model.harmonic[i][j].amp / model.amp[i];
+                else
+                    model.harmonic[i][j].percentage = 0.0;
+            }
+        }
+
+    }
+
+    function print_harmonic_result() {
+        var says;
+
+        var channel_count = model.name.length;
+        for (var i = 0; i < channel_count; i++){
+            says += "\n\t " + model.name[i] + ": ";
+            for (var j = 0; j < 7; j++){
+                 says += j +" = " + model.harmonic[i][j].amp.toFixed(3) + " " + (model.harmonic[i][j].percentage * 100).toFixed(3) + "%, "
+            }
+        }
+
+        if (says)
+            log(says)
+    }
+
+    /*!
+      检查数据模型是否有效
+      */
+    function isModelValid(model) {
+        if (!model || !model.data || !model.data.y)
+            return false;
+
+        if (model.data.rows < 1 || model.data.cols < 1)
+            return false;
+
+        return true;
+    }
+
+    /*!
+      n次谐波计算 - 傅氏全波差分计算方法
+
+      \c input: 输入采样序列，一般是一个周波采样点序列
+
+      \c n: 本次谐波分析的次数
+
+      */
+    function analPeriodHarmonic(input, n) {
+        if (!input || input.length < 8 || n < 1)
+            return NaN;
+
+        var fInput = input.map(parseFloat)
+
+        var Xr = 0.0, Xi = 0.0; // 实部，虚部
+        var N = fInput.length - 1;
+        var yinzi = 2*Math.PI /N;  // 差分因子
+        var fTemp, fV, fA;
+
+        for (var i = 1; i < N + 1; i++){
+            fTemp = fInput[i] - fInput[i-1];   // 计算差分
+            Xr += fTemp * Math.sin(n*(i + 1) * yinzi);
+            Xi += fTemp * Math.cos(n*(i + 1) * yinzi);
+        }
+
+        fV = 2.0 * Math.sin(Math.PI * n/N);      // 差分修正系数
+        fA = (0.5 - n/N) * Math.PI;
+
+        var a, b, c, d, divbase;
+        a = 2 *Xr/N;
+        b = 2 *Xi/N;
+        c = fV * Math.cos(fA);
+        d = fV * Math.sin(fA);
+        divbase = c*c + d*d;
+
+        var real, img, amp, angle;
+        if (divbase > 0.00001){
+            real = (a*c + b*d)/divbase; // 实部
+            img = (b*c - a*d)/divbase; // 虚部
+        }else{
+            real = 0.0;
+            img = 0.0;
+        }
+
+        amp = Math.sqrt((real*real + img*img) / 2);
+        angle = calcComplexAngle(real, img) * 180 / Math.PI
+
+        return {
+            n: n,
+            real: real,
+            img: img,
+            amp: amp,
+            angle: angle,
+            percentage: 0.0
+        }
+    }
+
+    /*!
+      直流分量分析
+
+      */
+    function analDC(input){
+        if (!input)
+            return NaN;
+
+        var count = input.length;
+        if (count < 8)
+            return NaN;
+
+        var fInput = input.map(parseFloat)
+
+        var fTemp = 0.0;
+        for (var i = 0; i < count; i++){
+            fTemp += input[i] * 1.0;
+        }
+
+        fTemp /= count;
+
+        return {
+            n: 0,
+            real: fTemp,
+            img: 0.0,
+            amp: fTemp,
+            angle: 0.0,
+            percentage: 0.0
+        }
+    }
+
+    function calcComplexAngle(real, img){
+        var fresult = 0.0;
+        if (Math.abs(real) > 0.0001){
+            fresult = Math.atan(img/real);
+            if (fresult > 0.0){ // 1, 3象限
+                if (real < 0.0 && img < 0.0){ // 3
+                    fresult = fresult - Math.PI
+                }
+            }else if(fresult < 0.0){ // 2, 4
+                if (real < 0.0 && img > 0.0){ // 2
+                    fresult = fresult + Math.PI
+                }
+            }else{ // 0° 或者 180°
+                if (real > 0.0)
+                    fresult = 0.0;
+                else
+                    fresult = Math.PI;
+            }
+        }else{ // 实部为 0
+            if (img > 0.0)
+                fresult = Math.PI / 2;
+            else if (img < 0.0)
+                fresult = - Math.PI / 2;
+            else
+                fresult = 0.0;
+        }
+
+        return fresult;
+    }
+
+
+    /*
+      离散度分析
+      */
+
+    function analTimeDisper() {
+        var fhege = 0.0;
+        var nhege = 0;
+        var nTotal = model.data.cols;
+        if (nTotal == 0)
+            nTotal += 1;
+
+        nhege = model.timeRelastStatic.n0us + model.timeRelastStatic.n1us +
+                model.timeRelastStatic.n2us + model.timeRelastStatic.n3us +
+                model.timeRelastStatic.n4us + model.timeRelastStatic.n5us +
+                model.timeRelastStatic.n6us +model.timeRelastStatic.n7us +
+                model.timeRelastStatic.n8us + model.timeRelastStatic.n9us +
+                model.timeRelastStatic.n10us + model.timeRelastStatic.neg_n1us +
+                model.timeRelastStatic.neg_n2us +model.timeRelastStatic.neg_n3us +
+                model.timeRelastStatic.neg_n4us + model.timeRelastStatic.neg_n5us +
+                model.timeRelastStatic.neg_n6us + model.timeRelastStatic.neg_n7us +
+                model.timeRelastStatic.neg_n8us + model.timeRelastStatic.neg_n9us +
+                model.timeRelastStatic.neg_n10us;
+
+        fhege = nhege / nTotal;
+        var fkeep = model.ftime_relative_last - model.ftime_relative_first;
+        var nZhenSu = Math.round(nTotal / fkeep);
+        var fLiuLiang = model.lTotalCapLenth * 8/(fkeep*1024*1024);
+        var title = "0x" + model.ncapp_id + " 总帧数： " + nTotal
+                + "  合格： " + nhege + " 帧, " + (fhege * 100).toFixed(2) + " %(帧间差-250us≤10us)"
+                + "  帧速： " + nZhenSu + " 帧/秒  流量： " + fLiuLiang.toFixed(3) + " Mb/s"
+                + "  持续时间： " + fkeep.toFixed(3);
+
+        return {
+            title: title,
+            static: model.timeRelastStatic
+        }
+
+
     }
 
     // ///////////////////////////////////////////////////////////////
 
     Component.onCompleted: {
+        initModelData();
+//        print_harmonic_result();
     }
 }

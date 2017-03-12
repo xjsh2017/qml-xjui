@@ -5,20 +5,28 @@ plugin XjUi
 # Components
 EntryCase 1.0 components/EntryCase.qml
 PageInfo 1.0 components/PageInfo.qml
-Grover.qml 1.0 components/Grover/Grover.qml
-GroverStyle.qml 1.0 components/Grover/GroverStyle.qml
-QChart.qml 1.0 components/QChart/QChart.qml
-QChart.js 1.0 components/QChart/QChart.js
+Groove.qml 1.0 components/Grover/Groove.qml
+WaveChart.qml 1.0 components/WaveChart/WaveChart.qml
+WaveChart.js 1.0 components/WaveChart/WaveChart.js
+VectorChart.qml 1.0 components/VectorChart/VectorChart.qml
+VectorTableView.qml 1.0 components/VectorChart/VectorTableView.qml
+Harmonic 1.0 components/Harmonic/Harmonic.qml
+QTableView.qml 1.0 components/QTableView.qml
+Chart.qml 1.0 components/Charts/Chart.qml
+ChartType.qml 1.0 components/Charts/ChartType.qml
+Chart.js 1.0 components/Charts/Chart.js
 
 # views
-WaveChartAnal 1.0 views/WaveChartAnal.qml
-VectorChart 1.0 views/VectorChart.qml
-TimeDisperAnal 1.0 views/TimeDisperAnal.qml
 HarmonicAnal 1.0 views/HarmonicAnal.qml
+SequenceAnal 1.0 views/SequenceAnal.qml
+TimeDisperAnal 1.0 views/TimeDisperAnal.qml
+VectorChart 1.0 views/VectorChart.qml
+WaveChartAnal 1.0 views/WaveChartAnal.qml
 
 # core
-singleton Calculator 1.0 core/Calculator.qml
-singleton Matlab 1.0 core/Matlab.qml
-singleton Global 1.0 core/Global.qml
+#singleton Calculator 1.0 core/Calculator.qml
+#singleton Global 1.0 core/Global.qml
+#singleton Matlab 1.0 core/Matlab.qml
+#singleton Matrix 1.0 core/Matrix.qml
 
-typeinfo plugin.qmltypes
+#typeinfo plugin.qmltypes

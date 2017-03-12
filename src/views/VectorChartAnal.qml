@@ -4,12 +4,12 @@ import QtQuick.Layouts 1.1
 
 import Material 0.2
 
+//import XjUi 1.0
 import "../components/VectorChart"
 
 Item {
     id: me
 
-    property alias model: table.model;
     property alias selectDataIndex: table.selectDataIndex;
 
     function dp(di){
@@ -35,7 +35,7 @@ Item {
 
         VectorChart {
             id: vec
-            model: table.model
+
 //            visible: false
             Layout.fillWidth: true
             Layout.minimumWidth: 300;
@@ -46,6 +46,7 @@ Item {
             target: table
 
             onModelCheckedChanged: {
+                console.log("onModelCheckedChanged")
                 vec.repaint();
             }
         }

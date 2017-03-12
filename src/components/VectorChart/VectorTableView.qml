@@ -3,8 +3,6 @@ import QtQuick.Window 2.2
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 
-//import MoeFileModel 1.0
-
 import Material 0.3
 
 import "../../core"
@@ -16,7 +14,8 @@ Item {
     width: 800
     height:600
 
-    property var model;
+    property var model: Calculator.model
+    property bool isNeedUpdate: Calculator.isNeedUpdate
     property int selectDataIndex: 0
 
     // ///////////////////////////////////////////////////////////////
@@ -26,7 +25,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-//        console.log("## XJTableView.qml ##: " + says);
+        console.log("## XJTableView.qml ##: " + says);
     }
 
     function dp(di){
@@ -35,7 +34,7 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    onModelChanged: {
+    onIsNeedUpdateChanged: {
         log("Model Changed detected!")
         modelCheckedChanged();
         update();
@@ -45,7 +44,6 @@ Item {
         log(root.model.rms)
         log(root.model.angle)
 
-//        modelChannel.set(1, {"rms": 100})
         for (var i = 0; i < modelChannel.count; i++){
             modelChannel.setProperty(i, "rms", root.model.rms[i])
             modelChannel.setProperty(i, "angle", root.model.angle[i] ? "∠ " + root.model.angle[i] + "°": "NaN")
@@ -91,7 +89,7 @@ Item {
             property int sizeClosed: 26
 
             elevation: rowDelegate.sizeOpen == rowDelegate.height ? 1 : 0
-            backgroundColor: styleData.alternate ? "#fafafa" : "white"
+            backgroundColor: (styleData.selected) ? Theme.accentColor : (styleData.alternate ? "#fafafa" : "white")
             height: getSize() // styleData.selected? sizeOpen : sizeClosed
 
             function getSize(){

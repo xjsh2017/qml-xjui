@@ -7,7 +7,8 @@ import QtQuick.Controls.Styles 1.2
 
 import Material 0.3
 
-import "../core"
+//import "../core"
+//import XjUi 1.0
 
 Item {
     id: root

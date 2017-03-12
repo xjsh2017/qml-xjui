@@ -5,11 +5,11 @@ import QtQuick.Layouts 1.1
 import Material 0.2
 
 import "../components/VectorChart"
+//import XjUi 1.0
 
 Item {
     id: me
 
-    property alias model: table.model;
     property alias selectDataIndex: table.selectDataIndex;
 
     function dp(di){

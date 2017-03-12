@@ -1,87 +1,53 @@
 import QtQuick 2.4
-import Material 0.2
 import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
-import "."
-import "../core"
-import "../components/Grover"
+import Material 0.2
+//import XjUi 1.0
+
 import "../components/WaveChart"
+import "../components/Grover"
+import "../core"
 
 Item {
     id: root
 
     // ///////////////////////////////////////////////////////////////
 
-    property var model: {
-//                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
-//                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
-                          "data": Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10),
-
-                          "name": ["通道延时"
-                                   , "保护A相电流1", "保护A相电流2"
-                                   , "保护B相电流1", "保护B相电流2"
-                                   , "保护C相电流1", "保护C相电流2"
-                                   , "计量A相电流", "计量B相电流", "计量C相电流"
-                                   , "零序电流I01", "零序电流I02"
-                                   , "间隙电流Ij1", "间隙电流Ij2"
-                                   , "保护A相电压1", "保护A相电压2"
-                                   , "B相电压采样值1", "B相电压采样值2"
-                                   , "C相电压采样值1", "C相电压采样值2"
-                                   , "线路抽取电压1", "线路抽取电压2"
-                                   , "零序电压1", "零序电压2"
-                                   , "计量A相电压", "计量B相电压", "计量C相电压"],
-                          "unit": [""
-                                   , "A", "A"
-                                   , "A", "A"
-                                   , "A", "A"
-                                   , "A", "A", "A"
-                                   , "A", "A"
-                                   , "A", "A"
-                                   , "V", "V"
-                                   , "V", "V"
-                                   , "V", "V"
-                                   , "V", "V"
-                                   , "V", "V"
-                                   , "V", "V", "V"],
-                          "phase": [""
-                                    , "A", "A"
-                                    , "B", "B"
-                                    , "C", "C"
-                                    , "A", "B", "C"
-                                    , "N", "N"
-                                    , "", ""
-                                    , "A", "A"
-                                    , "B", "B"
-                                    , "C", "C"
-                                    , "", ""
-                                    , "N", "N"
-                                    , "A", "B", "C"],
-                          rms: [""],
-                          angle: [""],
-                          check: [false]
-    }
+    property var model: Calculator.model
 
     property int selectDataIndex: 0
     property int wavePannelWidth: dp(160)
-    property int wavePannelHeight: dp(80)
+    property int wavePannelHeight: dp(60)
 
     property variant curvelist: []
     property variant wavePanelist: []
 
-    onModelChanged: {
-        log("WaveChartAnal Model Changed!")
-    }
+//    onModelChanged: {
+//        log("WaveChartAnal Model Changed!")
+//    }
 
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## WaveChartAnal.qml ##: " + says);
+//        console.log("## WaveChartAnal.qml ##: " + says);
     }
 
     function dp(di){
         return di;
+    }
+
+    function updateModel() {
+        waveModel.cols();
+        var Rows = waveModel.rows();
+        var Cols = waveModel.cols();
+        model.y = Matlab.matrix(Rows, Cols);
+        for (var i = 0; i < Rows; i ++){
+            model.y.data[i] = waveModel.y_data(i);
+        }
+
+        return 0;
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -452,6 +418,8 @@ Item {
                                 backgroundColor: Qt.lighter(drawColor)
 
                                 function updateWavePanel() {
+                                    Calculator.analHarmonic(root.model, index); // 谐波分析
+
                                     var tmp = root.model.data.y_row(index).data;
 
                                     var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
@@ -465,7 +433,8 @@ Item {
                                     root.model.rms[index] = (fresult ? fresult.RMS.toFixed(2) : "#");
                                     root.model.angle[index] = (fresult ? fresult.phase.toFixed(2) : "#");
 
-                                    root.modelChanged()
+//                                    root.modelChanged()
+                                    Calculator.isNeedUpdate = !Calculator.isNeedUpdate;
                                 }
 
                                 Rectangle {
@@ -586,6 +555,7 @@ Item {
                                     }
 
                                     onSelectDataIndexChanged: {
+                                        root.model.curSamplePos = curve.selectDataIndex;
                                         root.log("Event: onSelectDataIndexChanged --> index = " + index + ", select data index = " + selectDataIndex
                                                  + ", curve.grooveXPlot = " + curve.grooveXPlot)
                                         wavePanel.updateWavePanel();
@@ -776,18 +746,6 @@ Item {
         }
     }
 
-
-    function updateModel() {
-        waveModel.cols();
-        var Rows = waveModel.rows();
-        var Cols = waveModel.cols();
-        model.y = Matlab.matrix(Rows, Cols);
-        for (var i = 0; i < Rows; i ++){
-            model.y.data[i] = waveModel.y_data(i);
-        }
-
-        return 0;
-    }
 
     Component.onCompleted: {
 //        updateModel();

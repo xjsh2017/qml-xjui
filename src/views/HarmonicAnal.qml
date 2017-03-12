@@ -4,14 +4,12 @@ import QtQuick.Layouts 1.1
 
 import Material 0.2
 
-import "../components"
 import "../components/Harmoinc"
+
+//import XjUi 1.0
 
 Item {
     id: me
-
-    property alias model: table.model;
-    property alias selectDataIndex: table.selectDataIndex;
 
     function dp(di){
         return di;
@@ -26,7 +24,7 @@ Item {
         anchors.fill:parent;
         orientation: Qt.Horizontal;
 
-        QTableView {
+        HarmonicTableView {
             id: table
 
             Layout.fillWidth: true
@@ -35,9 +33,8 @@ Item {
         }
 
         Harmonic {
-            id: vec
-//            model: table.model
-//            visible: false
+            id: harmon
+
             Layout.fillWidth: true
             Layout.minimumWidth: 300;
             width: parent.width * 1 / 5
@@ -46,8 +43,8 @@ Item {
         Connections {
             target: table
 
-            onModelCheckedChanged: {
-                vec.repaint();
+            onSelectRowChanged: {
+                harmon.currentIndex = index;
             }
         }
     }

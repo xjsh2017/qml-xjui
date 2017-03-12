@@ -5,119 +5,159 @@ import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
 //import XjUi 1.0
-import "../../../src/views"
 import Material 0.3
+
+import "../../../src/views"
 
 Item {
     property var sectionTitles: [ "报文分析", "离散度分析", "谐波分析", "向量分析", "序分量分析"]
 
     Controls.SplitView{
-        id: content
+        anchors.fill:parent;
+        orientation: Qt.Horizontal;
 
-//        anchors.fill:parent;
-        width: parent.width
-        height: parent.height - navibar.height - dp(1)
-        orientation: Qt.Vertical;
 
-        WaveChartAnal {
-            id: wave
-            Layout.fillHeight: true
-            Layout.minimumWidth: 100;
+        handleDelegate: View {
+            width: dp(3)
+            height: parent.height
+
+            elevation: 2
         }
 
+        Rectangle {
+            id: tree
 
-        TabbedPages {
-            id: tabview
+            visible: false
 
-            model: wave.model
+//            Layout.fillWidth: true
+//            Layout.minimumWidth: dp(100);
+            width: dp(200)
+            Layout.maximumWidth: dp(400);
 
-            selectedTabIndex: 3
-            Layout.fillHeight: true;
-            Layout.minimumHeight: dp(200);
         }
-    }
 
-    View {
-        id: navibar
+        Rectangle {
+            id: table2
 
-        anchors.bottom: parent.bottom
+            Layout.fillWidth: true
 
-        elevation: 2
+            width: parent.width * 3 / 4
+            Layout.minimumWidth: dp(200);
 
-        backgroundColor: Theme.primaryDarkColor
+            Controls.SplitView{
+                id: content
 
-        height: dp(24)
-        width: parent.width
+                width: parent.width
+                height: parent.height - navibar.height - dp(1)
+                orientation: Qt.Vertical;
 
-        RowLayout {
-            anchors.fill: parent
-
-            spacing: dp(1)
-
-            Repeater {
-                model: sectionTitles
-
-                Item {
+                WaveChartAnal {
+                    id: wave
                     Layout.fillHeight: true
-                    width: btnNum.width + num.width
-                    Layout.margins: 2
+                    Layout.minimumWidth: 100;
+                }
 
-                    Button {
-                        id: btnNum
-                        text: qsTr(modelData)
+                TabbedPages {
+                    id: tabview
 
-                        implicitHeight: dp(16)
-                        implicitWidth: dp(80)
+                    selectedTabIndex: 3
+                    Layout.fillHeight: true;
+                    Layout.minimumHeight: dp(200);
+                }
+            }
 
-                        height: num.height
+            View {
+                id: navibar
 
-                        anchors.left: num.right
-                        anchors.leftMargin: -dp(2)
+                anchors.bottom: parent.bottom
 
-                        elevation: 1
-                        backgroundColor: tabview.selectedTabIndex == index ? num.backgroundColor : "lightgrey"
+                elevation: 2
 
-                        onClicked: {
-                            tabview.selectedTabIndex = index
-                        }
+                backgroundColor: Theme.primaryDarkColor
 
-                        Rectangle {
-                            anchors.fill: parent
+                height: dp(24)
+                width: parent.width
 
-                            border.color: Qt.rgba(0, 0, 0, 0.6)
-                            radius: dp(2)
-                            color: "transparent"
+                IconButton {
+                    id: action_hide_show_left
+
+                    action: Action {
+                        iconName: "editor/border_left"
+                        name: tree.visible ? "Hide Siderbar" : "Show Siderbar"
+                        onTriggered: {
+                            tree.visible = !tree.visible;
                         }
                     }
+                }
 
-                    View {
-                        id: num
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: dp(30)
+                    spacing: dp(1)
 
-                        height: parent.height
-                        width: height - dp(2)
+                    Repeater {
+                        model: sectionTitles
 
-                        backgroundColor: Theme.accentColor
+                        Item {
+                            width: dp(100)
 
-                        Text {
-                            anchors.centerIn: parent
+                            height: parent.height - dp(4)
+                            anchors.verticalCenter: parent.verticalCenter
 
-                            text: index + 1
-                            color: "white"
+                            View {
+                                id: num
+                                z: 1
+
+                                height: parent.height
+                                width: height - dp(2)
+
+                                backgroundColor: Theme.accentColor
+
+                                Text {
+                                    anchors.centerIn: parent
+
+                                    text: index + 1
+                                    color: "white"
+                                }
+
+                                border.color: Qt.rgba(0, 0, 0, 0.6)
+
+                                radius: dp(2)
+                            }
+
+                            Button {
+                                id: btnNum
+                                text: qsTr(modelData)
+
+                                height: parent.height
+                                width: parent.width - num.width
+
+                                anchors.left: num.right
+                                anchors.leftMargin: -dp(2)
+
+                                elevation: 1
+                                backgroundColor: tabview.selectedTabIndex == index ? num.backgroundColor : "lightgrey"
+
+                                onClicked: {
+                                    tabview.selectedTabIndex = index
+                                }
+
+                                Rectangle {
+                                    anchors.fill: parent
+
+                                    border.color: Qt.rgba(0, 0, 0, 0.6)
+                                    radius: dp(2)
+                                    color: "transparent"
+                                }
+                            }
                         }
-
-                        border.color: Qt.rgba(0, 0, 0, 0.6)
-
-                        radius: dp(2)
                     }
                 }
             }
 
-
-
-            Item {
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-            }
         }
+
     }
+
+
 }

@@ -1,9 +1,9 @@
 import QtQuick 2.0
 
-import "VectorChart.js" as Charts
-import "../../core"
-
 import Material 0.3
+//import XjUi 1.0
+
+import "../../core"
 
 Canvas {
 
@@ -11,7 +11,7 @@ Canvas {
 
     // ///////////////////////////////////////////////////////////////
 
-    property    var model;
+    property    var model: Calculator.model
 
     property    var ctx;
     property    var plotArea;        // 绘图区域
@@ -29,13 +29,6 @@ Canvas {
     // ///////////////////////////////////////////////////////////////
 
     function init() {
-//        model = {
-//            data: {
-//                "rms": [10, 5, 8.5],
-//                "angle": [0, 110, -130],
-//                "color": ["red", "blue", "green"]
-//            }
-//        }
     }
 
     function repaint() {
