@@ -13,7 +13,7 @@ Canvas {
 
     property    var model;
 
-    property    var ctx: getContext("2d")
+    property    var ctx;
     property    var plotArea;        // 绘图区域
     property    var plotMargins: {
                     "leftMargin": dp(10),
@@ -39,7 +39,6 @@ Canvas {
     }
 
     function repaint() {
-        ctx.clearRect(0, 0, width, height);
         requestPaint();
     }
 
@@ -145,6 +144,8 @@ Canvas {
         polarR = plotArea.r + outlen;
 
         var widthfont = ctx.measureText("90").width / 2;
+
+        ctx = getContext("2d");
 
         ctx.clearRect(0, 0, width, height);
         // 设置画笔
@@ -268,7 +269,7 @@ Canvas {
                 continue;
 
             var color = Global.phaseTypeColor(model.phase[i]);
-            drawVector(ctx, parseFloat(model.rms[i]), parseFloat(model.angle[i]), color)
+            drawVector(getContext("2d"), parseFloat(model.rms[i]), parseFloat(model.angle[i]), color)
         }
     }
 

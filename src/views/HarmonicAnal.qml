@@ -1,14 +1,17 @@
 import QtQuick 2.4
-import Material 0.2
 import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
-import Material.ListItems 0.1 as ListItem
 
-import "."
-import "./Charts"
+import Material 0.2
+
+import "../components"
+import "../components/Harmoinc"
 
 Item {
     id: me
+
+    property alias model: table.model;
+    property alias selectDataIndex: table.selectDataIndex;
 
     function dp(di){
         return di;
@@ -19,62 +22,33 @@ Item {
     }
 
     // 工具栏
+    Controls.SplitView{
+        anchors.fill:parent;
+        orientation: Qt.Horizontal;
 
+        QTableView {
+            id: table
 
-    // 离散度分析
-    View{
-        anchors {
-            fill: parent
-            margins: dp(6)
-        }
-
-        elevation: 1
-
-
-        Chart{
-            anchors.fill: parent
-            chartType: ChartType.bar;
-
-            onWidthChanged: {
-                console.log(width);
-            }
-
-            function randomScalingFactor() {
-                return Math.round(Math.random() * 100);
-            }
-
-            function randomColor() {
-                return Qt.rgba(Math.random(),
-                               Math.random(), Math.random(), 1);
-            }
-
-            chartData: {
-                "datasets": [{
-                                 "data": [randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor(),
-                                     randomScalingFactor()
-                                 ],
-                                 "backgroundColor": [randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor(),
-                                     randomColor()
-                                 ],
-                                 "label": '0x4001 谐波分布'
-                             }],
-                "labels": ["基波","直流","2次谐波","3次谐波","4次谐波","5次谐波","6次谐波","7次谐波"]
-            }
+            Layout.fillWidth: true
+            Layout.minimumWidth: 100;
 
         }
 
+        Harmonic {
+            id: vec
+//            model: table.model
+//            visible: false
+            Layout.fillWidth: true
+            Layout.minimumWidth: 300;
+            width: parent.width * 1 / 5
+        }
+
+        Connections {
+            target: table
+
+            onModelCheckedChanged: {
+                vec.repaint();
+            }
+        }
     }
-
 }
