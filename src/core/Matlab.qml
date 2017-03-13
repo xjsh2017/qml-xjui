@@ -333,7 +333,9 @@ QtObject {
         }
 
         return {
-            y: data,
+            // data:
+            x: data,               // matrix: 1 x Cols
+            y: data,               // matrix: rows x Cols
             rows: Rows,
             cols: Cols,
 
@@ -341,7 +343,10 @@ QtObject {
             print: matrix_print,
             subdata: matrix_subdata,
 
+            x_data: x_data,
             y_data: y_data,
+
+            x_row: x_row,
             y_row: y_row
         }
     }

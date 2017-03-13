@@ -594,7 +594,8 @@ Item {
             log("Wave Data Model has changed again...")
 //            waveModel.buildData(10, 100, 20);
             waveModel.queenNewData(5000, 50); // 插入一个新数据， 并删除原队列中第一个数据
-            btnDebug.text = waveModel.test + ": " + waveModel.x_data(0)
+            Calculator.updateModelFromInternalDataAPI(waveModel);
+//            btnDebug.text = waveModel.test + ": " + waveModel.x_data(0)
         }
     }
 
@@ -745,7 +746,6 @@ Item {
             // TODO set default colors again but we currently don't know what that is
         }
     }
-
 
     Component.onCompleted: {
 //        updateModel();

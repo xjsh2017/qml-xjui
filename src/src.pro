@@ -28,11 +28,14 @@ components.path = $$[QT_INSTALL_QML]/$$uri/components
 icons.files += icons/*
 icons.path = $$[QT_INSTALL_QML]/XjUi/icons
 
+qmlfiles.files += qml/*
+qmlfiles.path = $$[QT_INSTALL_QML]/XjUi/qml
+
 qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
-INSTALLS += target qmldir views components core# icons
+INSTALLS += target qmldir views components core qmlfiles# icons
 
 #---------------------------INSTALLS FILES end -------------------------------------
 # generate QML folder

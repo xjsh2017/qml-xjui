@@ -188,6 +188,12 @@ Canvas {
                     + "\n\t xPlotOffset = " + xPlotOffset);
     }
 
+    function stepChartToLast(){
+        var tmpLast = cols() - sampleWidth
+        if (tmpLast > 0)
+            startDataIndex = tmpLast;
+    }
+
     function rows() {
         return model.data.rows;
     }
@@ -439,6 +445,8 @@ Canvas {
         triggeredOnStart: true;
         onTriggered: {
             stepChartToLast();
+
+            repaint();
         }
     }
 

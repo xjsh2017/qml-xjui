@@ -21,7 +21,7 @@ QtObject {
                 // 采样数据
 //                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
 //                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
-                "data": Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20),
+                "data": null,//: Matlab.sampleSin(1, 1601, 0, 16000, -20, 20, 20),
                 //                          "data": Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10),
 
                 // 通道数据
@@ -89,6 +89,13 @@ QtObject {
 
     property  bool isNeedUpdate: false;
 
+    property string test: waveModel.test
+
+    onTestChanged: {
+        console.log("detect changed!")
+
+        updateModelFromInternalDataAPI(waveModel)
+    }
 
     // ///////////////////////////////////////////////////////////////
 
@@ -135,6 +142,44 @@ QtObject {
 
             n4to10us:0, n11to25us:0, n25tous:0
         }
+    }
+
+    /*
+        从内部数据接口更新模型数据
+      */
+    function updateModelFromInternalDataAPI(modeldata) {
+        if(!modeldata)
+            return;
+
+        var Rows = modeldata.rows();
+        var Cols = modeldata.cols();
+        var x = new Array(Rows);
+        var y = new Array(Rows);
+        for (var i = 0; i < Rows; i ++){
+            y[i] = modeldata.y_data(i);
+            x[i] = modeldata.x_data(i);
+            log(y[i][0]);
+        }
+        model.data = {
+            // data:
+            x: x,               // matrix: 1 x Cols
+            y: y,               // matrix: rows x Cols
+            rows: Rows,
+            cols: Cols,
+
+            // Functions
+            print: Matlab.matrix_print,
+            subdata: Matlab.matrix_subdata,
+
+            x_data: Matlab.x_data,
+            y_data: Matlab.y_data,
+
+            x_row: Matlab.x_row,
+            y_row: Matlab.y_row
+
+        }
+
+        return 0;
     }
 
     /*!

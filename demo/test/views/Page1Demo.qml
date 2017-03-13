@@ -127,7 +127,7 @@ Item {
 
                             Button {
                                 id: btnNum
-                                text: qsTr(modelData)
+//                                text: qsTr(modelData)
 
                                 height: parent.height
                                 width: parent.width - num.width
@@ -148,6 +148,17 @@ Item {
                                     border.color: Qt.rgba(0, 0, 0, 0.6)
                                     radius: dp(2)
                                     color: "transparent"
+
+                                    Label {
+                                        anchors.centerIn: parent
+                                        text: qsTr(modelData)
+
+                                        font {
+                                            family: "微软雅黑"
+                                            weight: Font.Light
+                                            pixelSize: dp(12)
+                                        }
+                                    }
                                 }
                             }
                         }
