@@ -73,7 +73,7 @@ Canvas {
     }
 
     function log(says) {
-//        console.log("# WaveChart.qml: # " + says);
+        console.log("# WaveChart.qml: # " + says);
     }
 
     function debug(de) {
@@ -89,11 +89,13 @@ Canvas {
         }
 
         updateSampleWidth();
-//        log("sampleWidth = " + sampleWidth)
+        log("sampleWidth = " + sampleWidth)
 
         start = Math.ceil(start);
-        plotData.labels = model.data.x_row(0, start, start + sampleWidth).data;
-        plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth).data;
+//        plotData.labels = model.data.x_row(0, start, start + sampleWidth).data;
+//        plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth).data;
+        plotData.labels = AnalDataModel.getXData(0, start, start + sampleWidth);
+        plotData.datasets[0].data = AnalDataModel.getYData(index, start, start + sampleWidth);
     }
 
     function updateSampleWidth() {
@@ -113,12 +115,14 @@ Canvas {
 
         updateTimeWidth();
 
-        var bound = Matlab.findBound(parseFloat(startTime), timeWidth, model.x);
+        var bound = Matlab.findBound(parseFloat(startTime), timeWidth, AnalDataModel.getXData(0));
         console.assert(bound.end >= bound.start)
 //        log("bound = " + bound.start + ", " + bound.end);
 
-        plotData.labels = model.x.row(0, bound.start, bound.end).data;
-        plotData.datasets[0].data = model.y.row(index, bound.start, bound.end).data;
+//        plotData.labels = model.x.row(0, bound.start, bound.end).data;
+//        plotData.datasets[0].data = model.y.row(index, bound.start, bound.end).data;
+        plotData.labels = AnalDataModel.getXData(0, bound.start, bound.end);
+        plotData.datasets[0].data = AnalDataModel.getYData(index, bound.end, bound.end);
 
 //        log(plotData.labels.length)
 //        log(plotData.labels)
@@ -172,12 +176,12 @@ Canvas {
             var maxStartTime = maxTimeEnd - timeWidth;
             var bound;
             if ( tmp > cols() - 1){
-                bound = Matlab.findBound(maxStartTime, 0, model.data.x);
+                bound = Matlab.findBound(maxStartTime, 0, AnalDataModel.getXData(0));
                 startDataIndex = bound.start;
             }else{
                 var newStartTime = parseFloat(xData(0, tmp));
                 if (newStartTime > maxStartTime){
-                    bound = Matlab.findBound(maxStartTime, 0, model.data.x);
+                    bound = Matlab.findBound(maxStartTime, 0, AnalDataModel.getXData(0));
                     startDataIndex = bound.start;
                 }else
                     startDataIndex = tmp;
@@ -195,19 +199,19 @@ Canvas {
     }
 
     function rows() {
-        return model.data.rows;
+        return AnalDataModel.getDataSize().h;
     }
 
     function cols() {
-        return model.data.cols;
+        return AnalDataModel.getDataSize().w;
     }
 
     function yData(dataIndex) {
-        return model.data.y_data(index, dataIndex);
+        return AnalDataModel.dataModel.y[index][dataIndex];
     }
 
     function xData(dataIndex) {
-        return model.data.x_data(0, dataIndex);
+        return AnalDataModel.dataModel.x[0][dataIndex];
     }
 
     /* 放大缩小波形 */
@@ -304,13 +308,12 @@ Canvas {
         if (plotMode == Global.enSampleMode)
             updatePlotDataBySample(startDataIndex);
         else
-            updatePlotDataByTime(model.x.value(0, startDataIndex));
+            updatePlotDataByTime(xData(startDataIndex));
 
-
-
-//        console.log("plotData.labels = " + plotData.labels)
-//        console.log("plotData.y = " + plotData.datasets[0].data)
-
+        if (!Matlab.isArray(plotData.datasets[0].data || !plotData.labels)){
+            plotData.datasets[0].data = [];
+            plotData.labels = [];
+        }
 
         if(!plotHandler) {
             switch(plotType) {
@@ -457,14 +460,6 @@ Canvas {
         to: 100;
         duration: 500;
         easing.type: Easing.InOutElastic;
-    }
-
-
-    property string test: waveModel.test        // 主要是在QQuickWidget项目中，当嵌入到TabWidget之后，切换标签会清空canvas的ctx清空
-    onTestChanged: {
-        log("Detect Repaint request from waveModel...start to repaint ...")
-        plotHandler = null
-        requestPaint();
     }
 
     Component.onCompleted: {

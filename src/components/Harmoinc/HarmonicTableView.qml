@@ -203,7 +203,6 @@ Item {
         }
 
         onCurrentRowChanged: {
-            console.log("11curr = " + currentRow);
             selectRowChanged(currentRow);
         }
 

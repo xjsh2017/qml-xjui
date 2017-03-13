@@ -80,7 +80,6 @@ Item {
             }
             chart.chartData.datasets[0].backgroundColor[i] = Global.randomColor();
         }
-        console.log(chart.chartData.datasets[0].data)
     }
 
     onIsModelUpdateChanged: {
@@ -117,7 +116,7 @@ Item {
             chartType: ChartType.bar;
 
             onWidthChanged: {
-                console.log(width);
+//                console.log(width);
             }
 
             function randomScalingFactor() {

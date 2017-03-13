@@ -642,6 +642,10 @@ QtObject {
         }
     }
 
+    function isArray(o){
+        return Object.prototype.toString.call(o)=='[object Array]';
+    }
+
     function log(says) {
         console.log("## Matlab.qml ##: \n" + says)
     }

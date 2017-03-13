@@ -306,8 +306,8 @@ Canvas {
     }
 
     function drawVector(ctx, r, angle, color) {
-        console.log("r = " + r + ", angle = " + angle)
-        console.log(typeof r + ", " + typeof angle)
+//        console.log("r = " + r + ", angle = " + angle)
+//        console.log(typeof r + ", " + typeof angle)
 
         r = parseFloat(r);
         angle = parseFloat(angle) - refAngle;
@@ -315,7 +315,7 @@ Canvas {
 
         r = maxRMS > 0 ? plotArea.r * r / maxRMS : 2;
 
-        console.log(r);
+//        console.log(r);
 
         angle = angle * Math.PI / 180;
 

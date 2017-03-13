@@ -16,6 +16,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     property var model: Calculator.model
+    property var model2: AnalDataModel.propModel
 
     property int selectDataIndex: 0
     property int wavePannelWidth: dp(160)
@@ -31,7 +32,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-//        console.log("## WaveChartAnal.qml ##: " + says);
+        console.log("## WaveChartAnal.qml ##: " + says);
     }
 
     function dp(di){
@@ -272,6 +273,10 @@ Item {
                                 name: "Go to Running Time Mode"
 
                                 onTriggered: {
+                                    AnalDataModel.setPropValue(0, "isVisible", !AnalDataModel.getPropValue(0, "isVisible"));
+
+                                    return;
+
                                     var varTmpInfo;
                                     if (timer_waveModel.running)
                                     {
@@ -400,7 +405,7 @@ Item {
                     spacing: dp(0)
 
                     Repeater {
-                        model: root.model.data.rows
+                        model: AnalDataModel.getCount()//Math.max(AnalDataModel.getCount(), 50)
 
                         Row {
                             spacing: dp(2)
@@ -417,24 +422,30 @@ Item {
                                 height: root.wavePannelHeight
                                 backgroundColor: Qt.lighter(drawColor)
 
+                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false
+
                                 function updateWavePanel() {
-                                    Calculator.analHarmonic(root.model, index); // 谐波分析
+                                    if (index < AnalDataModel.getCount())
+                                        visible = AnalDataModel.getPropValue(index, "isVisible");
 
-                                    var tmp = root.model.data.y_row(index).data;
+//                                    Calculator.analHarmonic(root.model, index); // 谐波分析
 
+//                                    var tmp = root.model.data.y_row(index).data;
+
+                                    var tmp = AnalDataModel.getYData(index);
                                     var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
-                                    tmp = root.model.data.y_row(index).data[curve.selectDataIndex];
+                                    tmp = AnalDataModel.dataModel.y[index][curve.selectDataIndex];
                                     if (btnValueType.valueType == 1){
                                         tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
                                     }
 
                                     label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.phase.toFixed(2) : "#") + "°"
 
-                                    root.model.rms[index] = (fresult ? fresult.RMS.toFixed(2) : "#");
-                                    root.model.angle[index] = (fresult ? fresult.phase.toFixed(2) : "#");
+//                                    root.model.rms[index] = (fresult ? fresult.RMS.toFixed(2) : "#");
+//                                    root.model.angle[index] = (fresult ? fresult.phase.toFixed(2) : "#");
 
 //                                    root.modelChanged()
-                                    Calculator.isNeedUpdate = !Calculator.isNeedUpdate;
+//                                    Calculator.isNeedUpdate = !Calculator.isNeedUpdate;
                                 }
 
                                 Rectangle {
@@ -455,7 +466,9 @@ Item {
 
                                         Label {
                                             id: labelChn
-                                            text: "通道 " + (index + 1) + "： " + root.model.name[index]
+//                                            text: "通道 " + (index + 1) + "： " + root.model.name[index]
+                                            text: "通道 " + (index + 1) + "： "
+                                                  + AnalDataModel.getPropValue(index, "name")
                                             color: Theme.light.textColor
                                             anchors.centerIn: parent
 
@@ -498,9 +511,14 @@ Item {
                                 width: waveView.width - wavePanel.width - parent.spacing
 
                                 backgroundColor: "#263238"
+                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false
 
                                 WaveChart {
                                     id: curve;
+
+                                    function updateCurve(){
+                                        waveChartView.visible = (index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false);
+                                    }
 
                                     anchors.fill: parent
 
@@ -556,8 +574,8 @@ Item {
 
                                     onSelectDataIndexChanged: {
                                         root.model.curSamplePos = curve.selectDataIndex;
-                                        root.log("Event: onSelectDataIndexChanged --> index = " + index + ", select data index = " + selectDataIndex
-                                                 + ", curve.grooveXPlot = " + curve.grooveXPlot)
+//                                        root.log("Event: onSelectDataIndexChanged --> index = " + index + ", select data index = " + selectDataIndex
+//                                                 + ", curve.grooveXPlot = " + curve.grooveXPlot)
                                         wavePanel.updateWavePanel();
                                         groove.value = curve.grooveXPlot + groove.minimumValue
                                         if (plotMode == Global.enSampleMode)
@@ -568,8 +586,8 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                root.curvelist.push(curve)
-                                root.wavePanelist.push(wavePanel)
+                                root.curvelist[index] = curve;
+                                root.wavePanelist[index] = wavePanel;
                             }
                         }
                     }
@@ -747,13 +765,29 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-//        updateModel();
-//        model.x.print();
-//        model.y.print();
+    Connections {
+        target: AnalDataModel
 
-//        var tmp = Matlab.matrix(2, 5, 1);
-//        tmp.print();
-//        tmp.y_row(1).print();
+        onPropValueChanged:{
+            log("AnalDataModel onPropValueChanged");
+            log("AnalDataModel.getCount() = " + AnalDataModel.getCount())
+            for (var i = 0; i < AnalDataModel.getCount(); i++){
+                root.wavePanelist[i].updateWavePanel();
+                root.curvelist[i].updateCurve()
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        root.model.name[0] = "cc";
+
+        AnalDataModel.dataModel = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
+
+        var tmp = AnalDataModel.dataModel;
+        log(tmp);
+        log(typeof tmp);
+        log("tmp.rows = " + tmp.rows)
+        log("tmp.cols = " + tmp.cols)
+//        log(tmp.y[0])
     }
 }

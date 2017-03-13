@@ -63,7 +63,7 @@ Item {
 
     property real valueRange: maximumValue - minimumValue
 
-    property real scrollbarSteps: Math.ceil(waveModel.cols() / valueRange - 1) + 2;
+    property real scrollbarSteps: 4;
 
 
     property int grooveBasiceHeight: 5 * Units.dp//control.hasOwnProperty("grooveBasiceHeight")

@@ -21,7 +21,7 @@ QtObject {
                 // 采样数据
 //                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
 //                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
-                "data": null,//: Matlab.sampleSin(1, 1601, 0, 16000, -20, 20, 20),
+                "data": Matlab.sampleSin(2, 1601, 0, 16000, -20, 20, 20),
                 //                          "data": Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10),
 
                 // 通道数据
@@ -89,12 +89,15 @@ QtObject {
 
     property  bool isNeedUpdate: false;
 
-    property string test: waveModel.test
+    property var internalDataModel: waveModel
+//    property string test: internalDataModel ? internalDataModel.test : ""
 
-    onTestChanged: {
-        console.log("detect changed!")
+//    onTestChanged: {
+//        log("detect changed!")
+//    }
 
-        updateModelFromInternalDataAPI(waveModel)
+    onModelChanged: {
+        log("Model Changed !")
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -158,7 +161,6 @@ QtObject {
         for (var i = 0; i < Rows; i ++){
             y[i] = modeldata.y_data(i);
             x[i] = modeldata.x_data(i);
-            log(y[i][0]);
         }
         model.data = {
             // data:
@@ -198,6 +200,11 @@ QtObject {
 //            log("Error using calcRMS (line 46) \n The 1st argument must be number array type.");
 //            return NaN;
 //        }
+        if (!Matlab.isArray(input)){
+            log("calcRMS : input is not array!");
+            return;
+        }
+
         var fInput = input.map(parseFloat)
 
         if (arguments.length < 3){
@@ -316,20 +323,18 @@ QtObject {
 
       */
     function analHarmonic(model, index) {
-        log("index = " + index)
         if (arguments.length < 1){
             log("Error using analHarmonic (line 46) \nThere should be 1 arguments at least.");
             return NaN;
         }
         index = (arguments[1] || arguments[1] == 0) ? arguments[1] : -1;
 
-        console.log("rows = " + model.data.rows + ", cols = " + model.data.cols)
         if (!isModelValid(model)
                 || model.data.cols < model.periodSampleCount
                 || model.curSamplePos < model.periodSampleCount)
             return NaN;
-        log("index = " + index)
-        log("curSamplePos = " + model.curSamplePos)
+        log("analHarmonic: rows = " + model.data.rows + ", cols = " + model.data.cols)
+        log("analHarmonic: curSamplePos = " + model.curSamplePos)
 
         var period = model.periodSampleCount;
         var pos = model.curSamplePos;
@@ -556,6 +561,5 @@ QtObject {
 
     Component.onCompleted: {
         initModelData();
-//        print_harmonic_result();
     }
 }

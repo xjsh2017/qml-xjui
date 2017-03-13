@@ -18,8 +18,15 @@ Item {
     property var model: Calculator.model
     property bool isModelUpdate: Calculator.isNeedUpdate
 
+
     // ///////////////////////////////////////////////////////////////
 
+
+    function log(says) {
+        console.log("## TimeDisperAnal.qml ##: " + says);
+    }
+
+    // ///////////////////////////////////////////////////////////////
 
     function updateChartData() {
         var result = Calculator.analTimeDisper();
@@ -58,7 +65,7 @@ Item {
 
         chart.chartData.datasets[0].label = result.title;
 
-        console.log("Title = " + result.title)
+        log("Title = " + result.title)
     }
 
     function update() {
@@ -87,7 +94,7 @@ Item {
             chartType: ChartType.bar;
 
             onWidthChanged: {
-                console.log(width);
+//                console.log(width);
             }
 
             chartData: {
@@ -151,7 +158,6 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("hehe")
         update();
     }
 

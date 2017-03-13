@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/quick">
         <file>Simple.qml</file>
-        <file>WaveChartAnal.qml</file>
+        <file>WSWaveChartAnal.qml</file>
     </qresource>
 </RCC>

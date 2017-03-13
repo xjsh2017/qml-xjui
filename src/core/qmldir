@@ -5,4 +5,5 @@ singleton Calculator 1.0 Calculator.qml
 singleton Global 1.0 Global.qml
 singleton Matlab 1.0 Matlab.qml
 singleton Matrix 1.0 Matrix.qml
+singleton AnalDataModel 1.0 AnalDataModel.qml
 
