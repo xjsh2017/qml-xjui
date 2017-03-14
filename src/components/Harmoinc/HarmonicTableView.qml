@@ -17,7 +17,8 @@ Item {
     width: 800
     height:600
 
-    property var model: Calculator.model
+    property var channelModel: AnalDataModel.listModel
+    property var analModel: AnalDataModel.analModel
     property bool isModelUpdate: Calculator.isNeedUpdate
     property int nShowHarmonTimes: 7
 
@@ -42,10 +43,16 @@ Item {
         update();
     }
 
-    function update() {
-        log(root.model.rms)
-        log(root.model.angle)
+    Connections {
+        target: AnalDataModel
 
+        onPropAnalDataChanged: {
+            log("Model Changed detected!")
+            update();
+        }
+    }
+
+    function update() {
         modelChannel.updateModel();
     }
 
@@ -56,16 +63,18 @@ Item {
         function updateModel() {
             clear();
 
-            var cols = Math.min(nShowHarmonTimes, model.maxHarmonicTimes) + 1;
-            for (var i = 0; i < model.data.rows; i++){
+            var cols = Math.min(nShowHarmonTimes, analModel.maxHarmonicTimes) + 1;
+            for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
 
                 var js = {};
                 js["serial"] = i + 1;
-                js["name"] = root.model.name[i];
-                for (var j = 0; j < cols; j ++){
-                    js[j] = model.harmonic[i][j].amp.toFixed(3) + ", "
-                            + (model.harmonic[i][j].percentage * 100).toFixed(2) + " %";
-                }
+                js["name"] = channelModel.get(i).name;
+
+                console.log(channelModel.get(i).harmonic[0])
+//                for (var j = 0; j < cols; j ++){
+//                    js[j] = channelModel.get(i).harmonic[j].amp.toFixed(3) + ", "
+//                            + (channelModel.get(i).harmonic[j].percentage * 100).toFixed(2) + " %";
+//                }
 
                 append(js);
             }
@@ -389,7 +398,7 @@ Item {
     }
 
     Component.onCompleted: {
-        if (root.model)
+        if (root.channelModel)
             modelChannel.updateModel();
     }
 }

@@ -35,16 +35,11 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-//    onIsNeedUpdateChanged: {
-//        log("Model Changed detected!")
-//        modelCheckedChanged();
-//        update();
-//    }
-
     Connections {
         target: AnalDataModel
 
         onPropValueChanged: {
+            modelCheckedChanged();
             root.update();
         }
     }
@@ -56,7 +51,7 @@ Item {
         for (var i = 0; i < modelChannel.count; i++){
             modelChannel.setProperty(i, "rms", root.model.get(i).rms)
             modelChannel.setProperty(i, "angle"
-                           , root.model.get(i).angle ? "∠ " + root.model.get(i).angle + "°": "NaN")
+                           , root.model.get(i).angle ? "∠ " + root.model.get(i).angle + "°": " ")
         }
     }
 

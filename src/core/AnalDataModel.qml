@@ -13,7 +13,7 @@ import QtQuick 2.4
  */
 
 QtObject {
-    id: analModel
+    id: analDataModel
 
     // ///////////////////////////////////////////////////////////////
 
@@ -22,33 +22,33 @@ QtObject {
     property var propModel: JSONListModel {
             id: properties
             json: '[ \
-                    {"name": "通道延时", "unit": "", "phase":"", "amp":0.0, "rms":0.0, "angle":0.0, "visible": false, "selected": false}, \
-                    {"name": "保护A相电流1", "unit": "A", "phase":"A", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": 1}, \
-                    {"name": "保护A相电流2", "unit": "A", "phase":"A", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "保护B相电流1", "unit": "A", "phase":"B", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": 1}, \
-                    {"name": "保护B相电流2", "unit": "A", "phase":"B", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "保护C相电流1", "unit": "A", "phase":"C", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": 1}, \
-                    {"name": "保护C相电流2", "unit": "A", "phase":"C", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "计量A相电流", "unit": "A", "phase":"A", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "计量B相电流", "unit": "A", "phase":"B", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "计量C相电流", "unit": "A", "phase":"C", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "零序电流I01", "unit": "A", "phase":"N", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "零序电流I02", "unit": "A", "phase":"N", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "间隙电流Ij1", "unit": "A", "phase":"", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "间隙电流Ij2", "unit": "A", "phase":"", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "保护A相电压1", "unit": "V", "phase":"A", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "保护A相电压2", "unit": "V", "phase":"A", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "B相电压采样值1", "unit": "V", "phase":"B", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "B相电压采样值2", "unit": "V", "phase":"B", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "C相电压采样值1", "unit": "V", "phase":"C", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "C相电压采样值2", "unit": "V", "phase":"C", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "线路抽取电压1", "unit": "V", "phase":"", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "线路抽取电压2", "unit": "V", "phase":"", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "零序电压1", "unit": "V", "phase":"N", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "零序电压2", "unit": "V", "phase":"N", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "计量A相电压", "unit": "V", "phase":"A", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "计量B相电压", "unit": "V", "phase":"B", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false}, \
-                    {"name": "计量C相电压", "unit": "V", "phase":"C", "amp":0.0, "rms":0.0, "angle":0.0, "visible": true, "selected": false} \
+                    {"name": "通道延时", "unit": "", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电流1", "unit": "A", "phase":"A", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电流2", "unit": "A", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护B相电流1", "unit": "A", "phase":"B", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护B相电流2", "unit": "A", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护C相电流1", "unit": "A", "phase":"C", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护C相电流2", "unit": "A", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量A相电流", "unit": "A", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量B相电流", "unit": "A", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量C相电流", "unit": "A", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电流I01", "unit": "A", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电流I02", "unit": "A", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "间隙电流Ij1", "unit": "A", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "间隙电流Ij2", "unit": "A", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电压1", "unit": "V", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电压2", "unit": "V", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "B相电压采样值1", "unit": "V", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "B相电压采样值2", "unit": "V", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "C相电压采样值1", "unit": "V", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "C相电压采样值2", "unit": "V", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "线路抽取电压1", "unit": "V", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "线路抽取电压2", "unit": "V", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电压1", "unit": "V", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电压2", "unit": "V", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量A相电压", "unit": "V", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量B相电压", "unit": "V", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量C相电压", "unit": "V", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []} \
                     ]'
 
     //        query: "$[?(@.label.charAt(0)==='A')]"
@@ -58,43 +58,56 @@ QtObject {
             }
 
         }
-
     property alias jsModel: properties.jsmodel;
     property alias json: properties.json;
     property alias listModel: properties.listmodel;
 
-    property var dataModel//:
+    property var sampleModel//:
 //                          Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250);
 //                          Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200);
 //                    Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
 //                          Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10);
 
+    property var analModel: {
+        "ncapp_id": 0,    // 链路appid
+
+        // 数据分析
+        curSamplePos: 0,        // 当前分析采样点索引位置
+        maxHarmonicTimes: 19,   // 谐波分析的最大谐波次数： 直流、一次谐波（基本分量）、二次谐波....nMax次谐波
+        periodSampleCount: 80,  // 一个周波点数
+        analSampleCount: 80,    // 谐波分析需要的采样点数，从当前采样点索引位置向前数，一般一个周波点数
+
+//        harmonic: [[]],         // 每个通道当前索引位置采样点的maxHarmonicTimes次谐波分析的结果， 通道数 X maxHarmonicTimes
+
+        // 离散度分析相关
+        timeRelastStatic: {},       // 本链路时间均匀度统计
+        ftime_relative_first: 0,    // 本链路第一帧报文与采样与采样文件中第一帧的时间差，见CAPCONNECTINFO，单位：秒
+        ftime_relative_last:0,      // 最后一帧报文与采样文件中第一帧的时间差
+        lTotalCapLenth: 0           // 本链路字节数
+    }
 
     // ///////////////////////////////////////////////////////////////
 
     signal propValueChanged();
     signal propXYDataChanged();
+    signal propAnalDataChanged();
 
-    function getXData(index, start, end){
-        if (index < getCount()){
-//            console.log(dataModel.x_row(index, start, end).data.map(parseFloat));
-//            return dataModel.x[index].map(parseFloat);
-            return dataModel.x_row(index, start, end).data;
-        }
-    }
+    function getChannelCount(){
+        if (listModel)
+            return listModel.count;
 
-    function getYData(index, start, end){
-        if (index < getCount()){
-//            console.log(dataModel.y[index].map(parseFloat));
-//            return dataModel.y[index].map(parseFloat);
-            return dataModel.y_row(index, start, end).data;
-        }
+        return 0;
     }
 
     function getDataSize(){
+//        console.log("sampleModel = " + sampleModel)
+//        console.log("sampleModel.y = " + sampleModel.y)
+//        console.log("sampleModel.y.length = " + sampleModel.y.length)
+//        console.log("sampleModel.y[0] = " + sampleModel.y[0])
+//        console.log("sampleModel.y[0].length = " + sampleModel.y[0].length)
         return {
-            h: dataModel.y.length,
-            w: y ? dataModel.y[0].length : 0
+            rows: sampleModel.y ? sampleModel.y.length : 0,
+            cols: sampleModel.y && sampleModel.y[0] ? sampleModel.y[0].length : 0
         }
     }
 
@@ -102,15 +115,8 @@ QtObject {
         return JSON.stringify(jsModel);
     }
 
-    function getCount(){
-        if (listModel)
-            return listModel.count;
-
-        return 0;
-    }
-
     function getPropName(index, num){
-        if (index < getCount()){
+        if (index < getChannelCount()){
             var i = 0;
             for (var key in jsModel[index]){
                 if (i == num){
@@ -118,6 +124,18 @@ QtObject {
                 }
                 i++;
             }
+        }
+    }
+
+    function getXData(index, start, end){
+        if (index < getChannelCount()){
+            return sampleModel.x_row(index, start, end).data;
+        }
+    }
+
+    function getYData(index, start, end){
+        if (index < getChannelCount()){
+            return sampleModel.y_row(index, start, end).data;
         }
     }
 
@@ -147,7 +165,33 @@ QtObject {
 
     // ///////////////////////////////////////////////////////////////
 
-    function initModelData() { log("initModelData")
+    function initModelData() {
+        var channel_count = getChannelCount();
+
+        for (var i = 0; i < channel_count; i++){
+            listModel.get(i).harmonic = new Array(19);
+            for (var j = 0; j < 19; j++){
+                listModel.get(i).harmonic[j] = {
+                    n: j,
+                    real: 0.0,
+                    img: 0.0,
+                    amp: 0.0,
+                    angle: 0.0,
+                    percentage: 0.0
+                }
+            }
+        }
+
+
+        console.log(listModel.get(i).harmonic)
+
+        analModel.timeRelastStatic = {
+            n0us: 0, n1us: 0, n2us: 0, n3us: 0, n4us: 0, n5us: 0, n6us: 0, n7us:0, n8us:0, n9us: 0, n10us:0, nup11us:0,
+            neg_n1us: 0, neg_n2us: 0, neg_n3us: 0, neg_n4us: 0, neg_n5us: 0, neg_n6us: 0, neg_n7us:0,
+            neg_n8us:0, neg_n9us: 0, neg_n10us:0, neg_nup11us:0,
+
+            n4to10us:0, n11to25us:0, n25tous:0
+        }
     }
 
     /*
@@ -166,35 +210,14 @@ QtObject {
             y[i] = modeldata.y_data(i);
         }
 
-        dataModel.x = x;
-        dataModel.y = y;
-        dataModel.rows = Rows;
-        dataModel.cols = Cols;
+        sampleModel.x = x;
+        sampleModel.y = y;
+        sampleModel.rows = Rows;
+        sampleModel.cols = Cols;
 
         log("Rows: " + Rows + ", Cols: " + Cols)
 
-//        dataModel.data = {
-//            // data:
-//            x: x,               // matrix: 1 x Cols
-//            y: y,               // matrix: rows x Cols
-//            rows: Rows,
-//            cols: Cols,
-
-//            // Functions
-////            print: Matlab.matrix_print,
-////            subdata: Matlab.matrix_subdata,
-
-////            x_data: Matlab.x_data,
-////            y_data: Matlab.y_data,
-
-////            x_row: Matlab.x_row,
-////            y_row: Matlab.y_row
-
-//        }
-
         propXYDataChanged();
-
-        return 0;
     }
 
     /*!
@@ -213,17 +236,7 @@ QtObject {
     // ///////////////////////////////////////////////////////////////
 
     Component.onCompleted: {
-        log("hello")
-        log(listModel.count)
-//        log(json);
-
-//        log(getPropValue(0, "visible"))
-        setPropValue(0, "visible", true);
-//        log(getPropValue(0, "visible"))
-
-//        dataModel = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
-//        log(getXData(0));
-
+        initModelData();
     }
 
 

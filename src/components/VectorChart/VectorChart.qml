@@ -11,7 +11,7 @@ Canvas {
 
     // ///////////////////////////////////////////////////////////////
 
-    property    var model: Calculator.model
+    property    var model: AnalDataModel.listModel
 
     property    var ctx;
     property    var plotArea;        // 绘图区域
@@ -50,19 +50,19 @@ Canvas {
         if (!canvas.model)
             return;
 
-        if (canvas.model.rms.length < 0)
+        if (canvas.model.count < 0)
             return;
 
-        var len = canvas.model.rms.length;
+        var len = canvas.model.count;
 
         var tmp = 0;
         for (var i = 0; i < len; i++){
-            if (!model.check[i])
+            if (!model.get(i).selected)
                 continue;
 
-            if (parseFloat(model.rms[i]) > tmp){
-                tmp = parseFloat(model.rms[i]);
-                log("index = " + i + ", model.rms = " + parseFloat(model.rms[i]));
+            if (parseFloat(model.get(i).rms) > tmp){
+                tmp = parseFloat(model.get(i).rms);
+                log("index = " + i + ", model.rms = " + parseFloat(model.get(i).rms));
             }
         }
 
@@ -252,17 +252,17 @@ Canvas {
         if (!canvas.model)
             return;
 
-        if (canvas.model.rms.length < 0)
+        if (canvas.model.count < 0)
             return;
 
-        var len = canvas.model.rms.length;
+        var len = canvas.model.count;
 
         for (var i = 0; i < len; i++){
-            if (!model.check[i])
+            if (!model.get(i).selected)
                 continue;
 
-            var color = Global.phaseTypeColor(model.phase[i]);
-            drawVector(getContext("2d"), parseFloat(model.rms[i]), parseFloat(model.angle[i]), color)
+            var color = Global.phaseTypeColor(model.get(i).phase);
+            drawVector(getContext("2d"), parseFloat(model.get(i).rms), parseFloat(model.get(i).angle), color)
         }
     }
 
@@ -363,7 +363,6 @@ Canvas {
         interval: 3000;
         triggeredOnStart: true;
         onTriggered: {
-            stepChartToLast();
         }
     }
 

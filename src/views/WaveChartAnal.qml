@@ -32,7 +32,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     function log(says) {
-        console.log("## WaveChartAnal.qml ##: " + says);
+//        console.log("## WaveChartAnal.qml ##: " + says);
     }
 
     function dp(di){
@@ -407,7 +407,7 @@ Item {
                     spacing: dp(0)
 
                     Repeater {
-                        model: AnalDataModel.getCount()//Math.max(AnalDataModel.getCount(), 50)
+                        model: AnalDataModel.getChannelCount()//Math.max(AnalDataModel.getChannelCount(), 50)
 
                         Row {
                             spacing: dp(2)
@@ -424,25 +424,25 @@ Item {
                                 height: root.wavePannelHeight
                                 backgroundColor: Qt.lighter(drawColor)
 
-                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "visible") : false
+                                visible: index < AnalDataModel.getChannelCount() ? AnalDataModel.getPropValue(index, "visible") : false
 
                                 function updateWavePanel() {
-                                    if (index < AnalDataModel.getCount())
+                                    if (index < AnalDataModel.getChannelCount())
                                         visible = AnalDataModel.getPropValue(index, "visible");
 
-//                                    Calculator.analHarmonic(root.model, index); // 谐波分析
+                                    Calculator.analHarmonic(AnalDataModel, index); // 谐波分析
 
                                     var tmp = AnalDataModel.getYData(index);
                                     var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
-                                    tmp = AnalDataModel.dataModel.y[index][curve.selectDataIndex].toFixed(2);
+                                    tmp = AnalDataModel.sampleModel.y[index][curve.selectDataIndex].toFixed(2);
                                     if (btnValueType.valueType == 1){
                                         tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
                                     }
 
                                     label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.angle.toFixed(2) : "#") + "°"
 
-                                    AnalDataModel.listModel.setProperty(index, "rms", (fresult ? fresult.RMS.toFixed(2) : NaN))
-                                    AnalDataModel.listModel.setProperty(index, "angle", (fresult ? fresult.angle.toFixed(2) : NaN))
+                                    AnalDataModel.listModel.setProperty(index, "rms", (fresult ? fresult.RMS.toFixed(2) : ""))
+                                    AnalDataModel.listModel.setProperty(index, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
 
                                     AnalDataModel.propValueChanged();
 //                                    Calculator.isNeedUpdate = !Calculator.isNeedUpdate;
@@ -511,13 +511,13 @@ Item {
                                 width: waveView.width - wavePanel.width - parent.spacing
 
                                 backgroundColor: "#263238"
-                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "visible") : false
+                                visible: index < AnalDataModel.getChannelCount() ? AnalDataModel.getPropValue(index, "visible") : false
 
                                 WaveChart {
                                     id: curve;
 
                                     function updateCurve(){
-                                        waveChartView.visible = (index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "visible") : false);
+                                        waveChartView.visible = (index < AnalDataModel.getChannelCount() ? AnalDataModel.getPropValue(index, "visible") : false);
                                         plotHandler = 0;
                                         requestPaint();
                                     }
@@ -578,6 +578,9 @@ Item {
                                         root.model.curSamplePos = curve.selectDataIndex;
 //                                        root.log("Event: onSelectDataIndexChanged --> index = " + index + ", select data index = " + selectDataIndex
 //                                                 + ", curve.grooveXPlot = " + curve.grooveXPlot)
+                                        if (selectDataIndex < 0)
+                                            return;
+
                                         wavePanel.updateWavePanel();
                                         groove.value = curve.grooveXPlot + groove.minimumValue
                                         if (plotMode == Global.enSampleMode)
@@ -781,10 +784,10 @@ Item {
         target: AnalDataModel
 
         onPropValueChanged:{
-            log("AnalDataModel onPropValueChanged"
-                + "\n\t AnalDataModel.getCount() = " + AnalDataModel.getCount());
+            log("AnalDataModel onPropValueChanged: "
+                + "\n\t AnalDataModel.channels = " + AnalDataModel.getChannelCount());
 
-//            for (var i = 0; i < AnalDataModel.getCount(); i++){
+//            for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
 //                root.wavePanelist[i].updateWavePanel();
 //                root.curvelist[i].updateCurve()
 //            }
@@ -792,10 +795,10 @@ Item {
 
         onPropXYDataChanged: {
             log("AnalDataModel onPropXYDataChanged: "
-                + "\n\t rows = " + AnalDataModel.dataModel.rows
-                + "\n\t cols = " + AnalDataModel.dataModel.cols);
+                + "\n\t rows = " + AnalDataModel.sampleModel.rows
+                + "\n\t cols = " + AnalDataModel.sampleModel.cols);
 
-            for (var i = 0; i < AnalDataModel.getCount(); i++){
+            for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
                 root.wavePanelist[i].updateWavePanel();
                 root.curvelist[i].updateCurve()
             }
@@ -805,9 +808,9 @@ Item {
     Component.onCompleted: {
         root.model.name[0] = "cc";
 
-        AnalDataModel.dataModel = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
+        AnalDataModel.sampleModel = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
 
-        var tmp = AnalDataModel.dataModel;
+        var tmp = AnalDataModel.sampleModel;
         log(tmp);
         log(typeof tmp);
         log("tmp.rows = " + tmp.rows)

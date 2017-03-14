@@ -199,19 +199,19 @@ Canvas {
     }
 
     function rows() {
-        return AnalDataModel.getDataSize().h;
+        return AnalDataModel.getDataSize().rows;
     }
 
     function cols() {
-        return AnalDataModel.getDataSize().w;
+        return AnalDataModel.getDataSize().cols;
     }
 
     function yData(dataIndex) {
-        return AnalDataModel.dataModel.y[index][dataIndex];
+        return AnalDataModel.sampleModel.y[index][dataIndex];
     }
 
     function xData(dataIndex) {
-        return AnalDataModel.dataModel.x[0][dataIndex];
+        return AnalDataModel.sampleModel.x[0][dataIndex];
     }
 
     /* 放大缩小波形 */
