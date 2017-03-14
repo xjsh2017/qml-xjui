@@ -7,6 +7,8 @@
 INCLUDEPATH += $$SDKInclude $$PWD
 #message($$SDKInclude)
 
+include(stores/stores.pri)
+
 searchlist += $$PWD/*.h
 for(searchvar, searchlist) {
     hlist += $$files($$searchvar, true)

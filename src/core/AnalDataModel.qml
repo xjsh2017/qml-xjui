@@ -163,9 +163,8 @@ QtObject {
         for (var i = 0; i < Rows; i ++){
             y[i] = modeldata.y_data(i);
             x[i] = modeldata.x_data(i);
-            log(y[i][0]);
         }
-        model.data = {
+        dataModel.data = {
             // data:
             x: x,               // matrix: 1 x Cols
             y: y,               // matrix: rows x Cols
@@ -173,16 +172,18 @@ QtObject {
             cols: Cols,
 
             // Functions
-            print: Matlab.matrix_print,
-            subdata: Matlab.matrix_subdata,
+//            print: Matlab.matrix_print,
+//            subdata: Matlab.matrix_subdata,
 
-            x_data: Matlab.x_data,
-            y_data: Matlab.y_data,
+//            x_data: Matlab.x_data,
+//            y_data: Matlab.y_data,
 
-            x_row: Matlab.x_row,
-            y_row: Matlab.y_row
+//            x_row: Matlab.x_row,
+//            y_row: Matlab.y_row
 
         }
+
+        propValueChanged();
 
         return 0;
     }

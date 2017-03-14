@@ -318,9 +318,10 @@ Item {
                                 name: qsTr("Refresh (Ctrl + R)")
                                 hoverAnimation: true
                                 onTriggered: {
+                                    waveModel.sync();
+                                    return;
                                     for (var i = 0; i < root.wavePanelist.length; ++i){
-                                        root.curvelist[i].plotHandler = null;
-                                        root.curvelist[i].requestPaint();
+                                        root.curvelist[i].repaint();
                                     }
                                     snackbar.open("All Charts Refreshed !")
                                 }
@@ -518,6 +519,8 @@ Item {
 
                                     function updateCurve(){
                                         waveChartView.visible = (index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false);
+                                        plotHandler = 0;
+                                        requestPaint();
                                     }
 
                                     anchors.fill: parent
@@ -772,9 +775,19 @@ Item {
             log("AnalDataModel onPropValueChanged");
             log("AnalDataModel.getCount() = " + AnalDataModel.getCount())
             for (var i = 0; i < AnalDataModel.getCount(); i++){
-                root.wavePanelist[i].updateWavePanel();
+//                root.wavePanelist[i].updateWavePanel();
                 root.curvelist[i].updateCurve()
             }
+        }
+    }
+
+    Connections {
+        target: waveModel
+
+        onModelDataChanged: {
+            console.log("waveModel data changed!")
+
+            AnalDataModel.updateModelFromInternalDataAPI(waveModel)
         }
     }
 
@@ -789,5 +802,7 @@ Item {
         log("tmp.rows = " + tmp.rows)
         log("tmp.cols = " + tmp.cols)
 //        log(tmp.y[0])
+
+        console.log("waveModel.rows() = " + waveModel.rows())
     }
 }

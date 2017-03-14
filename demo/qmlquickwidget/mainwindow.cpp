@@ -32,9 +32,9 @@ MainWindow::~MainWindow()
  * 注意， nMax 不小于 nCount
  *
  */
-QList<int> random(int nMax, int nCount)
+QList<qreal> random(int nMax, int nCount)
 {
-    QList<int> intList;
+    QList<qreal> intList;
     int   i=0, m=0;
     QTime time;
     for(i=0;;)
@@ -74,17 +74,16 @@ void MainWindow::setupUi()
     m_qwWaveAnal->setContent(QUrl(), component, component->create());
     m_qwWaveData = new WaveAnalDataModel();
 
+    int nMax = 5000;
+    int nCount = 1800;
+    m_qwWaveData->setXData(random(nMax, nCount));
     for (int i = 0; i < 10; ++i)
     {
-        int nMax = 5000;
-        int nCount = 1800;
-        QList<int> x = random(nMax, nCount);
-        QList<int> y = random(nMax, nCount);
+        QList<qreal> y = random(nMax, nCount);
 
         for (int j = 0; j < nCount; ++j)
         {
-            m_qwWaveData->append_x(i, x.at(j) - nMax / 2);
-            m_qwWaveData->append_y(i, y.at(j) - nMax / 2);
+            m_qwWaveData->yAppend(i, y.at(j) - nMax / 2);
         }
     }
     m_qwWaveAnal->rootContext()->setContextProperty("waveModel", m_qwWaveData);
@@ -100,17 +99,16 @@ void MainWindow::setupUi()
     m_qwWaveAnal2->setContent(QUrl(), component, component->create());
     m_qwWaveData2 = new WaveAnalDataModel();
 
+    nMax = 10000;
+    nCount = 1600;
+    m_qwWaveData2->setXData(random(nMax, nCount));
     for (int i = 0; i < 10; ++i)
     {
-        int nMax = 10000;
-        int nCount = 1600;
-        QList<int> x = random(nMax, nCount);
-        QList<int> y = random(nMax, nCount);
+        QList<qreal> y = random(nMax, nCount);
 
         for (int j = 0; j < nCount; ++j)
         {
-            m_qwWaveData2->append_x(i, x.at(j) - nMax / 2);
-            m_qwWaveData2->append_y(i, y.at(j) - nMax / 2);
+            m_qwWaveData2->yAppend(i, y.at(j) - nMax / 2);
         }
     }
     m_qwWaveAnal2->rootContext()->setContextProperty("waveModel", m_qwWaveData2);

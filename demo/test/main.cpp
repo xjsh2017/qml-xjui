@@ -3,6 +3,7 @@
 
 #include <QQmlContext>
 #include <QDir>
+#include <QDebug>
 
 #include "stores/waveanaldatamodel.h"
 
@@ -11,8 +12,12 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     WaveAnalDataModel data;
-//    data.buildData(10, 800, 20);
-    data.buildData(2, 5000, 1800);
+
+    QList<qreal> starts;
+    starts.push_back(0);
+    starts.push_back(120);
+    starts.push_back(240);
+    data.buildSinWaveData(27, 1601, 20, 0, 900, -20, 20, false, starts);
 
     QQmlApplicationEngine engine;
 
