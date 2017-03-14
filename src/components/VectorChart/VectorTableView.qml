@@ -14,7 +14,8 @@ Item {
     width: 800
     height:600
 
-    property var model: Calculator.model
+    property var model: AnalDataModel.listModel
+    property var propModel: AnalDataModel.propModel
     property bool isNeedUpdate: Calculator.isNeedUpdate
     property int selectDataIndex: 0
 
@@ -34,10 +35,18 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    onIsNeedUpdateChanged: {
-        log("Model Changed detected!")
-        modelCheckedChanged();
-        update();
+//    onIsNeedUpdateChanged: {
+//        log("Model Changed detected!")
+//        modelCheckedChanged();
+//        update();
+//    }
+
+    Connections {
+        target: AnalDataModel
+
+        onPropValueChanged: {
+            root.update();
+        }
     }
 
     function update() {
@@ -45,8 +54,9 @@ Item {
         log(root.model.angle)
 
         for (var i = 0; i < modelChannel.count; i++){
-            modelChannel.setProperty(i, "rms", root.model.rms[i])
-            modelChannel.setProperty(i, "angle", root.model.angle[i] ? "∠ " + root.model.angle[i] + "°": "NaN")
+            modelChannel.setProperty(i, "rms", root.model.get(i).rms)
+            modelChannel.setProperty(i, "angle"
+                           , root.model.get(i).angle ? "∠ " + root.model.get(i).angle + "°": "NaN")
         }
     }
 
@@ -56,17 +66,16 @@ Item {
 
         function updateModel() {
             clear();
-            for (var i = 0; i < model.data.rows; i++){
+            for (var i = 0; i < model.count; i++){
+                console.log(root.model.get(i).name)
                 append({
-                                   name: root.model.name[i],
-                                   unit: root.model.unit[i],
-                                   phase: root.model.phase[i],
-                                   rms: root.model.rms[i],
-                                   angle: root.model.angle[i],
-                                   "x": root.model.data.x,
-                                   "y": root.model.data.y_row(i)
+                                   name: root.model.get(i).name,
+                                   unit: root.model.get(i).unit,
+                                   phase: root.model.get(i).phase,
+                                   rms: root.model.get(i).rms,
+                                   angle: root.model.get(i).angle + " "
                                }
-                               )
+                        )
             }
         }
     }
@@ -212,7 +221,7 @@ Item {
                 anchors.fill: parent
 
                 CheckBox {
-                    checked: false
+                    checked: root.model.get(styleData.row).selected
                     anchors.verticalCenter: parent.verticalCenter
 
                     color: Theme.primaryColor
@@ -220,7 +229,7 @@ Item {
 
                     onCheckedChanged: {
                         console.log(styleData.row + ", Checked: " + checked);
-                        root.model.check[styleData.row] = checked;
+                        root.model.get(styleData.row).selected = checked;
                         root.modelCheckedChanged()
                     }
                 }
@@ -378,7 +387,9 @@ Item {
     }
 
     Component.onCompleted: {
-        if (root.model)
+        if (root.model){
             modelChannel.updateModel();
+            log("on vector table view ")
+        }
     }
 }

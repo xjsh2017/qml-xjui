@@ -273,7 +273,7 @@ Item {
                                 name: "Go to Running Time Mode"
 
                                 onTriggered: {
-                                    AnalDataModel.setPropValue(0, "isVisible", !AnalDataModel.getPropValue(0, "isVisible"));
+                                    AnalDataModel.setPropValue(0, "visible", !AnalDataModel.getPropValue(0, "visible"));
 
                                     return;
 
@@ -319,11 +319,12 @@ Item {
                                 hoverAnimation: true
                                 onTriggered: {
                                     waveModel.sync();
-                                    return;
-                                    for (var i = 0; i < root.wavePanelist.length; ++i){
-                                        root.curvelist[i].repaint();
-                                    }
                                     snackbar.open("All Charts Refreshed !")
+                                    return;
+//                                    for (var i = 0; i < root.wavePanelist.length; ++i){
+//                                        root.curvelist[i].plotHandler = 0;
+//                                        root.curvelist[i].requestPaint();
+//                                    }
                                 }
                             }
                         }
@@ -423,29 +424,27 @@ Item {
                                 height: root.wavePannelHeight
                                 backgroundColor: Qt.lighter(drawColor)
 
-                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false
+                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "visible") : false
 
                                 function updateWavePanel() {
                                     if (index < AnalDataModel.getCount())
-                                        visible = AnalDataModel.getPropValue(index, "isVisible");
+                                        visible = AnalDataModel.getPropValue(index, "visible");
 
 //                                    Calculator.analHarmonic(root.model, index); // 谐波分析
 
-//                                    var tmp = root.model.data.y_row(index).data;
-
                                     var tmp = AnalDataModel.getYData(index);
                                     var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
-                                    tmp = AnalDataModel.dataModel.y[index][curve.selectDataIndex];
+                                    tmp = AnalDataModel.dataModel.y[index][curve.selectDataIndex].toFixed(2);
                                     if (btnValueType.valueType == 1){
                                         tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
                                     }
 
-                                    label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.phase.toFixed(2) : "#") + "°"
+                                    label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.angle.toFixed(2) : "#") + "°"
 
-//                                    root.model.rms[index] = (fresult ? fresult.RMS.toFixed(2) : "#");
-//                                    root.model.angle[index] = (fresult ? fresult.phase.toFixed(2) : "#");
+                                    AnalDataModel.listModel.setProperty(index, "rms", (fresult ? fresult.RMS.toFixed(2) : NaN))
+                                    AnalDataModel.listModel.setProperty(index, "angle", (fresult ? fresult.angle.toFixed(2) : NaN))
 
-//                                    root.modelChanged()
+                                    AnalDataModel.propValueChanged();
 //                                    Calculator.isNeedUpdate = !Calculator.isNeedUpdate;
                                 }
 
@@ -512,13 +511,13 @@ Item {
                                 width: waveView.width - wavePanel.width - parent.spacing
 
                                 backgroundColor: "#263238"
-                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false
+                                visible: index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "visible") : false
 
                                 WaveChart {
                                     id: curve;
 
                                     function updateCurve(){
-                                        waveChartView.visible = (index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "isVisible") : false);
+                                        waveChartView.visible = (index < AnalDataModel.getCount() ? AnalDataModel.getPropValue(index, "visible") : false);
                                         plotHandler = 0;
                                         requestPaint();
                                     }
@@ -769,25 +768,37 @@ Item {
     }
 
     Connections {
-        target: AnalDataModel
+        target: waveModel
 
-        onPropValueChanged:{
-            log("AnalDataModel onPropValueChanged");
-            log("AnalDataModel.getCount() = " + AnalDataModel.getCount())
-            for (var i = 0; i < AnalDataModel.getCount(); i++){
-//                root.wavePanelist[i].updateWavePanel();
-                root.curvelist[i].updateCurve()
-            }
+        onModelDataChanged: {
+            console.log("Detect waveModel data changed outside!")
+
+            AnalDataModel.updateModelFromInternalDataAPI(waveModel)
         }
     }
 
     Connections {
-        target: waveModel
+        target: AnalDataModel
 
-        onModelDataChanged: {
-            console.log("waveModel data changed!")
+        onPropValueChanged:{
+            log("AnalDataModel onPropValueChanged"
+                + "\n\t AnalDataModel.getCount() = " + AnalDataModel.getCount());
 
-            AnalDataModel.updateModelFromInternalDataAPI(waveModel)
+//            for (var i = 0; i < AnalDataModel.getCount(); i++){
+//                root.wavePanelist[i].updateWavePanel();
+//                root.curvelist[i].updateCurve()
+//            }
+        }
+
+        onPropXYDataChanged: {
+            log("AnalDataModel onPropXYDataChanged: "
+                + "\n\t rows = " + AnalDataModel.dataModel.rows
+                + "\n\t cols = " + AnalDataModel.dataModel.cols);
+
+            for (var i = 0; i < AnalDataModel.getCount(); i++){
+                root.wavePanelist[i].updateWavePanel();
+                root.curvelist[i].updateCurve()
+            }
         }
     }
 

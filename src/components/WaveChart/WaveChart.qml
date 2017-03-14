@@ -73,7 +73,7 @@ Canvas {
     }
 
     function log(says) {
-        console.log("# WaveChart.qml: # " + says);
+//        console.log("# WaveChart.qml: # " + says);
     }
 
     function debug(de) {

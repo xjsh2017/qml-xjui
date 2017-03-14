@@ -219,7 +219,7 @@ QtObject {
 
         var RMS;
         var amplitude;
-        var phase;
+        var angle;
 
         var tmp = 0.0;
         var ex = 0.0;
@@ -236,22 +236,22 @@ QtObject {
         RMS = Math.sqrt(tmp/count);
         amplitude = Math.sqrt(2) * RMS;
         if (dx > 0)
-            phase = calcSinAngle(amplitude, fInput[curSamplePos], fInput[curSamplePos] > fInput[curSamplePos - 1]);
+            angle = calcSinAngle(amplitude, fInput[curSamplePos], fInput[curSamplePos] > fInput[curSamplePos - 1]);
         else
-            phase = 0.0;
+            angle = 0.0;
 
 //        log ("calcRMS: "
 //             + "\n\t sample(" + samplearr.length + ") = " + samplearr
 //             + "\n\t dx = " + dx + ", ex = " + ex
 //             + "\n\t RMS = " + RMS
 //             + "\n\t amplitude = " + amplitude
-//             + "\n\t phase =" + phase
+//             + "\n\t angle =" + angle
 //        )
 
         return {
             RMS: RMS,
             amplitude: amplitude,
-            phase: phase
+            angle: angle
         };
     }
 
