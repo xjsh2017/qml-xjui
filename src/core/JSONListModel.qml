@@ -46,8 +46,6 @@ Item {
             var jo = objectArray[key];
             jsonModel.append( jo );
         }
-
-        console.log("detect: json or query .. changed")
     }
 
     function parseJSONString(jsonString, jsonPathQuery) {

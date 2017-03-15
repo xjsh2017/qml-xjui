@@ -62,10 +62,10 @@ QtObject {
     property alias json: properties.json;
     property alias listModel: properties.listmodel;
 
-    property var sampleModel//:
+    property var sample;
 //                          Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250);
 //                          Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200);
-//                    Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
+//                          Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
 //                          Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10);
 
     property var analModel: {
@@ -99,27 +99,24 @@ QtObject {
         return 0;
     }
 
-    function getDataSize(){
-//        console.log("sampleModel = " + sampleModel)
-//        console.log("sampleModel.y = " + sampleModel.y)
-//        console.log("sampleModel.y.length = " + sampleModel.y.length)
-//        console.log("sampleModel.y[0] = " + sampleModel.y[0])
-//        console.log("sampleModel.y[0].length = " + sampleModel.y[0].length)
-        return {
-            rows: sampleModel.y ? sampleModel.y.length : 0,
-            cols: sampleModel.y && sampleModel.y[0] ? sampleModel.y[0].length : 0
-        }
+    function getChannelColor(index) {
+        return phaseColorByTypeName(listModel.get(index).phase)
+    }
+
+    function isChannelVisible(index) {
+        return index < getChannelCount() ?
+                    getPropValue(index, "visible") : false
     }
 
     function getJsonString(){
         return JSON.stringify(jsModel);
     }
 
-    function getPropName(index, num){
-        if (index < getChannelCount()){
+    function getPropName(channelIdx, propIdx){
+        if (index < getChannelCount() && isArray(jsModel)){
             var i = 0;
-            for (var key in jsModel[index]){
-                if (i == num){
+            for (var key in jsModel[channelIdx]){
+                if (i == propIdx){
                     return key;
                 }
                 i++;
@@ -127,32 +124,72 @@ QtObject {
         }
     }
 
+    function getPropValue(channelIdx, propName) {
+        if (hasProperty(channelIdx, propName))
+            return jsModel[channelIdx][propName];
+    }
+
+    function setPropValue(channelIdx, propName, value) {
+        if (hasProperty(channelIdx, propName)){
+            listModel.setProperty(channelIdx, propName, value);
+            jsModel[channelIdx][propName] = value;
+//            properties.json = JSON.stringify(jsModel);
+
+            propValueChanged();
+        }
+    }
+
+    /*! 判断索引编号为channelIdx的通道是否存在属性名propName  */
+    function hasProperty(channelIdx, propName){
+        return isArray(jsModel) && channelIdx < jsModel.length && (propName in jsModel[channelIdx])
+    }
+
+    function getDataCols() {
+        if (sample && is2dArray(sample.y))
+            return sample.y[0].length
+    }
+
+    function getDataRows() {
+        if (sample && isArray(sample.y))
+            return sample.y.length
+    }
+
+    function getDataSize(){
+        return {
+            rows: getDataRows(),
+            cols: getDataCols()
+        }
+    }
+
     function getXData(index, start, end){
-        if (index < getChannelCount()){
-            return sampleModel.x_row(index, start, end).data;
+        if (index < getChannelCount() && sample && sample.x_row){
+            return sample.x_row(index, start, end).data;
         }
     }
 
     function getYData(index, start, end){
-        if (index < getChannelCount()){
-            return sampleModel.y_row(index, start, end).data;
+        if (index < getChannelCount() && sample && sample.y_row){
+            return sample.y_row(index, start, end).data;
         }
     }
 
-    function getPropValue(index, propName) {
-        if (listModel)
-            return jsModel[index][propName];
-    }
+    function phaseColorByTypeName(type) {
+        switch (type) {
+        case 'A':
+            return "#ff9800";
+            break;
+        case 'B':
+            return "#4caf50";
 
-    function setPropValue(index, propName, value) {
-        if (listModel){
-            listModel.setProperty(index, propName, value);
-
-            jsModel[index][propName] = value;
-
-//            properties.json = JSON.stringify(jsModel);
-
-            propValueChanged();
+            break;
+        case 'C':
+            return "#ba68c8";
+            break;
+        case 'N':
+            return "#607d8b";
+            break;
+        default:
+            return "lightgrey"
         }
     }
 
@@ -160,7 +197,7 @@ QtObject {
 
 
     function log(says) {
-        console.log("## AnalDataModel.qml ##: " + says);
+//        console.log("## AnalDataModel.qml ##: " + says);
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -181,9 +218,6 @@ QtObject {
                 }
             }
         }
-
-
-        console.log(listModel.get(i).harmonic)
 
         analModel.timeRelastStatic = {
             n0us: 0, n1us: 0, n2us: 0, n3us: 0, n4us: 0, n5us: 0, n6us: 0, n7us:0, n8us:0, n9us: 0, n10us:0, nup11us:0,
@@ -210,10 +244,10 @@ QtObject {
             y[i] = modeldata.y_data(i);
         }
 
-        sampleModel.x = x;
-        sampleModel.y = y;
-        sampleModel.rows = Rows;
-        sampleModel.cols = Cols;
+        sample.x = x;
+        sample.y = y;
+        sample.rows = Rows;
+        sample.cols = Cols;
 
         log("Rows: " + Rows + ", Cols: " + Cols)
 
@@ -235,8 +269,18 @@ QtObject {
 
     // ///////////////////////////////////////////////////////////////
 
+    function isArray(o){
+        return Object.prototype.toString.call(o)=='[object Array]';
+    }
+
+    function is2dArray(arg){
+        return arg && isArray(arg) && isArray(arg[0])
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
     Component.onCompleted: {
-        initModelData();
+//        initModelData();
     }
 
 

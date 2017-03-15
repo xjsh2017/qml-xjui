@@ -67,8 +67,13 @@ Canvas {
         selectDataIndex = 0;
     }
 
-    function repaint() {
+    function updateCurve() {
         chartAnimationProgress = 100;
+        requestPaint();
+    }
+
+    function repaint(){
+        plotHandler = 0;
         requestPaint();
     }
 
@@ -374,7 +379,7 @@ Canvas {
 
         selectDataIndex = findSelDataIndex(grooveXPlot);
 
-        repaint();
+        updateCurve();
     }
 
     onTimeRateChanged: {
@@ -383,19 +388,19 @@ Canvas {
         selectDataIndex = findSelDataIndex(grooveXPlot);
 
 
-        repaint();
+        updateCurve();
     }
 
     onHeightChanged: {
-        repaint();
+        updateCurve();
     }
 
     onWidthChanged: {
-        repaint();
+        updateCurve();
     }
 
     onChartAnimationProgressChanged: {
-//        repaint();
+//        updateCurve();
     }
 
     onStartDataIndexChanged: {
@@ -403,7 +408,7 @@ Canvas {
 
 //        console.log("selectDataIndex = " + selectDataIndex);
 
-        repaint();
+        updateCurve();
     }
 
     MouseArea {
@@ -449,7 +454,7 @@ Canvas {
         onTriggered: {
             stepChartToLast();
 
-            repaint();
+            updateCurve();
         }
     }
 

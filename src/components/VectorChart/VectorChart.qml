@@ -139,16 +139,12 @@ Canvas {
         var widthfont = ctx.measureText("90").width / 2;
 
         ctx = getContext("2d");
-
         ctx.clearRect(0, 0, width, height);
+
         // 设置画笔
         ctx.lineWidth = 1
         ctx.strokeStyle = "grey"
-        ctx.fillStyle = "black"//Qt.rgba(0, 0, 0, 0.5)
-
-//        ctx.fillRect(plotMargins.leftMargin, plotMargins.topMargin
-//                     , width - plotMargins.rightMargin - plotMargins.leftMargin
-//                     , height - plotMargins.bottomMargin - plotMargins.topMargin);
+        ctx.fillStyle = Global.g_plotBackgroundColor
         ctx.fillRect(dp(3), dp(3), width - dp(6), height-dp(6));
 
         getRBound();

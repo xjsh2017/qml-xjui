@@ -10,7 +10,7 @@ import Material 0.3
 import "../../../src/views"
 
 Item {
-    property var sectionTitles: [ "报文分析", "离散度分析", "谐波分析", "向量分析", "序分量分析"]
+    property var sectionTitles: [ /*"报文分析", "离散度分析", */"谐波分析", "向量分析", "序分量分析"]
 
     Controls.SplitView{
         anchors.fill:parent;
@@ -53,6 +53,7 @@ Item {
 
                 WaveChartAnal {
                     id: wave
+
                     Layout.fillHeight: true
                     Layout.minimumWidth: 100;
                 }
@@ -60,7 +61,6 @@ Item {
                 TabbedPages {
                     id: tabview
 
-                    selectedTabIndex: 3
                     Layout.fillHeight: true;
                     Layout.minimumHeight: dp(200);
                 }

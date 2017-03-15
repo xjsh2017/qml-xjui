@@ -12,7 +12,6 @@ Item {
     property var sectionTitles: [ /*"报文分析", "离散度分析", */"谐波分析", "向量分析", "序分量分析"]
 
     function dp(number) {
-//        return Math.round(number * dp);
         return number;
     }
 
@@ -28,13 +27,12 @@ Item {
             elevation: 2
         }
 
+        /* 树形栏 */
         Rectangle {
             id: tree
 
             visible: false
 
-//            Layout.fillWidth: true
-//            Layout.minimumWidth: dp(100);
             width: dp(200)
             Layout.maximumWidth: dp(400);
 
@@ -61,13 +59,12 @@ Item {
                     Layout.minimumWidth: 100;
                 }
 
-                TabbedPages {
-                    id: tabview
+//                TabbedPages {
+//                    id: tabview
 
-//                    selectedTabIndex: 3
-                    Layout.fillHeight: true;
-                    Layout.minimumHeight: dp(200);
-                }
+//                    Layout.fillHeight: true;
+//                    Layout.minimumHeight: dp(200);
+//                }
             }
 
             View {

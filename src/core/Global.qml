@@ -31,6 +31,8 @@ QtObject {
     property    color g_timeModeColor: "green"
     property    color g_modeColor: g_plotMode == enTimeMode ? g_timeModeColor : g_sampleModeColor
 
+    property    color g_plotBackgroundColor: "#263238"
+
     // ///////////////////////////////////////////////////////////////
 
     function mergeFlags(defaults,userDefined) {
