@@ -18,7 +18,7 @@ Item {
     height:600
 
     property var channelModel: AnalDataModel.listModel
-    property var analModel: AnalDataModel.analModel
+    property var analyzer: AnalDataModel.analyzer
     property bool isModelUpdate: Calculator.isNeedUpdate
     property int nShowHarmonTimes: 7
 
@@ -46,7 +46,7 @@ Item {
     Connections {
         target: AnalDataModel
 
-        onPropAnalDataChanged: {
+        onChannelsChanged: {
             log("Model Changed detected!")
             update();
         }
@@ -63,7 +63,7 @@ Item {
         function updateModel() {
             clear();
 
-            var cols = Math.min(nShowHarmonTimes, analModel.maxHarmonicTimes) + 1;
+            var cols = Math.min(nShowHarmonTimes, analyzer.maxHarmonicTimes) + 1;
             for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
 
                 var js = {};

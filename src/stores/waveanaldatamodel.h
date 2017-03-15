@@ -1,4 +1,4 @@
-#ifndef WAVEANALDATAMODEL_H
+ï»¿#ifndef WAVEANALDATAMODEL_H
 #define WAVEANALDATAMODEL_H
 
 #include <QDate>
@@ -20,22 +20,22 @@
 // //////////////////
 /// \brief The WaveAnalDataModel class
 ///
-///  Êý¾Ý½Ó¿Ú£º ÊÊÓÃÓÚÀëÏß²¨ÐÎÓëMUÔÚÏß¼àÊÓ²¨ÐÎ
+///  æ•°æ®æŽ¥å£ï¼š é€‚ç”¨äºŽç¦»çº¿æ³¢å½¢ä¸ŽMUåœ¨çº¿ç›‘è§†æ³¢å½¢
 ///
 /// \code
 ///
-///    QString strJson = '[ {"name": "Í¨µÀÑÓÊ±", "unit": "", "phase":"", "visible": false}, \
-///                         {"name": "±£»¤AÏàµçÁ÷1", "unit": "A", "phase":"A", "visible": true} \
+///    QString strJson = '[ {"name": "é€šé“å»¶æ—¶", "unit": "", "phase":"", "visible": false}, \
+///                         {"name": "ä¿æŠ¤Aç›¸ç”µæµ1", "unit": "A", "phase":"A", "visible": true} \
 ///                        ]'
-///    // ÔÚÏß¼àÊÓ£º
+///    // åœ¨çº¿ç›‘è§†ï¼š
 ///
 ///     WaveAnalDataModel model;
 ///     model.setJson(strJson);
 ///     model.xAppend(x, true);
-///     model.yAppend(y, true); // ¿É²ÉÓÃ²»Í¬µÄÖØÔØAPIÌî³ä²ÉÑùÖµÊý¾Ý
+///     model.yAppend(y, true); // å¯é‡‡ç”¨ä¸åŒçš„é‡è½½APIå¡«å……é‡‡æ ·å€¼æ•°æ®
 ///     model.sync();
 ///
-///    // ÀëÏß·ÖÎö
+///    // ç¦»çº¿åˆ†æž
 ///
 ///     WaveAnalDataModel model;
 ///     model.setJson(strJson);
@@ -61,20 +61,20 @@ Q_SIGNALS:
 private:
 
     /*!
-     * \brief m_json    Í¨µÀÊôÐÔJSONÊý¾Ý½á¹¹
+     * \brief m_json    é€šé“å±žæ€§JSONæ•°æ®ç»“æž„
      *
-     * \code °´ÏÂÃæ¸ñÊ½ÌîÈëJSONÊý¾Ý
+     * \code æŒ‰ä¸‹é¢æ ¼å¼å¡«å…¥JSONæ•°æ®
      *  [
-     *     {"name": "Í¨µÀÑÓÊ±", "unit": "", "phase":"", "visible": false},
-     *     {"name": "±£»¤AÏàµçÁ÷1", "unit": "A", "phase":"A", "visible": true},
+     *     {"name": "é€šé“å»¶æ—¶", "unit": "", "phase":"", "visible": false},
+     *     {"name": "ä¿æŠ¤Aç›¸ç”µæµ1", "unit": "A", "phase":"A", "visible": true},
      *     .....
      *  ]
      * \endcode
      *
-     *   name: Í¨µÀÃû³Æ
-     *   unit£º µ¥Î»
-     *   phase: Ïà±ð
-     *   visible: ÓÃ»§ÊÇ·ñ¿É¼û
+     *   name: é€šé“åç§°
+     *   unitï¼š å•ä½
+     *   phase: ç›¸åˆ«
+     *   visible: ç”¨æˆ·æ˜¯å¦å¯è§
      */
     QString m_json;
     Q_PROPERTY(QString json READ json WRITE setJson NOTIFY jsonChanged)
@@ -89,7 +89,7 @@ private:
     int m_channelCount;
 
 signals:
-    void modelDataChanged();    // Êý¾ÝÄ£ÐÍ±ä»¯ÇëÇóÍ¬²½ÐÅºÅ
+    void modelDataChanged();    // æ•°æ®æ¨¡åž‹å˜åŒ–è¯·æ±‚åŒæ­¥ä¿¡å·
 
 //    QML_PROPERTY(QString, test, READ, test, WRITE, setTest, NOTIFY, testChanged)
 //    QML_PROPERTY(QString, mac2, READ, mac2, WRITE, setMac2, NOTIFY, mac2Changed)
@@ -118,22 +118,22 @@ public:
     Q_INVOKABLE int cols() { if (m_y.size() > 0) return m_y.at(0).size(); else return 0; }
 
     /*!
-      ÕýÏÒ²¨·¢ÉúÆ÷
+      æ­£å¼¦æ³¢å‘ç”Ÿå™¨
      *
-     * \c rows: ²úÉú¼¸¸öÕýÏÒ²¨£¬ xÖá¶¼ÊÇÒ»ÑùµÄ
+     * \c rows: äº§ç”Ÿå‡ ä¸ªæ­£å¼¦æ³¢ï¼Œ xè½´éƒ½æ˜¯ä¸€æ ·çš„
      *
-     * \c cols: Ã¿¸öÕýÏÒ²¨µÄ²ÉÑùµãÊý
+     * \c cols: æ¯ä¸ªæ­£å¼¦æ³¢çš„é‡‡æ ·ç‚¹æ•°
      *
-     * \c nT: Ã¿¸öÕýÏÒ²¨µÄÖÜÆÚÊý
+     * \c nT: æ¯ä¸ªæ­£å¼¦æ³¢çš„å‘¨æœŸæ•°
      *
-     * \c xMin, xMax: xÖáµÄ×î´ó×îÐ¡Öµ
+     * \c xMin, xMax: xè½´çš„æœ€å¤§æœ€å°å€¼
      *
-     * \c¡¡yMin, yMx: yÖáµÄ×î´ó×îÐ¡Öµ
+     * \cã€€yMin, yMx: yè½´çš„æœ€å¤§æœ€å°å€¼
      *
-     * \c bRandStartAngle£º Ã¿¸öÕýÏÒ²¨µÄÆðÊ¼Ïà½ÇÊÇ·ñÎªËæ»ú£¨0~360£©
+     * \c bRandStartAngleï¼š æ¯ä¸ªæ­£å¼¦æ³¢çš„èµ·å§‹ç›¸è§’æ˜¯å¦ä¸ºéšæœºï¼ˆ0~360ï¼‰
      *
-     * \c startAngles£º bRandStartAngleÎªfalseÊ±ÉúÐ§£¬Ö¸¶¨Ã¿¸öÕýÏÒ²¨µÄÆðÊ¼Ïà½Ç
-     *    ×¢ÒâÈôsizeÐ¡ÓÚÕýÏÒ²¨µÄ¸öÊý£¬ÔòÉÙÓÚµÄÕýÏÒ²¨ÆäÊµÏà½Ç¶ÈÎª0
+     * \c startAnglesï¼š bRandStartAngleä¸ºfalseæ—¶ç”Ÿæ•ˆï¼ŒæŒ‡å®šæ¯ä¸ªæ­£å¼¦æ³¢çš„èµ·å§‹ç›¸è§’
+     *    æ³¨æ„è‹¥sizeå°äºŽæ­£å¼¦æ³¢çš„ä¸ªæ•°ï¼Œåˆ™å°‘äºŽçš„æ­£å¼¦æ³¢å…¶å®žç›¸è§’åº¦ä¸º0
      *
      *
      * \code
@@ -166,10 +166,10 @@ signals:
     void yChanged(QList<QList<qreal> > &arg);
 
 private:
-    QList<qreal> m_x;               // Ö¡Ê±¼äÐòÁÐ
-    QList<QList<qreal> >m_y;        // ¸÷Í¨µÀÖ¡²ÉÑùµãÐòÁÐ
+    QList<qreal> m_x;               // å¸§æ—¶é—´åºåˆ—
+    QList<QList<qreal> >m_y;        // å„é€šé“å¸§é‡‡æ ·ç‚¹åºåˆ—
 
-    bool m_notify;                  // µ¥¸öÊý¾Ý²Ù×÷¶ÔÓ¦µÄ¸üÐÂÍ¨Öª
+    bool m_notify;                  // å•ä¸ªæ•°æ®æ“ä½œå¯¹åº”çš„æ›´æ–°é€šçŸ¥
 
 };
 

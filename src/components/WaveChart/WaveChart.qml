@@ -78,7 +78,7 @@ Canvas {
     }
 
     function log(says) {
-//        console.log("# WaveChart.qml: # " + says);
+        console.log("# WaveChart.qml: # " + says);
     }
 
     function debug(de) {
@@ -97,10 +97,12 @@ Canvas {
         log("sampleWidth = " + sampleWidth)
 
         start = Math.ceil(start);
-//        plotData.labels = model.data.x_row(0, start, start + sampleWidth).data;
-//        plotData.datasets[0].data = model.data.y_row(index, start, start + sampleWidth).data;
         plotData.labels = AnalDataModel.getXData(0, start, start + sampleWidth);
         plotData.datasets[0].data = AnalDataModel.getYData(index, start, start + sampleWidth);
+
+//        log(index);
+//        log(plotData.labels);
+//        log(plotData.datasets[0].data);
     }
 
     function updateSampleWidth() {
@@ -357,14 +359,14 @@ Canvas {
 
             sigDrawingCompleted(plotArea.leftTop.x)
 
-            log ("plotArea = "
-                 + "\n\t leftTop: " + plotArea.leftTop
-                 + "\n\t rightBottom: " + plotArea.rightBottom
-                 + "\n\t width = " + plotArea.width
-                 + "\n\t height = " + plotArea.height
-                 + "\n\t startIndex = " + startDataIndex
-                 + "\n\t time with = " + timeWidth
-                 + "\n\t sample with = " + sampleWidth)
+//            log ("plotArea = "
+//                 + "\n\t leftTop: " + plotArea.leftTop
+//                 + "\n\t rightBottom: " + plotArea.rightBottom
+//                 + "\n\t width = " + plotArea.width
+//                 + "\n\t height = " + plotArea.height
+//                 + "\n\t startIndex = " + startDataIndex
+//                 + "\n\t time with = " + timeWidth
+//                 + "\n\t sample with = " + sampleWidth)
         }
     }
 
@@ -468,6 +470,11 @@ Canvas {
     }
 
     Component.onCompleted: {
+        log("Component.onCompleted")
         init();
+    }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
     }
 }

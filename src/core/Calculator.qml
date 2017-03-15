@@ -1,10 +1,9 @@
 pragma Singleton
 
-import "."
 import QtQuick 2.4
 
 /*!
-   \qmltype XJElecCalculator
+   \qmltype Calculator
    \inqmlmodule XjUi
 
    \brief Provides access to standard colors that follow the Material Design specification.
@@ -12,177 +11,21 @@ import QtQuick 2.4
    See \l {http://www.google.com/design/spec/style/color.html#color-ui-color-application} for
    details about choosing a color scheme for your application.
  */
+
 QtObject {
     id: calculator
 
     // ///////////////////////////////////////////////////////////////
 
-    property var model: {
-                // 采样数据
-//                          "data": Matlab.sampleSin(10, 100001, 0, 16000, -20, 20, 1250),
-//                          "data": Matlab.sampleSin(27, 16001, 0, 16000, -20, 20, 200),
-                "data": Matlab.sampleSin(2, 1601, 0, 16000, -20, 20, 20),
-                //                          "data": Matlab.sampleSin(14, 1001, 0, 500, -20, 20, 10),
+    property var model;
 
-                // 通道数据
-                "name": ["通道延时"
-                         , "保护A相电流1", "保护A相电流2"
-                         , "保护B相电流1", "保护B相电流2"
-                         , "保护C相电流1", "保护C相电流2"
-                         , "计量A相电流", "计量B相电流", "计量C相电流"
-                         , "零序电流I01", "零序电流I02"
-                         , "间隙电流Ij1", "间隙电流Ij2"
-                         , "保护A相电压1", "保护A相电压2"
-                         , "B相电压采样值1", "B相电压采样值2"
-                         , "C相电压采样值1", "C相电压采样值2"
-                         , "线路抽取电压1", "线路抽取电压2"
-                         , "零序电压1", "零序电压2"
-                         , "计量A相电压", "计量B相电压", "计量C相电压"],
-                "unit": [""
-                         , "A", "A"
-                         , "A", "A"
-                         , "A", "A"
-                         , "A", "A", "A"
-                         , "A", "A"
-                         , "A", "A"
-                         , "V", "V"
-                         , "V", "V"
-                         , "V", "V"
-                         , "V", "V"
-                         , "V", "V"
-                         , "V", "V", "V"],
-                "phase": [""
-                          , "A", "A"
-                          , "B", "B"
-                          , "C", "C"
-                          , "A", "B", "C"
-                          , "N", "N"
-                          , "", ""
-                          , "A", "A"
-                          , "B", "B"
-                          , "C", "C"
-                          , "", ""
-                          , "N", "N"
-                          , "A", "B", "C"],
-
-                ncapp_id: 0,    // 链路appid
-
-                // 数据分析
-                curSamplePos: 0, // 当前分析采样点索引位置
-                maxHarmonicTimes: 19, // 谐波分析的最大谐波次数： 直流、一次谐波（基本分量）、二次谐波....nMax次谐波
-                check: [false],   // 当前通道的分析数据是否可见
-                isAnal: [true],   // 当前通道的分析数据是否分析
-                periodSampleCount: 80, // 一个周波点数
-                analSampleCount: 80, // 谐波分析需要的采样点数，从当前采样点索引位置向前数，一般一个周波点数
-
-                amp: [""],        // 每个通道当前索引位置采样点的幅值
-                rms: [""],        // 每个通道当前索引位置采样点的有效值
-                angle: [""],      // 每个通道当前索引位置采样点的相角
-                harmonic: [[]],    // 每个通道当前索引位置采样点的maxHarmonicTimes次谐波分析的结果， 通道数 X maxHarmonicTimes
-
-                // 离散度分析相关
-                timeRelastStatic: {},    // 本链路时间均匀度统计
-                ftime_relative_first: 0,    // 本链路第一帧报文与采样与采样文件中第一帧的时间差，见CAPCONNECTINFO，单位：秒
-                ftime_relative_last:0,   // 最后一帧报文与采样文件中第一帧的时间差
-                lTotalCapLenth: 0       // 本链路字节数
-    }
-
-    property  bool isNeedUpdate: false;
-
-    property var internalDataModel/*: waveModel*/
-//    property string test: internalDataModel ? internalDataModel.test : ""
-
-//    onTestChanged: {
-//        log("detect changed!")
-//    }
+    // ///////////////////////////////////////////////////////////////
 
     onModelChanged: {
-        log("Model Changed !")
+        log("Attention: Model Anal Result Data Changed !")
     }
 
     // ///////////////////////////////////////////////////////////////
-
-
-    function log(says) {
-        console.log("## Calculator.qml ##: " + says);
-    }
-
-    // ///////////////////////////////////////////////////////////////
-
-    function initModelData() { log("initModelData")
-        var channel_count = model.name.length;
-
-        model.check = new Array(channel_count);
-        model.isAnal = new Array(channel_count);
-        model.amp = new Array(channel_count);
-        model.rms = new Array(channel_count);
-        model.angle = new Array(channel_count);
-        model.harmonic = new Array(channel_count);
-        for (var i = 0; i < channel_count; i++){
-            model.check[i] = false;
-            model.isAnal[i] = true;
-            model.amp[i] = 0.0;
-            model.rms[i] = 0.0;
-            model.angle[i] = 0.0;
-
-            model.harmonic[i] = new Array(19);
-            for (var j = 0; j < 19; j++){
-                model.harmonic[i][j] = {
-                    n: j,
-                    real: 0.0,
-                    img: 0.0,
-                    amp: 0.0,
-                    angle: 0.0,
-                    percentage: 0.0
-                }
-            }
-        }
-
-        model.timeRelastStatic = {
-            n0us: 0, n1us: 0, n2us: 0, n3us: 0, n4us: 0, n5us: 0, n6us: 0, n7us:0, n8us:0, n9us: 0, n10us:0, nup11us:0,
-            neg_n1us: 0, neg_n2us: 0, neg_n3us: 0, neg_n4us: 0, neg_n5us: 0, neg_n6us: 0, neg_n7us:0,
-            neg_n8us:0, neg_n9us: 0, neg_n10us:0, neg_nup11us:0,
-
-            n4to10us:0, n11to25us:0, n25tous:0
-        }
-    }
-
-    /*
-        从内部数据接口更新模型数据
-      */
-    function updateModelFromInternalDataAPI(modeldata) {
-        if(!modeldata)
-            return;
-
-        var Rows = modeldata.rows();
-        var Cols = modeldata.cols();
-        var x = new Array(Rows);
-        var y = new Array(Rows);
-        for (var i = 0; i < Rows; i ++){
-            y[i] = modeldata.y_data(i);
-            x[i] = modeldata.x_data(i);
-        }
-        model.data = {
-            // data:
-            x: x,               // matrix: 1 x Cols
-            y: y,               // matrix: rows x Cols
-            rows: Rows,
-            cols: Cols,
-
-            // Functions
-            print: Matlab.matrix_print,
-            subdata: Matlab.matrix_subdata,
-
-            x_data: Matlab.x_data,
-            y_data: Matlab.y_data,
-
-            x_row: Matlab.x_row,
-            y_row: Matlab.y_row
-
-        }
-
-        return 0;
-    }
 
     /*!
    Select a color depending on whether the background is light or dark.
@@ -196,15 +39,10 @@ QtObject {
    \c curSamplePos: 计算点.
  */
     function calcRMS(input, curSamplePos, count) {
-//        if (typeof input[0] != "number"){
-//            log("Error using calcRMS (line 46) \n The 1st argument must be number array type.");
-//            return NaN;
-//        }
-        if (!Matlab.isArray(input)){
+        if (!isArray(input)){
             log("calcRMS : input is not array!");
             return;
         }
-
         var fInput = input.map(parseFloat)
 
         if (arguments.length < 3){
@@ -372,36 +210,6 @@ QtObject {
 
     }
 
-    function print_harmonic_result() {
-        var says;
-
-        var channel_count = model.name.length;
-        for (var i = 0; i < channel_count; i++){
-            says += "\n\t " + model.name[i] + ": ";
-            for (var j = 0; j < 7; j++){
-                 says += j +" = " + model.harmonic[i][j].amp.toFixed(3) + " " + (model.harmonic[i][j].percentage * 100).toFixed(3) + "%, "
-            }
-        }
-
-        if (says)
-            log(says)
-    }
-
-    /*!
-      检查数据模型是否有效
-      */
-    function isModelValid(model) {
-        if (!model)
-            return false;
-
-        var size = model.getDataSize();
-
-        if (size.rows < 1 || size.cols < 1)
-            return false;
-
-        return true;
-    }
-
     /*!
       n次谐波计算 - 傅氏全波差分计算方法
 
@@ -520,11 +328,9 @@ QtObject {
         return fresult;
     }
 
-
     /*
       离散度分析
       */
-
     function analTimeDisper() {
         var fhege = 0.0;
         var nhege = 0;
@@ -561,9 +367,52 @@ QtObject {
 
     }
 
+
+    function print_harmonic_result() {
+        var says;
+
+        var channel_count = model.name.length;
+        for (var i = 0; i < channel_count; i++){
+            says += "\n\t " + model.name[i] + ": ";
+            for (var j = 0; j < 7; j++){
+                 says += j +" = " + model.harmonic[i][j].amp.toFixed(3) + " " + (model.harmonic[i][j].percentage * 100).toFixed(3) + "%, "
+            }
+        }
+
+        if (says)
+            log(says)
+    }
+
+    /*!
+      检查数据模型是否有效
+      */
+    function isModelValid(model) {
+        if (!model || !model.typename || model.typename != "AnalDataModel")
+            return false;
+
+        return true;
+    }
+
+
+    // ///////////////////////////////////////////////////////////////
+
+    function isArray(o){
+        return Object.prototype.toString.call(o)=='[object Array]';
+    }
+
+    function is2dArray(arg){
+        return arg && isArray(arg) && isArray(arg[0])
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
+    function log(says) {
+        console.log("## Calculator.qml ##: " + says);
+    }
+
     // ///////////////////////////////////////////////////////////////
 
     Component.onCompleted: {
-        initModelData();
+        log("Component.onCompleted")
     }
 }

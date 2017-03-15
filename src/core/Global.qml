@@ -72,7 +72,7 @@ QtObject {
     }
 
     function log(says) {
-        console.log("## Global.qml ##: \n" + says)
+        console.log("## Global.qml ##: " + says)
     }
 
     function dp(number) {
@@ -81,6 +81,8 @@ QtObject {
     }
 
     Component.onCompleted: {
+        log("Component.onCompleted")
+
         Theme.primaryColor = "#00bcd4";
         Theme.accentColor = "#ff9800";
         Theme.tabHighlightColor = "white";

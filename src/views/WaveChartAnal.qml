@@ -11,7 +11,7 @@ import "../components/Grover"
 import "../core"
 
 Item {
-    id: root
+    id: wca
 
     // ///////////////////////////////////////////////////////////////
 
@@ -22,6 +22,8 @@ Item {
     property variant curvelist: []
     property variant waveViewlist: []
     property variant wavePanelist: []
+
+    property  real grooveXPlot: 0
 
 
     // ///////////////////////////////////////////////////////////////
@@ -37,20 +39,20 @@ Item {
     function updatePanelCurves(type){
         for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
             if (type == 0)
-                root.wavePanelist[i].updatePanel();
+                wca.wavePanelist[i].updatePanel();
             else if (type == 1)
-                root.curvelist[i].updateCurve();
+                wca.curvelist[i].updateCurve();
             else{
-                root.wavePanelist[i].updatePanel();
-                root.curvelist[i].updateCurve();
+                wca.wavePanelist[i].updatePanel();
+                wca.curvelist[i].updateCurve();
             }
         }
     }
 
     function repaintAllCurves(){
-        for (var i = 0; i < root.wavePanelist.length; ++i){
-            root.curvelist[i].plotHandler = 0;
-            root.curvelist[i].requestPaint();
+        for (var i = 0; i < wca.wavePanelist.length; ++i){
+            wca.curvelist[i].plotHandler = 0;
+            wca.curvelist[i].requestPaint();
         }
     }
 
@@ -201,7 +203,6 @@ Item {
 
                         Button {
                             id: btnValueType
-                            text: qsTr("瞬")
 
                             property int valueType: 0   // 0 - 瞬时值， 1 - 有效值
 
@@ -211,13 +212,26 @@ Item {
                             backgroundColor: Theme.accentColor
                             Layout.alignment: Qt.AlignVCenter
 
+                            Label {
+                                id: label_btn_value_type
+                                anchors.centerIn: parent
+                                text: qsTr("瞬")
+                                color: "white"
+
+                                font {
+                                    family: "微软雅黑"
+                                    weight: Font.Light
+                                    pixelSize: dp(13)
+                                }
+                            }
+
                             onClicked: {
                                 if (valueType == 1){
-                                    text = qsTr("瞬");
+                                    label_btn_value_type.text = qsTr("瞬");
                                     valueType = 0;
                                     backgroundColor = Theme.accentColor
                                 }else{
-                                    text = qsTr("有")
+                                    label_btn_value_type.text = qsTr("有")
                                     valueType = 1;
                                     backgroundColor = "green"
                                 }
@@ -228,7 +242,6 @@ Item {
 
                         Button {
                             id: btnGrooveMode
-                            text: qsTr("采")
 
                             implicitHeight: dp(22)
                             implicitWidth: dp(22)
@@ -236,13 +249,26 @@ Item {
                             backgroundColor: Theme.accentColor
                             Layout.alignment: Qt.AlignVCenter
 
+                            Label {
+                                id: label_GrooveMode
+                                anchors.centerIn: parent
+                                text: qsTr("采")
+                                color: "white"
+
+                                font {
+                                    family: "微软雅黑"
+                                    weight: Font.Light
+                                    pixelSize: dp(13)
+                                }
+                            }
+
                             onClicked: {
                                 if (Global.g_plotMode == Global.enTimeMode){
-                                    text = qsTr("采");
+                                    label_GrooveMode.text = qsTr("采");
                                     Global.g_plotMode = Global.enSampleMode;
                                     backgroundColor = Global.g_sampleModeColor
                                 }else{
-                                    text = qsTr("时")
+                                    label_GrooveMode.text = qsTr("时")
                                     Global.g_plotMode = Global.enTimeMode;
                                     backgroundColor = Global.g_timeModeColor
                                 }
@@ -271,8 +297,8 @@ Item {
                                     snackbar.open(varTmpInfo)
                                     log(varTmpInfo)
 
-                                    for (var i = 0; i < root.curvelist.length; ++i){
-                                        root.curvelist[i].startRunningTime(timer_wave.running);
+                                    for (var i = 0; i < wca.curvelist.length; ++i){
+                                        wca.curvelist[i].startRunningTime(timer_wave.running);
                                     }
                                 }
                             }
@@ -324,12 +350,12 @@ Item {
                     numericValueLabel: true
                     activeFocusOnPress: true
                     darkBackground: false
-                    samplecount: AnalDataModel.getDataCols();
+                    samplecount: AnalDataModel.getDataCols() ? AnalDataModel.getDataCols() : 0;
 
                     onScrollbarPosChanged : {
                         var deltaStartDataIndex = delta / Global.g_sampleRate;
-                        for (var i = 0; i < root.curvelist.length; ++i){
-                            root.curvelist[i].startDataIndex +=
+                        for (var i = 0; i < wca.curvelist.length; ++i){
+                            wca.curvelist[i].startDataIndex +=
                                     (delta ? 1 : -1) * deltaStartDataIndex;
                         }
                     }
@@ -368,7 +394,8 @@ Item {
                         Row {
                             spacing: dp(2)
 
-                            property color drawColor: AnalDataModel.getChannelColor(index)
+                            property color drawColor: AnalDataModel.getChannelColor(index) ?
+                                                          AnalDataModel.getChannelColor(index) : Theme.backgroundColor
 
                             // 波形图面板
                             View {
@@ -376,31 +403,30 @@ Item {
 
                                 elevation: 1
 
-                                width: root.wavePannelWidth
-                                height: root.wavePannelHeight
+                                width: wca.wavePannelWidth
+                                height: wca.wavePannelHeight
                                 backgroundColor: Qt.lighter(drawColor)
 
                                 visible: AnalDataModel.isChannelVisible(modelData)
 
                                 function updatePanel() {
-//                                    if (index < AnalDataModel.getChannelCount())
-//                                        visible = AnalDataModel.getPropValue(index, "visible");
+                                    visible = AnalDataModel.isChannelVisible(index);
 
 ////                                    Calculator.analHarmonic(AnalDataModel, index); // 谐波分析
 
-//                                    var tmp = AnalDataModel.getYData(index);
-//                                    var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex, 80);
-//                                    tmp = AnalDataModel.sampleModel.y[index][curve.selectDataIndex].toFixed(2);
-//                                    if (btnValueType.valueType == 1){
-//                                        tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
-//                                    }
+                                    var tmp = AnalDataModel.getYData(index);
+                                    if (tmp){
+                                        var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex
+                                                                         , AnalDataModel.analyzer.periodSampleCount);
+                                        tmp = AnalDataModel.sample.y[index][curve.selectDataIndex].toFixed(2);
+                                        if (btnValueType.valueType == 1){
+                                            tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
+                                        }
+                                        label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.angle.toFixed(2) : "#") + "°"
 
-//                                    label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.angle.toFixed(2) : "#") + "°"
-
-//                                    AnalDataModel.listModel.setProperty(index, "rms", (fresult ? fresult.RMS.toFixed(2) : ""))
-//                                    AnalDataModel.listModel.setProperty(index, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
-
-//                                    AnalDataModel.propValueChanged();
+                                        AnalDataModel.setPropValue(index, "rms", (fresult ? fresult.RMS.toFixed(2) : ""));
+                                        AnalDataModel.setPropValue(index, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
+                                    }
                                 }
 
                                 Rectangle {
@@ -476,9 +502,11 @@ Item {
                                     chartAnimationEasing: Easing.InOutElastic;
                                     chartAnimationDuration: 1000;
 
-//                                    model: root.model
+//                                    model: wca.model
                                     index: modelData
                                     grooveColor: Global.g_modeColor
+
+                                    grooveXPlot: root.grooveXPlot
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -502,30 +530,18 @@ Item {
                                     }
 
                                     onSigDrawingCompleted: {
-                                        groovePannel.width = root.wavePannelWidth + x;
+                                        groovePannel.width = wca.wavePannelWidth + x;
                                     }
 
-                                    onGrooveXPlotChanged: {
-                                        for (var i = 0; i < root.curvelist.length; ++i){
-                                            if (root.curvelist[i] == curve)
-                                                continue;
-                                            if (curve.grooveXPlot == root.curvelist[i].grooveXPlot)
-                                                continue;
 
-                                            root.curvelist[i].grooveXPlot = curve.grooveXPlot;
-                                        }
-                                        console.log(curve);
-                                        groove.value = curve.grooveXPlot + groove.minimumValue
-                                        if (plotMode == Global.enSampleMode)
-                                            groove.knobLabel = selectDataIndex;
-                                    }
 
                                     onSelectDataIndexChanged: {
-                                        AnalDataModel.analModel.curSamplePos = selectDataIndex;
+                                        AnalDataModel.analyzer.curSamplePos = selectDataIndex;
                                         if (selectDataIndex < 0)
                                             return;
 
-                                        wavePanel.updatePanel();
+                                        if (visible)
+                                            wavePanel.updatePanel();
                                         groove.value = curve.grooveXPlot + groove.minimumValue
                                         if (plotMode == Global.enSampleMode)
                                             groove.knobLabel = selectDataIndex;
@@ -534,10 +550,34 @@ Item {
 
                             }
 
+                            Connections {
+                                target: curve
+
+                                onGrooveXPlotChanged: {
+                                    console.log(wca.curvelist.length)
+                                    for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
+                                        if (wca.curvelist[i] == curve)
+                                            continue;
+                                        if (curve.grooveXPlot == wca.curvelist[i].grooveXPlot)
+                                            continue;
+
+
+                                        console.log("wca.curvelist[" + i + "].grooveXPlot = "
+                                                    + wca.curvelist[i].grooveXPlot)
+
+                                        wca.curvelist[i].grooveXPlot = curve.grooveXPlot;
+                                    }
+                                    console.log(curve);
+                                    groove.value = curve.grooveXPlot + groove.minimumValue
+                                    if (curve.plotMode == Global.enSampleMode)
+                                        groove.knobLabel = curve.selectDataIndex;
+                                }
+                            }
+
                             Component.onCompleted: {
-                                root.waveViewlist[index] = waveView
-                                root.curvelist[index] = curve;
-                                root.wavePanelist[index] = wavePanel;
+                                wca.waveViewlist[index] = waveView
+                                wca.curvelist[index] = curve;
+                                wca.wavePanelist[index] = wavePanel;
                             }
                         }
                     }
@@ -587,13 +627,13 @@ Item {
 
             CheckBox {
                 checked: false
-                text: "Show Points: " + root.curvelist.length
+                text: "Show Points: " + wca.curvelist.length
                 darkBackground: false
 
                 onCheckedChanged: {
-                    for (var i = 0; i < root.curvelist.length; ++i){
-                        root.curvelist[i].chartOptions.pointDot = checked;
-                        root.curvelist[i].requestPaint();
+                    for (var i = 0; i < wca.curvelist.length; ++i){
+                        wca.curvelist[i].chartOptions.pointDot = checked;
+                        wca.curvelist[i].requestPaint();
                     }
                 }
             }
@@ -602,49 +642,49 @@ Item {
 
             CheckBox {
                 checked: false
-                text: "Show X Labels: " + root.curvelist.length
+                text: "Show X Labels: " + wca.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < root.curvelist.length; ++i){
-                        root.curvelist[i].chartOptions.scaleShowLabelsX = checked;
-                        root.curvelist[i].requestPaint();
+                    for (var i = 0; i < wca.curvelist.length; ++i){
+                        wca.curvelist[i].chartOptions.scaleShowLabelsX = checked;
+                        wca.curvelist[i].requestPaint();
                     }
                 }
             }
 
             CheckBox {
                 checked: false
-                text: "Show Y Labels: " + root.curvelist.length
+                text: "Show Y Labels: " + wca.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < root.curvelist.length; ++i){
-                        root.curvelist[i].chartOptions.scaleShowLabelsY = checked;
-                        root.curvelist[i].requestPaint();
+                    for (var i = 0; i < wca.curvelist.length; ++i){
+                        wca.curvelist[i].chartOptions.scaleShowLabelsY = checked;
+                        wca.curvelist[i].requestPaint();
                     }
                 }
             }
 
             CheckBox {
                 checked: true
-                text: "Show Y Labels: " + root.curvelist.length
+                text: "Show Y Labels: " + wca.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < root.curvelist.length; ++i){
-                        root.curvelist[i].chartOptions.scaleShowAxisX = checked;
-                        root.curvelist[i].chartOptions.scaleShowAxisY = checked;
-                        root.curvelist[i].requestPaint();
+                    for (var i = 0; i < wca.curvelist.length; ++i){
+                        wca.curvelist[i].chartOptions.scaleShowAxisX = checked;
+                        wca.curvelist[i].chartOptions.scaleShowAxisY = checked;
+                        wca.curvelist[i].requestPaint();
                     }
                 }
             }
 
             CheckBox {
                 checked: false
-                text: "Show Y Labels: " + root.curvelist.length
+                text: "Show Y Labels: " + wca.curvelist.length
                 darkBackground: false
                 onCheckedChanged: {
-                    for (var i = 0; i < root.curvelist.length; ++i){
-                        root.curvelist[i].chartOptions.scaleShowGridLines = checked;
-                        root.curvelist[i].requestPaint();
+                    for (var i = 0; i < wca.curvelist.length; ++i){
+                        wca.curvelist[i].chartOptions.scaleShowGridLines = checked;
+                        wca.curvelist[i].requestPaint();
                     }
                 }
             }
@@ -718,14 +758,19 @@ Item {
     Connections {
         target: AnalDataModel
 
-        onPropValueChanged:{
-            log("AnalDataModel onPropValueChanged")
+        onChannelsChanged:{
+            log("AnalDataModel --> onChannelsChanged")
         }
 
-        onPropXYDataChanged: {
-            log("AnalDataModel onPropXYDataChanged: "
-                + "\n\t rows = " + AnalDataModel.sampleModel.rows
-                + "\n\t cols = " + AnalDataModel.sampleModel.cols);
+        onSampleChanged: {
+            log("AnalDataModel --> onSampleChanged: "
+                + "\n\t rows = " + AnalDataModel.sample.rows()
+                + "\n\t cols = " + AnalDataModel.sample.cols());
+        }
+
+        onAnalyzerChanged: {
+            log("AnalDataModel --> onAnalyzerChanged")
+
         }
     }
 
@@ -742,6 +787,15 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     Component.onCompleted: {
-//        AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
+        Calculator.model = AnalDataModel
+
+        AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
+        var sample = AnalDataModel.sample;
+
+        log("wca.curvelist = " + wca.curvelist);
+    }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
     }
 }

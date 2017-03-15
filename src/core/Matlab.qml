@@ -1,6 +1,6 @@
 pragma Singleton
 
-import QtQuick 2.4
+import QtQuick 2.0
 
 /*!
    \qmltype Matlab
@@ -431,18 +431,37 @@ QtObject {
             // data:
             x: x,               // matrix: 1 x Cols
             y: y,               // matrix: rows x Cols
-            rows: Rows,
-            cols: Cols,
 
             // Functions
-            print: matrix_print,
-            subdata: matrix_subdata,
+            rows: matrix_rows,
+            cols: matrix_cols,
 
             x_data: x_data,
             y_data: y_data,
-
             x_row: x_row,
-            y_row: y_row
+            y_row: y_row,
+
+            print: matrix_print,
+            subdata: matrix_subdata,
+            cpto: cpto
+        }
+    }
+
+    function matrix_rows(who) {
+        if (!who)
+            who = this
+
+        if (is2dArray(who.y)){
+            return who.y.length;
+        }
+    }
+
+    function matrix_cols(who) {
+        if (!who)
+            who = this
+
+        if (is2dArray(who.y)){
+            return who.y[0].length;
         }
     }
 
@@ -495,35 +514,37 @@ QtObject {
             // data:
             x: x,               // matrix: 1 x Cols
             y: y,               // matrix: rows x Cols
-            rows: Rows,
-            cols: Cols,
 
             // Functions
-            print: matrix_print,
-            subdata: matrix_subdata,
+            rows: matrix_rows,
+            cols: matrix_cols,
 
             x_data: x_data,
             y_data: y_data,
-
             x_row: x_row,
-            y_row: y_row
+            y_row: y_row,
+
+            print: matrix_print,
+            subdata: matrix_subdata,
+            cpto: cpto
         }
     }
 
     function x_row(index, start, end, who) {
+//        log(index + ", " + start + ", " + end + ", " + who)
         if (!who)
             who = this;
 
-        if (!who.x || index > who.rows - 1 || index < 0)
+        if (!who.x || index > who.rows() - 1 || index < 0)
             return NaN;
 
         start = arguments[1] ? arguments[1] : 0;
-        end = arguments[2] ? arguments[2] : who.cols - 1;
+        end = arguments[2] ? arguments[2] : who.cols() - 1;
 
-        if (start < 0 || end < 0 || end < start || start > who.cols - 1)
+        if (start < 0 || end < 0 || end < start || start > who.cols() - 1)
             return NaN;
 
-        end = Math.min(end, who.cols - 1)
+        end = Math.min(end, who.cols() - 1)
         var tmp = new Array(end - start + 1);
         for (var i = start; i <= end; i++)
             tmp[i - start] = who.x[index][i];
@@ -539,16 +560,16 @@ QtObject {
         if (!who)
             who = this;
 
-        if (!who.y || index > who.rows - 1 || index < 0)
+        if (!who.y || index > who.rows() - 1 || index < 0)
             return NaN;
 
         start = arguments[1] ? arguments[1] : 0;
-        end = arguments[2] ? arguments[2] : who.cols - 1;
+        end = arguments[2] ? arguments[2] : who.cols() - 1;
 
-        if (start < 0 || end < 0 || end < start || start > who.cols - 1)
+        if (start < 0 || end < 0 || end < start || start > who.cols() - 1)
             return NaN;
 
-        end = Math.min(end, who.cols - 1)
+        end = Math.min(end, who.cols() - 1)
         var tmp = new Array(end - start + 1);
         for (var i = start; i <= end; i++)
             tmp[i - start] = who.y[index][i];
@@ -576,8 +597,8 @@ QtObject {
         if (!who)
             who = this;
         var says = "\ntype: " + typeof this + " { x: " + (typeof who.x) + ", y " + (typeof who.y)
-                + ", rows: " + (typeof who.rows) + "(" + who.rows + ")"
-                + ", cols: " + (typeof who.cols) + "(" + who.cols + ")" + " }\n";
+                + ", rows: " + (typeof who.rows()) + "(" + who.rows() + ")"
+                + ", cols: " + (typeof who.cols()) + "(" + who.cols() + ")" + " }\n";
 
         if (who.x && who.x[0]){
             says += "\nx (Matrix: " + who.x.length + " x " + who.x[0].length +")=\n";
@@ -611,6 +632,26 @@ QtObject {
             log(says);
     }
 
+    function cpto(to, from){
+        if (!from)
+            from = this
+
+        to.x = from.x;
+        to.y = from.y;
+
+        to.rows = from.rows;
+        to.cols = from.cols;
+        to.print = from.print;
+        to.subdata = from.subdata;
+
+        to.x_data = from.x_data;
+        to.y_data = from.y_data;
+        to.x_row = from.x_row;
+        to.y_row = from.y_row;
+
+        to.cpto = cpto
+    }
+
     // ///////////////////////////////////////////////////////////////
 
 
@@ -642,14 +683,24 @@ QtObject {
         }
     }
 
+    // ///////////////////////////////////////////////////////////////
+
     function isArray(o){
         return Object.prototype.toString.call(o)=='[object Array]';
     }
 
-    function log(says) {
-        console.log("## Matlab.qml ##: \n" + says)
+    function is2dArray(arg){
+        return arg && isArray(arg) && isArray(arg[0])
     }
 
+    function log(says) {
+        console.log("## Matlab.qml ##: " + says)
+    }
+
+
+    // ///////////////////////////////////////////////////////////////
+
     Component.onCompleted: {
+        log("Component.onCompleted")
     }
 }

@@ -74,18 +74,18 @@ void MainWindow::setupUi()
     m_qwWaveAnal->setContent(QUrl(), component, component->create());
     m_qwWaveData = new WaveAnalDataModel();
 
-    int nMax = 5000;
-    int nCount = 1800;
-    m_qwWaveData->setXData(random(nMax, nCount));
-    for (int i = 0; i < 10; ++i)
-    {
-        QList<qreal> y = random(nMax, nCount);
+//    int nMax = 5000;
+//    int nCount = 1800;
+//    m_qwWaveData->setXData(random(nMax, nCount));
+//    for (int i = 0; i < 10; ++i)
+//    {
+//        QList<qreal> y = random(nMax, nCount);
 
-        for (int j = 0; j < nCount; ++j)
-        {
-            m_qwWaveData->yAppend(i, y.at(j) - nMax / 2);
-        }
-    }
+//        for (int j = 0; j < nCount; ++j)
+//        {
+//            m_qwWaveData->yAppend(i, y.at(j) - nMax / 2);
+//        }
+//    }
     m_qwWaveAnal->rootContext()->setContextProperty("waveModel", m_qwWaveData);
 
     tabw->addTab(m_qwWaveAnal, QStringLiteral("Wave - Sample1"));
@@ -99,18 +99,18 @@ void MainWindow::setupUi()
     m_qwWaveAnal2->setContent(QUrl(), component, component->create());
     m_qwWaveData2 = new WaveAnalDataModel();
 
-    nMax = 10000;
-    nCount = 1600;
-    m_qwWaveData2->setXData(random(nMax, nCount));
-    for (int i = 0; i < 10; ++i)
-    {
-        QList<qreal> y = random(nMax, nCount);
+//    nMax = 10000;
+//    nCount = 1600;
+//    m_qwWaveData2->setXData(random(nMax, nCount));
+//    for (int i = 0; i < 10; ++i)
+//    {
+//        QList<qreal> y = random(nMax, nCount);
 
-        for (int j = 0; j < nCount; ++j)
-        {
-            m_qwWaveData2->yAppend(i, y.at(j) - nMax / 2);
-        }
-    }
+//        for (int j = 0; j < nCount; ++j)
+//        {
+//            m_qwWaveData2->yAppend(i, y.at(j) - nMax / 2);
+//        }
+//    }
     m_qwWaveAnal2->rootContext()->setContextProperty("waveModel", m_qwWaveData2);
 
     tabw->addTab(m_qwWaveAnal2, QStringLiteral("Wave - Sample2"));
@@ -120,18 +120,18 @@ void MainWindow::currentChanged(int index)
 {
     qDebug() << index;
 
-    if (index == 0)
-    {
-        qDebug()<< m_qwWaveAnal->rootContext();
-        if (m_qwWaveData->test() == "1")
-            m_qwWaveData->setTest("0");
-        else
-            m_qwWaveData->setTest("1");
-    }else if (index == 1){
-        qDebug()<< m_qwWaveAnal2->rootContext();
-        if (m_qwWaveData2->test() == "1")
-            m_qwWaveData2->setTest("0");
-        else
-            m_qwWaveData2->setTest("1");
-    }
+//    if (index == 0)
+//    {
+//        qDebug()<< m_qwWaveAnal->rootContext();
+//        if (m_qwWaveData->test() == "1")
+//            m_qwWaveData->setTest("0");
+//        else
+//            m_qwWaveData->setTest("1");
+//    }else if (index == 1){
+//        qDebug()<< m_qwWaveAnal2->rootContext();
+//        if (m_qwWaveData2->test() == "1")
+//            m_qwWaveData2->setTest("0");
+//        else
+//            m_qwWaveData2->setTest("1");
+//    }
 }
