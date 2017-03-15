@@ -34,21 +34,21 @@ TabbedPage {
         event.accepted = true
     }
 
-    Tab {
-        title: "Overview"
-        iconName: "action/home"
+//    Tab {
+//        title: "Overview"
+//        iconName: "action/home"
 
-        sourceComponent: Rectangle {
-            color: Palette.colors.red["200"]
+//        sourceComponent: Rectangle {
+//            color: Palette.colors.red["200"]
 
-            Button {
-                anchors.centerIn: parent
-                darkBackground: true
-                text: "Go to tab 3"
-                onClicked: {}//page.selectedTab = 2
-            }
-        }
-    }
+//            Button {
+//                anchors.centerIn: parent
+//                darkBackground: true
+//                text: "Go to tab 3"
+//                onClicked: {}//page.selectedTab = 2
+//            }
+//        }
+//    }
 
 //    Tab {
 //        title: "离散度分析"
