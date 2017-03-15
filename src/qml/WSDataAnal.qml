@@ -4,10 +4,9 @@ import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
-//import XjUi 1.0
+import XjUi 1.0
 import Material 0.3
 
-import "../views"
 
 Item {
     property var sectionTitles: [ "报文分析", "离散度分析", "谐波分析", "向量分析", "序分量分析"]
