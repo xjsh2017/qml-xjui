@@ -50,14 +50,14 @@ TabbedPage {
         }
     }
 
-    Tab {
-        title: "离散度分析"
+//    Tab {
+//        title: "离散度分析"
 
-        sourceComponent: TimeDisperAnal {
-            id: timeDisperAnal
-//            model: page.model
-        }
-    }
+//        sourceComponent: TimeDisperAnal {
+//            id: timeDisperAnal
+////            model: page.model
+//        }
+//    }
 
     Tab {
         title: "谐波分析"

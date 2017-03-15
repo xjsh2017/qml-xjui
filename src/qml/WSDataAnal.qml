@@ -9,7 +9,7 @@ import Material 0.3
 
 
 Item {
-    property var sectionTitles: [ "报文分析", "离散度分析", "谐波分析", "向量分析", "序分量分析"]
+    property var sectionTitles: [ /*"报文分析", "离散度分析", */"谐波分析", "向量分析", "序分量分析"]
 
     function dp(number) {
 //        return Math.round(number * dp);
@@ -64,7 +64,7 @@ Item {
                 TabbedPages {
                     id: tabview
 
-                    selectedTabIndex: 3
+//                    selectedTabIndex: 3
                     Layout.fillHeight: true;
                     Layout.minimumHeight: dp(200);
                 }
