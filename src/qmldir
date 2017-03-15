@@ -20,8 +20,9 @@ Chart.js 1.0 components/Charts/Chart.js
 HarmonicAnal 1.0 views/HarmonicAnal.qml
 SequenceAnal 1.0 views/SequenceAnal.qml
 TimeDisperAnal 1.0 views/TimeDisperAnal.qml
-VectorChart 1.0 views/VectorChart.qml
+VectorChartAnal 1.0 views/VectorChartAnal.qml
 WaveChartAnal 1.0 views/WaveChartAnal.qml
+TabbedPages 1.0 qml/TabbedPages.qml
 
 # core
 #singleton Calculator 1.0 core/Calculator.qml

@@ -35,7 +35,10 @@ qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
-INSTALLS += target qmldir views components core qmlfiles# icons
+stores.files = stores/*
+stores.path = $$[QT_INSTALL_QML]/XjUi/stores
+
+INSTALLS += target qmldir views components core qmlfiles stores# icons
 
 #---------------------------INSTALLS FILES end -------------------------------------
 # generate QML folder

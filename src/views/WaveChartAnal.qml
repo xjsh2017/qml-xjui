@@ -320,11 +320,10 @@ Item {
                                 onTriggered: {
                                     waveModel.sync();
                                     snackbar.open("All Charts Refreshed !")
-                                    return;
-//                                    for (var i = 0; i < root.wavePanelist.length; ++i){
-//                                        root.curvelist[i].plotHandler = 0;
-//                                        root.curvelist[i].requestPaint();
-//                                    }
+                                    for (var i = 0; i < root.wavePanelist.length; ++i){
+                                        root.curvelist[i].plotHandler = 0;
+                                        root.curvelist[i].requestPaint();
+                                    }
                                 }
                             }
                         }
