@@ -19,7 +19,16 @@ WaveAnalDataModel::WaveAnalDataModel(QObject *parent)
 void WaveAnalDataModel::reset()
 {
     m_x.clear();
+    setChannelCount(m_channelCount);
+}
+
+void WaveAnalDataModel::setChannelCount(int arg)
+{
+    m_channelCount = arg;
     m_y.clear();
+
+    for (int i = 0; i < m_channelCount; i++)
+        m_y.append(QList<qreal>());
 }
 
 QList<qreal> WaveAnalDataModel::x_data()
@@ -55,12 +64,13 @@ void WaveAnalDataModel::xAppend(QList<qreal> rowValue, bool needQueen)
 
 void WaveAnalDataModel::yAppend(int idx, qreal value, bool needQueen)
 {
-    QList<qreal> tmp = m_y.at(idx);
+    if (m_channelCount < 1 || m_y.size() < m_channelCount)
+        return;
+
     if (needQueen){
-        tmp.removeLast();
+        m_y[idx].removeLast();
     }
-    tmp.append(value);
-    m_y.replace(idx, tmp);
+    m_y[idx].append(value);
 
     if (m_notify)
     emit yChanged(m_y);
@@ -68,6 +78,8 @@ void WaveAnalDataModel::yAppend(int idx, qreal value, bool needQueen)
 
 void WaveAnalDataModel::yAppend(int idx, QList<qreal> rowValue, bool needQueen)
 {
+    if (m_channelCount < 1 || m_y.size() < m_channelCount)
+        return;
     QList<qreal> tmp = m_y.at(idx);
     if (needQueen){
         popFront(tmp, rowValue.size());
@@ -81,6 +93,8 @@ void WaveAnalDataModel::yAppend(int idx, QList<qreal> rowValue, bool needQueen)
 
 void WaveAnalDataModel::yAppend(QList<QList<qreal> > matrix, bool needQueen)
 {
+    if (m_channelCount < 1 || m_y.size() < m_channelCount)
+        return;
     if (needQueen){
         for (int i = 0; i < matrix.size(); i++){
             yAppend(i, matrix.at(i), needQueen);

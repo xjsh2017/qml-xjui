@@ -86,6 +86,8 @@ Q_SIGNALS:
     void jsonChanged(QString arg);
 private:
 
+    int m_channelCount;
+
 signals:
     void modelDataChanged();    // 数据模型变化请求同步信号
 
@@ -98,6 +100,7 @@ public:
     explicit WaveAnalDataModel(QObject *parent = 0);
 
     Q_INVOKABLE void reset();
+    Q_INVOKABLE void setChannelCount(int arg);
 
     Q_INVOKABLE QList<qreal> x_data();
     Q_INVOKABLE QList<qreal> y_data(int idx);
