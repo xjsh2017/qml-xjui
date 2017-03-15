@@ -79,5 +79,8 @@ QtObject {
     }
 
     Component.onCompleted: {
+        Theme.primaryColor = "#00bcd4";
+        Theme.accentColor = "#ff9800";
+        Theme.tabHighlightColor = "white";
     }
 }

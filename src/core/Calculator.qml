@@ -89,7 +89,7 @@ QtObject {
 
     property  bool isNeedUpdate: false;
 
-    property var internalDataModel: waveModel
+    property var internalDataModel/*: waveModel*/
 //    property string test: internalDataModel ? internalDataModel.test : ""
 
 //    onTestChanged: {

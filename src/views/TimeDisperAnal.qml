@@ -94,7 +94,8 @@ Item {
             chartType: ChartType.bar;
 
             onWidthChanged: {
-//                console.log(width);
+                console.log(width);
+                repaint();
             }
 
             chartData: {
@@ -154,7 +155,6 @@ Item {
             }
 
         }
-
     }
 
     Component.onCompleted: {

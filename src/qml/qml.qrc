@@ -2,5 +2,9 @@
     <qresource prefix="/quick">
         <file>Simple.qml</file>
         <file>WSWaveChartAnal.qml</file>
+        <file>WSTimeDisperAnal.qml</file>
+        <file>WSHarmonicAnal.qml</file>
+        <file>WSSequenceAnal.qml</file>
+        <file>WSVectorChartAnal.qml</file>
     </qresource>
 </RCC>
