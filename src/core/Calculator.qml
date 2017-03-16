@@ -161,50 +161,57 @@ QtObject {
 
       */
     function analHarmonic(model, index) {
+        if (!isModelValid(model)){
+            log("Error anal model !");
+            return;
+        }
+
         if (arguments.length < 1){
             log("Error using analHarmonic (line 46) \nThere should be 1 arguments at least.");
             return NaN;
         }
         index = (arguments[1] || arguments[1] == 0) ? arguments[1] : -1;
 
-        var channelModel = model.listModel;
-        var sampleModel = model.sampleModel;
-        var analModel = model.analModel
-        var size = model.getDataSize();
+        var channels = model.channels;
+        var sample = model.sample;
+        var analyzer = model.analyzer
 
-        if (!isModelValid(model)
-                || size.cols < analModel.periodSampleCount
-                || model.curSamplePos < analModel.periodSampleCount)
-            return NaN;
-        log("analHarmonic: rows = " + size.rows + ", cols = " + size.cols)
-        log("analHarmonic: curSamplePos = " + analModel.curSamplePos)
+        var period = analyzer.periodSampleCount;
+        var pos = analyzer.curSamplePos;
+        var nMax = analyzer.maxHarmonicTimes;
 
-        var period = analModel.periodSampleCount;
-        var pos = analModel.curSamplePos;
-        var nMax = analModel.maxHarmonicTimes;
+        var rows = model.getDataRows();
+        var cols = model.getDataCols();
+
+        if (cols < period || pos <= period)
+            return;
 
         // 逐个通道分析
-        for (var i = 0; i < size.rows; i++){
+        for (var i = 0; i < rows; i++){
             if (index != -1 && i != index)
                 continue;
 
             log("harmonic: " + i + ", anal started ...");
 
-            var input = sampleModel.y_row(i, pos - period, pos).data;
+            var input = sample.y_row(i, pos - period, pos).data;
+            var harmon = model.getPropValue(i, "harmonic");
 
-            channelModel.get(i).harmonic[0] = analDC(input);
+            harmon[0] = analDC(input);
             for (var j = 1; j <= nMax; j++){
-                channelModel.get(i).harmonic[j] = analPeriodHarmonic(input, j);
+                harmon[j] = analPeriodHarmonic(input, j);
                 if (j == 1) // 基波幅值作为通道在该索引点的幅值
-                    channelModel.get(i).amp = channelModel.get(i).harmonic[j].amp;
+                    model.setPropValue(i, "amp", harmon[j].amp.toString());
             }
 
             // 谐波百分比计算， 各谐波的amp与基波的amp的比值百分数， 所以基波永远是100%
+            var amp = parseInt(model.getPropValue(i, "amp"));
             for (j = 0; j <= nMax; j++){
-                if (channelModel.get(i).amp > 1.0)
-                    channelModel.get(i).harmonic[j].percentage = channelModel.get(i).harmonic[j].amp / channelModel.get(i).amp;
+                if (j == 1)
+                    harmon[j].percentage = 1.0;
+                else if (isArray(harmon) && j <= harmon.length && amp > 1.0)
+                    harmon[j].percentage = harmon[j].amp / amp;
                 else
-                    channelModel.get(i).harmonic[j].percentage = 0.0;
+                    harmon[j].percentage = 0.0;
             }
         }
 

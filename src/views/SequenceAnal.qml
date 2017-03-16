@@ -1,10 +1,12 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
+import Material.ListItems 0.1 as ListItem
 
 import Material 0.2
 
 import "../components/VectorChart"
+import "../core"
 //import XjUi 1.0
 
 Item {
@@ -73,6 +75,21 @@ Item {
 
                 Item {
                     height: parent.height
+                    width: dp(2)
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: dp(1)
+
+                        height: parent.height * 3/4
+
+                        color: Theme.backgroundColor
+                    }
+
+                }
+
+                Item {
+                    height: parent.height
                     width: dp(80)
                     Label {
                         anchors.centerIn: parent
@@ -125,7 +142,7 @@ Item {
                     }
 
                     onClicked: {
-
+                        channelSettings.show();
                     }
                 }
 
@@ -177,5 +194,114 @@ Item {
             }
         }
 
+    }
+
+    Dialog {
+        id: channelSettings
+        title: qsTr("")
+
+        positiveButtonText: qsTr("确定")
+        negativeButtonText: qsTr("取消")
+
+        function updateModel() {
+            var tmp = [];
+
+            var cols = AnalDataModel.getChannelCount();
+            tmp[0] = "---"
+            for (var i = 0; i < cols; i++){
+                tmp.push("通道 " + (i + 1) + " : " + AnalDataModel.getPropValue(i, "name"));
+            }
+            return tmp
+        }
+
+        Item {
+
+            width: dp(300)
+            height: dp(380)
+
+            ColumnLayout {
+                id: column
+
+                property var sections: ["UA", "UB", "UC", "IA", "IB", "IC"]
+
+                anchors {
+                    fill: parent
+                    topMargin: dp(16)
+                    bottomMargin: dp(16)
+                }
+
+                Label {
+                    id: titleLabel
+
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        margins: dp(16)
+                    }
+
+                    style: "title"
+                    text: qsTr("序分量分析-通道选择")
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: dp(9)
+                }
+
+                MagicDivider {
+                    styleDivider:  1
+                    dash_len: 3
+                    color: Theme.accentColor
+                }
+
+//                Item {
+//                    Layout.fillWidth: true
+//                    Layout.preferredHeight: dp(9)
+//                }
+
+                Repeater{
+                    model: column.sections
+
+                    delegate: ListItem.Standard {
+                        content: RowLayout {
+                            anchors.centerIn: parent
+                            width: parent.width
+
+                            Item {
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.preferredWidth: 0.2 * parent.width
+
+                                Label {
+                                    anchors.centerIn: parent
+                                    text: modelData
+                                }
+                            }
+
+                            MenuField {
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.fillWidth: true
+
+                                model: []
+                                Component.onCompleted: {
+                                    model = channelSettings.updateModel();
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+
+                Item {
+                    Layout.fillHeight: true;
+                    Layout.fillWidth: true;
+                }
+            }
+
+        }
+
+        onRejected: {
+            // TODO set default colors again but we currently don't know what that is
+        }
     }
 }

@@ -1,6 +1,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
+import Material.ListItems 0.1 as ListItem
 
 import Material 0.2
 
@@ -106,6 +107,7 @@ Item {
 
                     width: dp(50)
                     height: parent.height
+                    visible: false
 
                     currentIndex: 2
                     model: ListModel {
@@ -133,6 +135,53 @@ Item {
                     }
                     Component.onCompleted: {
                         updateModel();
+                    }
+                }
+
+                Item {
+                    width: dp(80)
+                    height: parent.height
+
+                    property alias selectIdx: cmbMenu.selectedIndex
+
+                    ListItem.Standard {
+                        anchors.fill: parent
+
+                        content: RowLayout {
+                            anchors.centerIn: parent
+                            width: parent.width
+
+                            MenuField {
+                                id: cmbMenu
+                                anchors.fill: parent
+
+                                model: []
+                                Component.onCompleted: {
+                                    var tmp = [];
+                                    var cols = AnalDataModel.analyzer.maxHarmonicTimes;
+                                    for (var i = 2; i <= cols; i++){
+                                        tmp.push(i)
+                                    }
+                                    model = tmp;
+
+                                    selectedIndex = 7 - 2;
+                                }
+
+                                onItemSelected: {
+                                    if (table && table.showHarmonTimes)
+                                        table.showHarmonTimes = index + 2;
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        visible: false
+                        height: parent.height + dp(4)
+                        width: parent.width
+                        y: -dp(2)
+                        color:"transparent"
+                        border.color: "grey";
                     }
                 }
 
@@ -182,6 +231,7 @@ Item {
                 target: table
 
                 onSelectRowChanged: {
+                    console.log("onSelectRowChanged : " + index)
                     harmon.currentIndex = index;
                 }
             }

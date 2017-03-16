@@ -56,14 +56,18 @@ Item {
 
         function updateModel() {
             clear();
-            for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
+
+            var names = ["UA", "UB", "UC", "U1", "U2", "3U0", "IA", "IB", "IC", "I_1", "I_2", "3I0"];
+            var phase = ["A", "B", "C", "", "", "", "A", "B", "C", "", "", ""];
+            var unit = ["A", "B", "C", "", "", "", "A", "B", "C", "", "", ""];
+            for (var i = 0; i < names.length; i++){
                 if (!AnalDataModel.getPropValue(i, "visible"))
                     continue;
                 append({
                                    serial: i + 1,
-                                   name: AnalDataModel.getPropValue(i, "name"),
-                                   unit: AnalDataModel.getPropValue(i, "unit"),
-                                   phase: AnalDataModel.getPropValue(i, "phase"),
+                                   name: names[i],
+                                   unit: unit[i],
+                                   phase: phase[i],
                                    rms: AnalDataModel.getPropValue(i, "rms"),
                                    angle: AnalDataModel.getPropValue(i, "angle"),
                                }

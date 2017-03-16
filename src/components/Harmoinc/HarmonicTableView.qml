@@ -168,7 +168,7 @@ Item {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 onClicked: {
-                    table.currentRow = styleData.row;
+                    table.currentRow = modelChannel.get(styleData.row).serial - 1;
                     if(rowDelegate.sizeOpen == rowDelegate.height)
                     {
                         table.selection.deselect(styleData.row);
@@ -229,9 +229,10 @@ Item {
                 text: styleData.value
 
                 color: {
-                    var color = AnalDataModel.getChannelColor(styleData.row);
-                    if ( !styleData.selected && (styleData.column != 1 && styleData.column != 0)/* && color != "lightgrey"*/)
-                        return AnalDataModel.getChannelColor(parseInt(modelChannel.get(styleData.row).serial))
+                    var idx = parseInt(modelChannel.get(styleData.row).serial) - 1;
+                    var color = AnalDataModel.getChannelColor(idx);
+                    if ( color && !styleData.selected && (styleData.column != 1 && styleData.column != 0)/* && color != "lightgrey"*/)
+                        return color
 
                     return styleData.textColor;
                 }

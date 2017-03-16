@@ -13,7 +13,6 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    property var model: Calculator.model
     property int currentIndex: -1;      // 通道
 
 
@@ -31,44 +30,13 @@ Item {
         if (currentIndex < 0)
             return;
 
-//        {
-//                        "datasets": [{
-//                                         "data": [randomScalingFactor(),
-//                                             randomScalingFactor(),
-//                                             randomScalingFactor(),
-//                                             randomScalingFactor(),
-//                                             randomScalingFactor(),
-//                                             randomScalingFactor(),
-//                                             randomScalingFactor(),
-//                                             randomScalingFactor()
-//                                         ],
-//                                         "backgroundColor": [randomColor(),
-//                                             randomColor(),
-//                                             randomColor(),
-//                                             randomColor(),
-//                                             randomColor(),
-//                                             randomColor(),
-//                                             randomColor(),
-//                                             randomColor()
-//                                         ],
-//                                         "label": '0x4001 谐波分布'
-//                                     }],
-//                        "labels": ["直流","基波","2次谐波","3次谐波","4次谐波","5次谐波","6次谐波","7次谐波"]
-//                    }
-
-//        var js = {}
-
         for (var i = 0; i <= 7; i++){
-            chart.chartData.datasets[0].data[i] = (model.harmonic[currentIndex][i].percentage * 100).toFixed(2)
-//            if (i == 0)
-//                chart.chartData.datasets[0].label[i] = "直流分量： " + model.harmonic[currentIndex][i].amp.toFixed(2)
-//                        + ", " + (model.harmonic[currentIndex][i].percentage * 100).toFixed(2) + " %";
-//            else if (i == 1)
-//                chart.chartData.datasets[0].label[i] = "基波分量： " + model.harmonic[currentIndex][i].amp.toFixed(2)
-//                        + ", " + (model.harmonic[currentIndex][i].percentage * 100).toFixed(0) + " %";
-//            else
-//                chart.chartData.datasets[0].label[i] = i + " 次谐波分量： " + model.harmonic[currentIndex][i].amp.toFixed(2)
-//                        + ", " + (model.harmonic[currentIndex][i].percentage * 100).toFixed(2) + " %";
+            var harmon_value = AnalDataModel.getHarmonValue(currentIndex, i);
+            if (AnalDataModel.isHarmonValueValid(harmon_value))
+                chart.chartData.datasets[0].data[i] = (harmon_value.percentage * 100).toFixed(2);
+            else
+                chart.chartData.datasets[0].data[i] = 0;
+
             if (i == 0){
                 chart.chartData.labels[i] = "直流";
             }else if (i == 1){
@@ -79,12 +47,6 @@ Item {
             chart.chartData.datasets[0].backgroundColor[i] = Global.randomColor();
         }
     }
-
-//    onIsModelUpdateChanged: {
-//        updateChartData();
-
-//        chart.repaint();
-//    }
 
     onCurrentIndexChanged: {
         updateChartData();

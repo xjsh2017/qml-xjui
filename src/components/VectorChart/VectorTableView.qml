@@ -43,10 +43,11 @@ Item {
 
     function update() {
         for (var i = 0; i < modelChannel.count; i++){
-            modelChannel.setProperty(i, "rms", AnalDataModel.getPropValue(i, "rms"))
+            var idx = modelChannel.get(i).serial - 1;
+            modelChannel.setProperty(i, "rms", AnalDataModel.getPropValue(idx, "rms"))
             modelChannel.setProperty(i, "angle"
-                           , AnalDataModel.getPropValue(i, "angle") ?
-                                         "∠ " + AnalDataModel.getPropValue(i, "angle") + "°": " ")
+                           , AnalDataModel.getPropValue(idx, "angle") ?
+                                         "∠ " + AnalDataModel.getPropValue(idx, "angle") + "°": " ")
         }
     }
 
@@ -113,7 +114,7 @@ Item {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 onClicked: {
-                    table.currentRow = styleData.row;
+                    table.currentRow = modelChannel.get(styleData.row).serial - 1;
                     if(rowDelegate.sizeOpen == rowDelegate.height)
                     {
                         table.selection.deselect(styleData.row);
@@ -191,7 +192,7 @@ Item {
             }
 
             CheckBox {
-                checked: AnalDataModel.getPropValue(styleData.row, "selected")
+                checked: AnalDataModel.getPropValue(modelChannel.get(styleData.row).serial - 1, "selected")
                 anchors.verticalCenter: parent.verticalCenter
 
                 visible: styleData.column == 1
@@ -200,7 +201,8 @@ Item {
                 color: Theme.primaryColor
 
                 onCheckedChanged: {
-                    AnalDataModel.setPropValue(styleData.row, "selected", checked)
+                    var idx = modelChannel.get(styleData.row).serial - 1;
+                    AnalDataModel.setPropValue(idx, "selected", checked)
                     root.modelCheckedChanged()
                 }
             }

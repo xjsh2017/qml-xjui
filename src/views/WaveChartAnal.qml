@@ -19,9 +19,9 @@ Item {
     property int wavePannelWidth: dp(160)
     property int wavePannelHeight: dp(60)
 
-    property variant curvelist: []
-    property variant waveViewlist: []
-    property variant wavePanelist: []
+    property variant curvelist: new Array(50)
+    property variant waveViewlist: new Array(50)
+    property variant wavePanelist: new Array(50)
 
 
     // ///////////////////////////////////////////////////////////////
@@ -410,7 +410,7 @@ Item {
                                 function updatePanel() {
                                     visible = AnalDataModel.isChannelVisible(index);
 
-////                                    Calculator.analHarmonic(AnalDataModel, index); // 谐波分析
+                                    Calculator.analHarmonic(AnalDataModel, index); // 谐波分析
 
                                     var tmp = AnalDataModel.getYData(index);
                                     if (tmp){
@@ -424,6 +424,7 @@ Item {
 
                                         AnalDataModel.setPropValue(index, "rms", (fresult ? fresult.RMS.toFixed(2) : ""));
                                         AnalDataModel.setPropValue(index, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
+                                        AnalDataModel.analyzerResultUpdated();
                                     }
                                 }
 
