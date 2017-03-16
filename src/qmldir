@@ -3,15 +3,12 @@ module XjUi
 plugin XjUi
 
 # Components
-EntryCase 1.0 components/EntryCase.qml
-PageInfo 1.0 components/PageInfo.qml
 Groove.qml 1.0 components/Grover/Groove.qml
 WaveChart.qml 1.0 components/WaveChart/WaveChart.qml
 WaveChart.js 1.0 components/WaveChart/WaveChart.js
 VectorChart.qml 1.0 components/VectorChart/VectorChart.qml
 VectorTableView.qml 1.0 components/VectorChart/VectorTableView.qml
 Harmonic 1.0 components/Harmonic/Harmonic.qml
-QTableView.qml 1.0 components/QTableView.qml
 Chart.qml 1.0 components/Charts/Chart.qml
 ChartType.qml 1.0 components/Charts/ChartType.qml
 Chart.js 1.0 components/Charts/Chart.js

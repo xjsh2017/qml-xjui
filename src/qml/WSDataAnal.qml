@@ -59,12 +59,12 @@ Item {
                     Layout.minimumWidth: 100;
                 }
 
-//                TabbedPages {
-//                    id: tabview
+                TabbedPages {
+                    id: tabview
 
-//                    Layout.fillHeight: true;
-//                    Layout.minimumHeight: dp(200);
-//                }
+                    Layout.fillHeight: true;
+                    Layout.minimumHeight: dp(200);
+                }
             }
 
             View {

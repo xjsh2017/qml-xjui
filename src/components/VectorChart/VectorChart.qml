@@ -68,7 +68,7 @@ Canvas {
 
         maxRMS = tmp;
 
-        console.log("max RMS = " + maxRMS);
+        log("max RMS = " + maxRMS);
 
         return tmp;
     }
@@ -116,16 +116,16 @@ Canvas {
             r: plotWidth / 2 - fontSize - dp(3)
         }
 
-        var says = "init size: "
-                + "\n\t Canvas: width = " + width.toFixed(3) + ", height = " + height.toFixed(3)
-                + "\n\t Margins: (" + plotMargins.leftMargin + ", " + plotMargins.rightMargin + ", "
-                    + plotMargins.topMargin + ", " + plotMargins.bottomMargin + ")"
-                + "\n\t Plot Area: width = " + plotArea.width.toFixed(3) + ", height = " + plotArea.height.toFixed(3)
-                + "\n\t\t leftTop = (" + plotArea.leftTop.x.toFixed(3) + ", " + plotArea.leftTop.y.toFixed(3) + ")"
-                + "\n\t\t rightBottom = (" + plotArea.rightBottom.x.toFixed(3) + ", " + plotArea.rightBottom.y.toFixed(3) + ")"
-                + "\n\t\t center = (" + plotArea.center.x.toFixed(3) + ", " + plotArea.center.y.toFixed(3) + ")"
+//        var says = "init size: "
+//                + "\n\t Canvas: width = " + width.toFixed(3) + ", height = " + height.toFixed(3)
+//                + "\n\t Margins: (" + plotMargins.leftMargin + ", " + plotMargins.rightMargin + ", "
+//                    + plotMargins.topMargin + ", " + plotMargins.bottomMargin + ")"
+//                + "\n\t Plot Area: width = " + plotArea.width.toFixed(3) + ", height = " + plotArea.height.toFixed(3)
+//                + "\n\t\t leftTop = (" + plotArea.leftTop.x.toFixed(3) + ", " + plotArea.leftTop.y.toFixed(3) + ")"
+//                + "\n\t\t rightBottom = (" + plotArea.rightBottom.x.toFixed(3) + ", " + plotArea.rightBottom.y.toFixed(3) + ")"
+//                + "\n\t\t center = (" + plotArea.center.x.toFixed(3) + ", " + plotArea.center.y.toFixed(3) + ")"
 
-        log(says)
+//        log(says)
     }
 
     function drawScale() {
@@ -282,18 +282,18 @@ Canvas {
         var y1 = { 1: m1, 2: m2, 3: m1, 4: m2 }
         var y2 = { 1: m1, 2: m1, 3: m2, 4: m2 }
 
-        console.log("p0: " + Qt.point(x0, y0) + ", p: " + Qt.point(x,y)
-                    + "\n\t r = " + r + ", angle = " + (angle * 180 / Math.PI).toFixed(3)
-                    + "\n\t c = " + c
-                    + "\n\t d = " + d
-                    + "\n\t e = " + e
-                    + "\n\t v1 = " + v1
-                    + "\n\t v2 = " + v2
-                    + "\n\t m1 = " + m1
-                    + "\n\t m2 = " + m2
-                    + "\n\t p1 = " + Qt.point(x1[2], y1[2])
-                    + "\n\t p1 = " + Qt.point(x2[2], y2[2])
-                    )
+//        log("p0: " + Qt.point(x0, y0) + ", p: " + Qt.point(x,y)
+//                    + "\n\t r = " + r + ", angle = " + (angle * 180 / Math.PI).toFixed(3)
+//                    + "\n\t c = " + c
+//                    + "\n\t d = " + d
+//                    + "\n\t e = " + e
+//                    + "\n\t v1 = " + v1
+//                    + "\n\t v2 = " + v2
+//                    + "\n\t m1 = " + m1
+//                    + "\n\t m2 = " + m2
+//                    + "\n\t p1 = " + Qt.point(x1[2], y1[2])
+//                    + "\n\t p1 = " + Qt.point(x2[2], y2[2])
+//                    )
 
         return {
             p1: Qt.point(x1[2], y1[2]),

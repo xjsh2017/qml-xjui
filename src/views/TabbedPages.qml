@@ -19,7 +19,8 @@ import QtQuick 2.4
 import Material 0.2
 import Material.ListItems 0.1 as ListItem
 
-import XjUi 1.0
+//import XjUi 1.0
+import "../views"
 
 TabbedPage {
     id: page
@@ -64,6 +65,8 @@ TabbedPage {
 
         sourceComponent:  HarmonicAnal{
             id: harmonicAnal
+
+            titleName: title
         }
     }
 
@@ -72,6 +75,8 @@ TabbedPage {
 
         sourceComponent: VectorChartAnal {
             id: vec
+
+            titleName: title
         }
     }
 
@@ -80,6 +85,8 @@ TabbedPage {
 
         sourceComponent: SequenceAnal {
             id: sequenceAnal
+
+            titleName: title
         }
     }
 

@@ -23,8 +23,6 @@ Item {
     property variant waveViewlist: []
     property variant wavePanelist: []
 
-    property  real grooveXPlot: 0
-
 
     // ///////////////////////////////////////////////////////////////
 
@@ -491,6 +489,7 @@ Item {
                                 width: waveFrameView.width - wavePanel.width - parent.spacing
 
                                 backgroundColor: Global.g_plotBackgroundColor
+                                visible: AnalDataModel.isChannelVisible(modelData)
 
                                 WaveChart {
                                     id: curve;
@@ -505,8 +504,6 @@ Item {
 //                                    model: wca.model
                                     index: modelData
                                     grooveColor: Global.g_modeColor
-
-                                    grooveXPlot: root.grooveXPlot
 
                                     chartDatasetOptions: {
                                         "fillColor": "transparent",
@@ -554,13 +551,12 @@ Item {
                                 target: curve
 
                                 onGrooveXPlotChanged: {
-                                    console.log(wca.curvelist.length)
+                                    console.log("wca.curvelist.length = " + wca.curvelist.length)
                                     for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
                                         if (wca.curvelist[i] == curve)
                                             continue;
                                         if (curve.grooveXPlot == wca.curvelist[i].grooveXPlot)
                                             continue;
-
 
                                         console.log("wca.curvelist[" + i + "].grooveXPlot = "
                                                     + wca.curvelist[i].grooveXPlot)
@@ -575,9 +571,9 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                wca.waveViewlist[index] = waveView
                                 wca.curvelist[index] = curve;
                                 wca.wavePanelist[index] = wavePanel;
+                                wca.waveViewlist[index] = waveView
                             }
                         }
                     }
@@ -791,6 +787,23 @@ Item {
 
         AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
         var sample = AnalDataModel.sample;
+
+        Theme.primaryColor = "#00bcd4";
+        Theme.accentColor = "#ff9800";
+        Theme.tabHighlightColor = "white";
+
+        var harmon = AnalDataModel.getPropValue(1, "harmonic");
+        log(Matlab.isArray(harmon))
+
+        var test = {
+            n: 1,
+            real: 20.5,
+            img: -31.8,
+            amp: 28.99,
+            angle: 35.6,
+            percentage: 0.125
+        }
+        log("AnalDataModel.isHarmonValueValid(test) = " + AnalDataModel.isHarmonValueValid(test));
 
         log("wca.curvelist = " + wca.curvelist);
     }

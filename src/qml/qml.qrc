@@ -2,5 +2,6 @@
     <qresource prefix="/quick">
         <file>Simple.qml</file>
         <file>WSDataAnal.qml</file>
+        <file>OnlineWaveMon.qml</file>
     </qresource>
 </RCC>

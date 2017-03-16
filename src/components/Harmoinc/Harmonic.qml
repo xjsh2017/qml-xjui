@@ -16,8 +16,6 @@ Item {
     property var model: Calculator.model
     property int currentIndex: -1;      // 通道
 
-    property bool isModelUpdate: Calculator.isNeedUpdate
-
 
     // ///////////////////////////////////////////////////////////////
 
@@ -82,11 +80,11 @@ Item {
         }
     }
 
-    onIsModelUpdateChanged: {
-        updateChartData();
+//    onIsModelUpdateChanged: {
+//        updateChartData();
 
-        chart.repaint();
-    }
+//        chart.repaint();
+//    }
 
     onCurrentIndexChanged: {
         updateChartData();

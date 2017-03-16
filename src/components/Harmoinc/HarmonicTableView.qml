@@ -17,10 +17,7 @@ Item {
     width: 800
     height:600
 
-    property var channelModel: AnalDataModel.listModel
-    property var analyzer: AnalDataModel.analyzer
-    property bool isModelUpdate: Calculator.isNeedUpdate
-    property int nShowHarmonTimes: 7
+    property int showHarmonTimes: 7
 
     // ///////////////////////////////////////////////////////////////
 
@@ -38,11 +35,6 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    onIsModelUpdateChanged: {
-        log("Model Changed detected!")
-        update();
-    }
-
     Connections {
         target: AnalDataModel
 
@@ -56,6 +48,12 @@ Item {
         modelChannel.updateModel();
     }
 
+    onShowHarmonTimesChanged: {
+        log("onShowHarmonTimesChanged")
+//        modelChannel.updateModel();
+        table.update();
+    }
+
     ListModel
     {
         id: modelChannel
@@ -63,18 +61,22 @@ Item {
         function updateModel() {
             clear();
 
-            var cols = Math.min(nShowHarmonTimes, analyzer.maxHarmonicTimes) + 1;
             for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
-
+                if (!AnalDataModel.getPropValue(i, "visible"))
+                    continue;
                 var js = {};
                 js["serial"] = i + 1;
-                js["name"] = channelModel.get(i).name;
+                js["name"] = AnalDataModel.getPropValue(i, "name");
 
-                console.log(channelModel.get(i).harmonic[0])
-//                for (var j = 0; j < cols; j ++){
-//                    js[j] = channelModel.get(i).harmonic[j].amp.toFixed(3) + ", "
-//                            + (channelModel.get(i).harmonic[j].percentage * 100).toFixed(2) + " %";
-//                }
+                for (var j = 0; j <= AnalDataModel.analyzer.maxHarmonicTimes; j ++){
+                    var harmon_value = AnalDataModel.getHarmonValue(i, j);
+                    if (harmon_value && AnalDataModel.isHarmonValueValid(harmon_value)){
+                        js[j] = harmon_value.amp.toFixed(3) + ", "
+                                + (harmon_value.percentage * 100).toFixed(2) + " %";
+                    }else{
+                        js[j] = "";
+                    }
+                }
 
                 append(js);
             }
@@ -88,9 +90,53 @@ Item {
 
         model: modelChannel
 
+        function createResources() {
+            resources = [];
+            var roleList = roleNames
+            var titleList = titleNames
+            var widthList = widths
+            var cols = AnalDataModel.analyzer.maxHarmonicTimes + 1;//Math.min(showHarmonTimes, AnalDataModel.analyzer.maxHarmonicTimes) + 1;
+            for (var i = 2; i < cols; i++){
+                roleList.push(i.toString());
+                titleList.push(i + "次谐波");
+                widthList.push(100)
+            }
 
-        property var roleNames: [" ", "serial", "name","0", "1", "2", "3", "4", "5", "6", "7"]
-        property var titleNames: [" ", "序号", "通道名称","直流分量", "基波", "2次谐波", "3次谐波", "4次谐波", "5次谐波", "6次谐波", "7次谐波"]
+            var temp = []
+            for(i=0; i<roleList.length; i++)
+            {
+                var role  = roleList[i];
+                var title  = titleList[i];
+                var width = widthList[i];
+                temp.push(columnComponent.createObject(table,
+                                                       {
+                                                           "role": role,
+                                                           "title": title,
+                                                           "width": width,
+                                                           "horizontalAlignment": Text.AlignHCenter
+                                                       }))
+                if (i - 4 >= showHarmonTimes)
+                    temp[i].visible = false;
+            }
+
+            resources = temp;
+
+            return temp;
+        }
+
+        function update() {
+            log("resources.length = " + resources.length)
+            for (var i = 5; i < resources.length; i++){
+                if (i >= showHarmonTimes + 4)
+                    resources[i].visible = false;
+                else
+                    resources[i].visible = true;
+            }
+        }
+
+        property var roleNames: [" ", "serial", "name","0", "1"]
+        property var titleNames: [" ", "通道编号", "通道名称","直流分量", "基波"]
+        property var widths: [1, 60, 150, 100, 100]
 
         rowDelegate: View {
             id: rowDelegate
@@ -153,7 +199,7 @@ Item {
             elevation: 1
             height: dp(24)
 
-            backgroundColor: Theme.primaryColor
+            backgroundColor: Theme.backgroundColor
 
             Text {
                 id: textItem
@@ -178,9 +224,18 @@ Item {
         itemDelegate: Item {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                color: styleData.textColor
+                anchors.centerIn: parent
                 elide: styleData.elideMode
                 text: styleData.value
+
+                color: {
+                    var color = AnalDataModel.getChannelColor(styleData.row);
+                    if ( !styleData.selected && (styleData.column != 1 && styleData.column != 0)/* && color != "lightgrey"*/)
+                        return AnalDataModel.getChannelColor(parseInt(modelChannel.get(styleData.row).serial))
+
+                    return styleData.textColor;
+                }
+
 
                 font {
                     family: "微软雅黑"
@@ -190,205 +245,11 @@ Item {
             }
         }
 
-        resources:{
-            var roleList = roleNames
-            var titleList = titleNames
-            var temp = []
-            for(var i=0; i<roleList.length; i++)
-            {
-                var role  = roleList[i];
-                var title  = titleList[i]
-                if (i == 0){
-                    temp.push(columnComponent.createObject(table, { "role": role, "title": title, width: 1}))
-                    continue;
-                } else if (i == 1) {
-                    temp.push(columnComponent.createObject(table, { "role": role, "title": title, width: 30}))
-                    continue;
-                }
-
-                temp.push(columnComponent.createObject(table, { "role": role, "title": title}))
-            }
-            return temp
-        }
+        resources: createResources()
 
         onCurrentRowChanged: {
             selectRowChanged(currentRow);
         }
-
-        // columns go here...
-//        TableViewColumn {
-//            id: icon
-//            width: 1
-//            delegate: Item{
-//                anchors.fill: parent
-//                clip: !styleData.selected
-//                Rectangle {
-//                    clip:false
-//                    anchors.top: parent.top
-//                    anchors.bottom: parent.bottom
-//                    anchors.left: parent.left
-//                    //height: 60
-//                    width: table.width
-////                    color: "#4db6ac"
-//                    color: Theme.accentColor
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: colNumber
-//            role: "serialNum"
-//            title: "序号"
-//            width: 80
-//            delegate: Item {
-//                id: itemFirst
-//                clip:true
-//                anchors.fill: parent
-
-//                CheckBox {
-//                    checked: false
-//                    anchors.verticalCenter: parent.verticalCenter
-
-//                    color: Theme.primaryColor
-//                    text: styleData.row + 1
-
-//                    onCheckedChanged: {
-//                        console.log(styleData.row + ", Checked: " + checked);
-//                        root.model.check[styleData.row] = checked;
-//                        root.modelCheckedChanged()
-//                    }
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: colName
-//            role: "name"
-//            title: "通道名称"
-//            width: 200
-//            delegate: Item {
-//                clip:true
-//                anchors.fill: parent
-
-//                Text {
-//                    anchors {
-//                        verticalCenter: parent.verticalCenter
-//                        left: parent.left
-//                        leftMargin: dp(3)
-//                    }
-
-//                    text: styleData.value
-
-//                    color: {
-//                        if ( modelChannel && modelChannel.get(styleData.row) && modelChannel.get(styleData.row).phase)
-//                            return Global.phaseTypeColor(modelChannel.get(styleData.row).phase)
-
-//                        return Qt.rgba(0,0,0,1)//ThemePalette.textColor;
-//                    }
-
-//                    elide: Text.ElideRight
-
-
-
-//                    font {
-//                        family: "微软雅黑"
-//                        weight: Font.Light
-//                        pixelSize: dp(12)
-//                    }
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: youxiao
-//            role: "rms"
-//            title: "有效值"
-//            width: 100
-//            delegate: Item {
-//                anchors.fill: parent
-//                clip: true
-//                Text{
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    text: styleData.value
-//                    elide: Text.ElideRight
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: angle
-//            role: "angle"
-//            title: "相角"
-//            width: 100
-//            delegate: Item {
-//                anchors.fill: parent
-//                clip: true
-//                Text{
-//                    anchors.verticalCenter: parent.verticalCenter
-//                    text: styleData.value
-//                    elide: Text.ElideRight
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: phase
-//            role: "phase"
-//            title: "相别"
-//            width: 60
-//            horizontalAlignment: Text.AlignHCenter
-//            delegate: Item {
-//                id: cc
-//                anchors.fill: parent
-//                clip: true
-//                property alias text: content.text
-
-//                Text{
-//                    id: content
-//                    anchors.centerIn: parent;
-//                    text: styleData.value
-//                    elide: Text.ElideRight
-
-//                    color: Global.phaseTypeColor(text)
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: unit
-//            role: "unit"
-//            title: "单位"
-//            width: 60
-//            horizontalAlignment: Text.AlignHCenter
-//            delegate: Item {
-//                anchors.fill: parent
-//                clip: true
-//                Text{
-//                    id:txt2
-//                    anchors.centerIn: parent;
-//                    text: styleData.value
-//                    elide: Text.ElideRight
-//                }
-//            }
-//        }
-
-//        TableViewColumn {
-//            id: precision
-//            role: "precision"
-//            title: "精度系数"
-//            width: 100
-//            delegate: Item {
-//                anchors.fill: parent
-//                clip: true
-//                Text{
-//                    anchors.centerIn: parent;
-//                    text: styleData.value
-//                    elide: Text.ElideRight
-//                }
-//            }
-//        }
-
-
     }
 
     Component
@@ -398,7 +259,11 @@ Item {
     }
 
     Component.onCompleted: {
-        if (root.channelModel)
+        if (AnalDataModel.isModelValid())
             modelChannel.updateModel();
+    }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
     }
 }

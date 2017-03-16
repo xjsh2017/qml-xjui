@@ -69,48 +69,17 @@ void MainWindow::setupUi()
     m_qwWaveAnal = new QQuickWidget();
     m_qwWaveAnal->setObjectName(QStringLiteral("qwWaveAnal"));
     m_qwWaveAnal->setResizeMode(QQuickWidget::SizeRootObjectToView );
-    QQmlComponent *component = new QQmlComponent(m_qwWaveAnal->engine());
-    component->setData("import QtQuick 2.4\n import XjUi 1.0 \n WaveChartAnal{}", QUrl());
-    m_qwWaveAnal->setContent(QUrl(), component, component->create());
+    m_qwWaveAnal->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
     m_qwWaveData = new WaveAnalDataModel();
-
-//    int nMax = 5000;
-//    int nCount = 1800;
-//    m_qwWaveData->setXData(random(nMax, nCount));
-//    for (int i = 0; i < 10; ++i)
-//    {
-//        QList<qreal> y = random(nMax, nCount);
-
-//        for (int j = 0; j < nCount; ++j)
-//        {
-//            m_qwWaveData->yAppend(i, y.at(j) - nMax / 2);
-//        }
-//    }
     m_qwWaveAnal->rootContext()->setContextProperty("waveModel", m_qwWaveData);
 
     tabw->addTab(m_qwWaveAnal, QStringLiteral("Wave - Sample1"));
-    tabw->removeTab(0);
 
     m_qwWaveAnal2 = new QQuickWidget();
     m_qwWaveAnal2->setObjectName(QStringLiteral("qwWaveAnal"));
     m_qwWaveAnal2->setResizeMode(QQuickWidget::SizeRootObjectToView );
-    component = new QQmlComponent(m_qwWaveAnal2->engine());
-    component->setData("import QtQuick 2.4\n import XjUi 1.0 \n WaveChartAnal{}", QUrl());
-    m_qwWaveAnal2->setContent(QUrl(), component, component->create());
+    m_qwWaveAnal2->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
     m_qwWaveData2 = new WaveAnalDataModel();
-
-//    nMax = 10000;
-//    nCount = 1600;
-//    m_qwWaveData2->setXData(random(nMax, nCount));
-//    for (int i = 0; i < 10; ++i)
-//    {
-//        QList<qreal> y = random(nMax, nCount);
-
-//        for (int j = 0; j < nCount; ++j)
-//        {
-//            m_qwWaveData2->yAppend(i, y.at(j) - nMax / 2);
-//        }
-//    }
     m_qwWaveAnal2->rootContext()->setContextProperty("waveModel", m_qwWaveData2);
 
     tabw->addTab(m_qwWaveAnal2, QStringLiteral("Wave - Sample2"));
