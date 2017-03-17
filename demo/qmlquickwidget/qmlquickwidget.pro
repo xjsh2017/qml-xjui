@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = qmldemo
+TARGET = qmlquickwidget
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -24,9 +24,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    qxjquickwidget.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    qxjquickwidget.h
 
 FORMS    += mainwindow.ui
 

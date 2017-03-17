@@ -27,7 +27,7 @@ Item {
         id: verticallayout
 
         anchors.fill: parent
-        spacing: dp(2)
+        spacing: dp(0)
 
         // 工具栏
         View {

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QQuickWidget>
+#include "qxjquickwidget.h"
 #include <QQuickView>
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_qwWaveData;
+    delete m_qwWaveView;
 }
 
 /*
@@ -66,14 +68,14 @@ void MainWindow::setupUi()
     tabw->removeTab(0);
 
     // 波形图
-    m_qwWaveAnal = new QQuickWidget();
-    m_qwWaveAnal->setObjectName(QStringLiteral("qwWaveAnal"));
-    m_qwWaveAnal->setResizeMode(QQuickWidget::SizeRootObjectToView );
-    m_qwWaveAnal->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
+    m_qwWaveView = new QXJQuickWidget(this);
+    m_qwWaveView->setObjectName(QStringLiteral("qwWaveAnal"));
+    m_qwWaveView->setResizeMode(QQuickWidget::SizeRootObjectToView );
+    m_qwWaveView->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
     m_qwWaveData = new WaveAnalDataModel();
-    m_qwWaveAnal->rootContext()->setContextProperty("waveModel", m_qwWaveData);
+    m_qwWaveView->rootContext()->setContextProperty("waveModel", m_qwWaveData);
 
-    tabw->addTab(m_qwWaveAnal, QStringLiteral("Wave - Sample1"));
+    tabw->addTab(m_qwWaveView, QStringLiteral("Wave - Sample1"));
 
 //    m_qwWaveAnal2 = new QQuickWidget();
 //    m_qwWaveAnal2->setObjectName(QStringLiteral("qwWaveAnal"));
@@ -87,20 +89,5 @@ void MainWindow::setupUi()
 
 void MainWindow::currentChanged(int index)
 {
-    qDebug() << index;
 
-//    if (index == 0)
-//    {
-//        qDebug()<< m_qwWaveAnal->rootContext();
-//        if (m_qwWaveData->test() == "1")
-//            m_qwWaveData->setTest("0");
-//        else
-//            m_qwWaveData->setTest("1");
-//    }else if (index == 1){
-//        qDebug()<< m_qwWaveAnal2->rootContext();
-//        if (m_qwWaveData2->test() == "1")
-//            m_qwWaveData2->setTest("0");
-//        else
-//            m_qwWaveData2->setTest("1");
-//    }
 }

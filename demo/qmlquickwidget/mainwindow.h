@@ -26,7 +26,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QQuickWidget *m_qwWaveAnal; // Qml波形分析图
+    QQuickWidget *m_qwWaveView; // Qml波形分析图
     QQuickWidget *m_qwWaveAnal2; // Qml波形分析图2
     WaveAnalDataModel *m_qwWaveData; // Qml波形分析数据
     WaveAnalDataModel *m_qwWaveData2; // Qml波形分析数据2
