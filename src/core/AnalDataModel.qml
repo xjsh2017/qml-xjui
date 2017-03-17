@@ -199,15 +199,27 @@ QtObject {
         }
     }
 
-    function getXData(index, start, end){
+    function getXRow(index, start, end){
         if (index < getChannelCount() && sample && sample.x_row){
             return sample.x_row(index, start, end).data;
         }
     }
 
-    function getYData(index, start, end){
+    function getYRow(index, start, end){
         if (index < getChannelCount() && sample && sample.y_row){
             return sample.y_row(index, start, end).data;
+        }
+    }
+
+    function getXData(rowIdx, colIdx){
+        if (rowIdx < getChannelCount() && sample && sample.x_data){
+            return sample.x_data(rowIdx, colIdx);
+        }
+    }
+
+    function getYData(rowIdx, colIdx){
+        if (rowIdx < getChannelCount() && sample && sample.y_data){
+            return sample.y_data(rowIdx, colIdx);
         }
     }
 

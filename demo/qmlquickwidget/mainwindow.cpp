@@ -75,14 +75,14 @@ void MainWindow::setupUi()
 
     tabw->addTab(m_qwWaveAnal, QStringLiteral("Wave - Sample1"));
 
-    m_qwWaveAnal2 = new QQuickWidget();
-    m_qwWaveAnal2->setObjectName(QStringLiteral("qwWaveAnal"));
-    m_qwWaveAnal2->setResizeMode(QQuickWidget::SizeRootObjectToView );
-    m_qwWaveAnal2->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
-    m_qwWaveData2 = new WaveAnalDataModel();
-    m_qwWaveAnal2->rootContext()->setContextProperty("waveModel", m_qwWaveData2);
+//    m_qwWaveAnal2 = new QQuickWidget();
+//    m_qwWaveAnal2->setObjectName(QStringLiteral("qwWaveAnal"));
+//    m_qwWaveAnal2->setResizeMode(QQuickWidget::SizeRootObjectToView );
+//    m_qwWaveAnal2->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
+//    m_qwWaveData2 = new WaveAnalDataModel();
+//    m_qwWaveAnal2->rootContext()->setContextProperty("waveModel", m_qwWaveData2);
 
-    tabw->addTab(m_qwWaveAnal2, QStringLiteral("Wave - Sample2"));
+//    tabw->addTab(m_qwWaveAnal2, QStringLiteral("Wave - Sample2"));
 }
 
 void MainWindow::currentChanged(int index)

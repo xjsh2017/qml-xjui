@@ -15,14 +15,83 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    property int selectDataIndex: 0
     property int wavePannelWidth: dp(160)
     property int wavePannelHeight: dp(60)
 
-    property variant curvelist: new Array(50)
-    property variant waveViewlist: new Array(50)
-    property variant wavePanelist: new Array(50)
+    property  real grooveXPlot: 0;
+    property   int selectDataIndex: 0
 
+    property int maxCount: 50;
+
+    property var curvelist: new Array(maxCount)
+    property variant waveViewlist: new Array(maxCount)
+    property variant wavePanelist: new Array(maxCount)
+
+    onCurvelistChanged: {
+        log("onCurvelistChanged: curvelist = " + curvelist)
+    }
+
+    // 更新大标尺groove的位置和读数，更新其它波形的刻度线位置
+    onGrooveXPlotChanged: {
+        log("wca onGrooveXPlotChanged: new grooveXPlot = " + grooveXPlot);
+
+        groove.value = grooveXPlot + groove.minimumValue
+        log("setting groove x = " + groove.value);
+
+        // 更新其它波形的grooveXPlot
+        log("doing: setting other wave groove line x = " + grooveXPlot);
+        for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
+            var curve = wca.curvelist[i];
+            if (!curve || curve.grooveXPlot == grooveXPlot || !curve.visible)
+                continue;
+
+            curve.grooveXPlot = grooveXPlot;
+        }
+        log("done!: setting other wave groove line x = " + grooveXPlot);
+    }
+
+    // 计算分析新的索引位置
+    onSelectDataIndexChanged: {
+        log("wca onSelectDataIndexChanged: new selectDataIndex = " + selectDataIndex);
+
+        AnalDataModel.analyzer.curSamplePos = selectDataIndex;
+        log("AnalDataModel.analyzer.curSamplePos = " + selectDataIndex);
+
+        if (Global.g_plotMode == Global.enSampleMode)
+            groove.knobLabel = selectDataIndex;
+        log("setting groove label = " + selectDataIndex);
+
+        log("doing : Calculator.analHarmonic(AnalDataModel)");
+//        Calculator.analHarmonic(AnalDataModel); // 谐波分析
+        log("done! : Calculator.analHarmonic(AnalDataModel)");
+
+        log("doing : Calculator.analRMS(AnalDataModel)");
+        Calculator.analRMS(AnalDataModel);  // RMS 计算
+        log("done! : Calculator.analRMS(AnalDataModel)");
+        log("doing : wca.updatePanels()");
+        updatePanels()
+        log("done! : wca.updatePanels()");
+    }
+
+    function updatePanels() {
+        for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
+            var panel = wca.wavePanelist[i];
+            if (!panel || !panel.visible)
+                continue;
+
+            panel.updatePanel();
+        }
+    }
+
+    function repaintCurves(){
+        for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
+            var curve = wca.curvelist[i];
+            if (!curve || !curve.visible)
+                continue;
+
+            curve.repaint();
+        }
+    }
 
     // ///////////////////////////////////////////////////////////////
 
@@ -32,26 +101,6 @@ Item {
 
     function dp(di){
         return di;
-    }
-
-    function updatePanelCurves(type){
-        for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
-            if (type == 0)
-                wca.wavePanelist[i].updatePanel();
-            else if (type == 1)
-                wca.curvelist[i].updateCurve();
-            else{
-                wca.wavePanelist[i].updatePanel();
-                wca.curvelist[i].updateCurve();
-            }
-        }
-    }
-
-    function repaintAllCurves(){
-        for (var i = 0; i < wca.wavePanelist.length; ++i){
-            wca.curvelist[i].plotHandler = 0;
-            wca.curvelist[i].requestPaint();
-        }
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -234,7 +283,7 @@ Item {
                                     backgroundColor = "green"
                                 }
 
-                                updatePanelCurves(0);
+                                updatePanels();
                             }
                         }
 
@@ -323,9 +372,8 @@ Item {
                                 name: qsTr("Refresh (Ctrl + R)")
                                 hoverAnimation: true
                                 onTriggered: {
-                                    waveModel.sync();
-                                    repaintAllCurves();
-                                    snackbar.open("All Charts Refreshed !")
+                                    repaintCurves();
+                                    snackbar.open("All Curves Refreshed !")
                                 }
                             }
                         }
@@ -352,7 +400,7 @@ Item {
 
                     onScrollbarPosChanged : {
                         var deltaStartDataIndex = delta / Global.g_sampleRate;
-                        for (var i = 0; i < wca.curvelist.length; ++i){
+                        for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
                             wca.curvelist[i].startDataIndex +=
                                     (delta ? 1 : -1) * deltaStartDataIndex;
                         }
@@ -387,13 +435,13 @@ Item {
                     spacing: dp(0)
 
                     Repeater {
-                        model: Math.max(AnalDataModel.getChannelCount(), 40)
+                        model: Math.max(AnalDataModel.getChannelCount(), maxCount)
 
                         Row {
                             spacing: dp(2)
 
-                            property color drawColor: AnalDataModel.getChannelColor(index) ?
-                                                          AnalDataModel.getChannelColor(index) : Theme.backgroundColor
+                            property color drawColor: AnalDataModel.getChannelColor(modelData) ?
+                                                          AnalDataModel.getChannelColor(modelData) : Theme.backgroundColor
 
                             // 波形图面板
                             View {
@@ -407,24 +455,15 @@ Item {
 
                                 visible: AnalDataModel.isChannelVisible(modelData)
 
-                                function updatePanel() {
-                                    visible = AnalDataModel.isChannelVisible(index);
+                                function updatePanel(){
+                                    var value_rms = AnalDataModel.getPropValue(index, "rms");
+                                    var value_angle = AnalDataModel.getPropValue(index, "angle");
+                                    var value_instant = AnalDataModel.getYData(index, selectDataIndex).toFixed(2);
 
-                                    Calculator.analHarmonic(AnalDataModel, index); // 谐波分析
-
-                                    var tmp = AnalDataModel.getYData(index);
-                                    if (tmp){
-                                        var fresult = Calculator.calcRMS(tmp, curve.selectDataIndex
-                                                                         , AnalDataModel.analyzer.periodSampleCount);
-                                        tmp = AnalDataModel.sample.y[index][curve.selectDataIndex].toFixed(2);
-                                        if (btnValueType.valueType == 1){
-                                            tmp = (fresult ? fresult.RMS.toFixed(2) : "#");
-                                        }
-                                        label_chnn_value.text = tmp + " ∠ " + (fresult ? fresult.angle.toFixed(2) : "#") + "°"
-
-                                        AnalDataModel.setPropValue(index, "rms", (fresult ? fresult.RMS.toFixed(2) : ""));
-                                        AnalDataModel.setPropValue(index, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
-                                        AnalDataModel.analyzerResultUpdated();
+                                    if (btnValueType.valueType == 1){
+                                        label_chnn_value.text = value_rms + " ∠ " + value_angle + "°"
+                                    }else{
+                                        label_chnn_value.text = value_instant + " ∠ " + value_angle + "°"
                                     }
                                 }
 
@@ -533,48 +572,66 @@ Item {
 
 
 
+                                    onGrooveXPlotChanged: {
+                                        var says = " curve: = " + curve
+                                                + ", index = " + index
+                                                + ", Event: = onGrooveXPlotChanged";
+
+                                        wca.grooveXPlot = curve.grooveXPlot; // 通知其它波形更新
+
+                                        console.log(says)
+
+//                                        groove.value = curve.grooveXPlot + groove.minimumValue
+//                                        if (curve.plotMode == Global.enSampleMode)
+//                                            groove.knobLabel = curve.selectDataIndex;
+
+    //                                    for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
+    //                                        if (wca.curvelist[i] == curve)
+    //                                            continue;
+    //                                        if (curve.grooveXPlot == wca.curvelist[i].grooveXPlot)
+    //                                            continue;
+
+    //                                        console.log("wca.curvelist[" + i + "].grooveXPlot = "
+    //                                                    + wca.curvelist[i].grooveXPlot)
+
+    //                                        wca.curvelist[i].grooveXPlot = curve.grooveXPlot;
+    //                                    }
+                                    }
+
+
+
                                     onSelectDataIndexChanged: {
-                                        AnalDataModel.analyzer.curSamplePos = selectDataIndex;
-                                        if (selectDataIndex < 0)
+                                        if (selectDataIndex < 0 || index >= AnalDataModel.getChannelCount())
                                             return;
 
-                                        if (visible)
-                                            wavePanel.updatePanel();
-                                        groove.value = curve.grooveXPlot + groove.minimumValue
-                                        if (plotMode == Global.enSampleMode)
-                                            groove.knobLabel = selectDataIndex;
+                                        var says = " curve: = " + curve
+                                                + ", index: = " + index
+                                                + ", Event: = onSelectDataIndexChanged";
+                                        says += "\n\t new selectDataIndex = " + curve.selectDataIndex;
+
+                                        wca.selectDataIndex = curve.selectDataIndex;
+                                        says += "\n\t set wca.selectDataIndex = " + curve.selectDataIndex;
+
+                                        console.log(says);
+
+//                                        if (visible)
+//                                            wavePanel.updatePanel();
+
+//                                        AnalDataModel.analyzer.curSamplePos = selectDataIndex;
+
+//                                        groove.value = curve.grooveXPlot + groove.minimumValue
+//                                        if (plotMode == Global.enSampleMode)
+//                                            groove.knobLabel = selectDataIndex;
                                     }
                                 }
 
-                            }
-
-                            Connections {
-                                target: curve
-
-                                onGrooveXPlotChanged: {
-                                    console.log("wca.curvelist.length = " + wca.curvelist.length)
-                                    for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
-                                        if (wca.curvelist[i] == curve)
-                                            continue;
-                                        if (curve.grooveXPlot == wca.curvelist[i].grooveXPlot)
-                                            continue;
-
-                                        console.log("wca.curvelist[" + i + "].grooveXPlot = "
-                                                    + wca.curvelist[i].grooveXPlot)
-
-                                        wca.curvelist[i].grooveXPlot = curve.grooveXPlot;
-                                    }
-                                    console.log(curve);
-                                    groove.value = curve.grooveXPlot + groove.minimumValue
-                                    if (curve.plotMode == Global.enSampleMode)
-                                        groove.knobLabel = curve.selectDataIndex;
-                                }
                             }
 
                             Component.onCompleted: {
-                                wca.curvelist[index] = curve;
-                                wca.wavePanelist[index] = wavePanel;
-                                wca.waveViewlist[index] = waveView
+                                console.log("Component.onCompleted: index = " + modelData);
+                                wca.curvelist[modelData] = curve;
+                                wca.wavePanelist[modelData] = wavePanel;
+                                wca.waveViewlist[modelData] = waveView
                             }
                         }
                     }
@@ -771,42 +828,35 @@ Item {
         }
     }
 
-    Connections {
-        target: waveModel
+//    Connections {
+//        target: waveModel
 
-        onModelDataChanged: {
-            console.log("Detect waveModel data changed outside!")
+//        onModelDataChanged: {
+//            console.log("Detect waveModel data changed outside!")
 
-//            AnalDataModel.updateModelFromInternalDataAPI(waveModel)
-        }
-    }
+////            AnalDataModel.updateModelFromInternalDataAPI(waveModel)
+//        }
+//    }
 
     // ///////////////////////////////////////////////////////////////
 
     Component.onCompleted: {
-        Calculator.model = AnalDataModel
+        try {
+            Theme.primaryColor = "#00bcd4";
+            Theme.accentColor = "#ff9800";
+            Theme.tabHighlightColor = "white";
 
-        AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
-        var sample = AnalDataModel.sample;
+//            Calculator.model = AnalDataModel
 
-        Theme.primaryColor = "#00bcd4";
-        Theme.accentColor = "#ff9800";
-        Theme.tabHighlightColor = "white";
+            AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
+            var sample = AnalDataModel.sample;
 
-        var harmon = AnalDataModel.getPropValue(1, "harmonic");
-        log(Matlab.isArray(harmon))
+            log("Component.onCompleted")
+            log("wca.curvelist = " + curvelist);
 
-        var test = {
-            n: 1,
-            real: 20.5,
-            img: -31.8,
-            amp: 28.99,
-            angle: 35.6,
-            percentage: 0.125
+        } catch (error) {
+            // Ignore the error; it only means that the fonts were not enabled
         }
-        log("AnalDataModel.isHarmonValueValid(test) = " + AnalDataModel.isHarmonValueValid(test));
-
-        log("wca.curvelist = " + wca.curvelist);
     }
 
     Component.onDestruction: {

@@ -14,7 +14,15 @@ Canvas {
 
     property   int plotType: Charts.ChartType.LINE;
     property   var plotHandler;
-    property   var plotArea;        // 绘图区域
+    property   var plotArea: {
+        return {
+            leftTop: Qt.point(0, 0),
+            rightBottom: Qt.point(0, 0),
+            width: 0,
+            height: 0
+        }
+    }
+
     property   var plotData;
     property  real startDataIndex: 0;
     property   int selectDataIndex: 0;
@@ -97,8 +105,8 @@ Canvas {
         log("sampleWidth = " + sampleWidth)
 
         start = Math.ceil(start);
-        plotData.labels = AnalDataModel.getXData(0, start, start + sampleWidth);
-        plotData.datasets[0].data = AnalDataModel.getYData(index, start, start + sampleWidth);
+        plotData.labels = AnalDataModel.getXRow(0, start, start + sampleWidth);
+        plotData.datasets[0].data = AnalDataModel.getYRow(index, start, start + sampleWidth);
 
 //        log(index);
 //        log(plotData.labels);
@@ -122,14 +130,14 @@ Canvas {
 
         updateTimeWidth();
 
-        var bound = Matlab.findBound(parseFloat(startTime), timeWidth, AnalDataModel.getXData(0));
+        var bound = Matlab.findBound(parseFloat(startTime), timeWidth, AnalDataModel.getXRow(0));
         console.assert(bound.end >= bound.start)
 //        log("bound = " + bound.start + ", " + bound.end);
 
 //        plotData.labels = model.x.row(0, bound.start, bound.end).data;
 //        plotData.datasets[0].data = model.y.row(index, bound.start, bound.end).data;
-        plotData.labels = AnalDataModel.getXData(0, bound.start, bound.end);
-        plotData.datasets[0].data = AnalDataModel.getYData(index, bound.end, bound.end);
+        plotData.labels = AnalDataModel.getXRow(0, bound.start, bound.end);
+        plotData.datasets[0].data = AnalDataModel.getYRow(index, bound.end, bound.end);
 
 //        log(plotData.labels.length)
 //        log(plotData.labels)
@@ -183,12 +191,12 @@ Canvas {
             var maxStartTime = maxTimeEnd - timeWidth;
             var bound;
             if ( tmp > cols() - 1){
-                bound = Matlab.findBound(maxStartTime, 0, AnalDataModel.getXData(0));
+                bound = Matlab.findBound(maxStartTime, 0, AnalDataModel.getXRow(0));
                 startDataIndex = bound.start;
             }else{
                 var newStartTime = parseFloat(xData(0, tmp));
                 if (newStartTime > maxStartTime){
-                    bound = Matlab.findBound(maxStartTime, 0, AnalDataModel.getXData(0));
+                    bound = Matlab.findBound(maxStartTime, 0, AnalDataModel.getXRow(0));
                     startDataIndex = bound.start;
                 }else
                     startDataIndex = tmp;

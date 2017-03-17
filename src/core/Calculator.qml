@@ -27,6 +27,45 @@ QtObject {
 
     // ///////////////////////////////////////////////////////////////
 
+    function analRMS(model, channelIdx) {
+        if (!isModelValid(model)){
+            log("Error anal model !");
+            return;
+        }
+
+        if (arguments.length < 1){
+            log("Error using analHarmonic (line 46) \nThere should be 1 arguments at least.");
+            return NaN;
+        }
+        channelIdx = (arguments[1] || arguments[1] == 0) ? arguments[1] : -1;
+
+        var count_channel = model.getChannelCount();
+        var selectDataIndex = model.analyzer.curSamplePos
+        var periodSampleCount = model.analyzer.periodSampleCount
+        for (var i = 0; i < count_channel; i++){
+            if (channelIdx != -1 && i != channelIdx)
+                continue;
+
+            log("analRMS: channel idx = " + i + ", select data idx = " + selectDataIndex
+                + ", periodSampelCount = " + periodSampleCount
+                + ", started ...");
+
+            var tmp = model.getYRow(i);
+//            log("data = " + tmp);
+            if (tmp){
+                var fresult = calcRMS(tmp, selectDataIndex, periodSampleCount);
+                model.setPropValue(i, "rms", (fresult ? fresult.rms.toFixed(2) : ""));
+                model.setPropValue(i, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
+                model.analyzerResultUpdated();
+
+                log("index = " + i + ", analRMS result: "
+                    + "\n\t rms = " + fresult.rms
+                    + "\n\t amplitude = " + fresult.amplitude
+                    + "\n\t angle = " + fresult.angle);
+            }
+        }
+    }
+
     /*!
    Select a color depending on whether the background is light or dark.
 
@@ -55,7 +94,7 @@ QtObject {
 
         count = arguments[2] != undefined ? arguments[2] : 80;
 
-        var RMS;
+        var rms;
         var amplitude;
         var angle;
 
@@ -71,8 +110,8 @@ QtObject {
         ex = ex / count;
 
         var dx = Math.sqrt(tmp/count - ex * ex)
-        RMS = Math.sqrt(tmp/count);
-        amplitude = Math.sqrt(2) * RMS;
+        rms = Math.sqrt(tmp/count);
+        amplitude = Math.sqrt(2) * rms;
         if (dx > 0)
             angle = calcSinAngle(amplitude, fInput[curSamplePos], fInput[curSamplePos] > fInput[curSamplePos - 1]);
         else
@@ -81,13 +120,13 @@ QtObject {
 //        log ("calcRMS: "
 //             + "\n\t sample(" + samplearr.length + ") = " + samplearr
 //             + "\n\t dx = " + dx + ", ex = " + ex
-//             + "\n\t RMS = " + RMS
+//             + "\n\t rms = " + rms
 //             + "\n\t amplitude = " + amplitude
 //             + "\n\t angle =" + angle
 //        )
 
         return {
-            RMS: RMS,
+            rms: rms,
             amplitude: amplitude,
             angle: angle
         };
@@ -421,5 +460,9 @@ QtObject {
 
     Component.onCompleted: {
         log("Component.onCompleted")
+    }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
     }
 }

@@ -55,4 +55,16 @@ Item {
 
         return objectArray;
     }
+
+    function log(says) {
+        console.log("## JSONListModel.qml ##: " + says);
+    }
+
+    Component.onCompleted: {
+        log("Component.onCompleted")
+    }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
+    }
 }

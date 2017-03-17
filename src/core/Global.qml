@@ -83,4 +83,8 @@ QtObject {
     Component.onCompleted: {
         log("Component.onCompleted")
     }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
+    }
 }
