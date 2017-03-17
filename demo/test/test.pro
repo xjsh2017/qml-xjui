@@ -17,7 +17,7 @@ include(deployment.pri)
 SRC_PATH = ../../src
 INCLUDEPATH += $${SRC_PATH}
 
-include($${SRC_PATH}/stores/stores.pri)
+include($${SRC_PATH}/stores/stores.lite.pri)
 
 qmldemo.files += \
     ./*.qml \

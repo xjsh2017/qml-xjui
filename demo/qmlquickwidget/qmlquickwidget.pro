@@ -24,11 +24,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    qxjquickwidget.cpp
+        mainwindow.cpp
 
-HEADERS  += mainwindow.h \
-    qxjquickwidget.h
+HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
