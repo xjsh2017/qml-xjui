@@ -38,8 +38,8 @@ Item {
     Connections {
         target: AnalDataModel
 
-        onChannelsChanged: {
-            log("Model Changed detected!")
+        onAnalyzerResultUpdated: {
+            log("Detected AnalDataModel Anal Result Updated !")
             update();
         }
     }
@@ -229,10 +229,13 @@ Item {
                 text: styleData.value
 
                 color: {
-                    var idx = parseInt(modelChannel.get(styleData.row).serial) - 1;
-                    var color = AnalDataModel.getChannelColor(idx);
-                    if ( color && !styleData.selected && (styleData.column != 1 && styleData.column != 0)/* && color != "lightgrey"*/)
-                        return color
+                    var rowModel = modelChannel.get(styleData.row);
+                    if (rowModel && rowModel.serial){
+                        var idx = parseInt(rowModel.serial) - 1;
+                        var color = AnalDataModel.getChannelColor(idx);
+                        if ( color && !styleData.selected && (styleData.column != 1 && styleData.column != 0)/* && color != "lightgrey"*/)
+                            return color
+                    }
 
                     return styleData.textColor;
                 }

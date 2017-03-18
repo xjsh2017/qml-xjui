@@ -61,8 +61,9 @@ Item {
             groove.knobLabel = selectDataIndex;
         log("setting groove label = " + selectDataIndex);
 
+        AnalDataModel.blockAnalSignal();
         log("doing : Calculator.analHarmonic(AnalDataModel)");
-//        Calculator.analHarmonic(AnalDataModel); // 谐波分析
+        Calculator.analHarmonic(AnalDataModel); // 谐波分析
         log("done! : Calculator.analHarmonic(AnalDataModel)");
 
         log("doing : Calculator.analRMS(AnalDataModel)");
@@ -71,6 +72,8 @@ Item {
         log("doing : wca.updatePanels()");
         updatePanels()
         log("done! : wca.updatePanels()");
+
+        AnalDataModel.unblockAnalSignal(true);
     }
 
     function updatePanels() {
@@ -368,7 +371,7 @@ Item {
                             id: chart_refresh
 
                             action: Action {
-                                iconName: "navigation/refresh"
+                                iconName: "action/autorenew"
                                 name: qsTr("Refresh (Ctrl + R)")
                                 hoverAnimation: true
                                 onTriggered: {
@@ -812,18 +815,14 @@ Item {
     Connections {
         target: AnalDataModel
 
-        onChannelsChanged:{
-            log("AnalDataModel --> onChannelsChanged")
-        }
-
         onSampleChanged: {
-            log("AnalDataModel --> onSampleChanged: "
-                + "\n\t rows = " + AnalDataModel.sample.rows()
-                + "\n\t cols = " + AnalDataModel.sample.cols());
+            log("Detecting AnalDataModel Sample Updtated: "
+                + " rows = " + AnalDataModel.sample.rows()
+                + ", cols = " + AnalDataModel.sample.cols());
         }
 
         onAnalyzerChanged: {
-            log("AnalDataModel --> onAnalyzerChanged")
+            log("Detected AnalDataModel anal param updated !")
 
         }
     }

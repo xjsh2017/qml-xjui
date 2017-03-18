@@ -21,11 +21,12 @@ QtObject {
 
     property var channels: JSONListModel {
             id: js_list_properties
+        property var locals: ["name", "unit", "phase", "visible", "selected"]
             json: '[ \
                     {"name": "通道延时", "unit": "", "phase":"", "visible": false, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
                     {"name": "保护A相电流1", "unit": "A", "phase":"A", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
                     {"name": "保护A相电流2", "unit": "A", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护B相电流1", "unit": "A", "phase":"B", "visible": false, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护B相电流1", "unit": "A", "phase":"B", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
                     {"name": "保护B相电流2", "unit": "A", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
                     {"name": "保护C相电流1", "unit": "A", "phase":"C", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
                     {"name": "保护C相电流2", "unit": "A", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
@@ -63,6 +64,7 @@ QtObject {
     property alias jsModel: js_list_properties.jsmodel;
     property alias json: js_list_properties.json;
     property alias listModel: js_list_properties.listmodel;
+    property alias localProps: js_list_properties.locals
 
     /*!
         var tmp = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
@@ -121,9 +123,13 @@ QtObject {
         lTotalCapLenth: 0           // 本链路字节数
     }
 
+    property bool blockChannelPropUpdatedSignal: false
+    property bool blockAnalRstUpdatedSignal: false
+
     // ///////////////////////////////////////////////////////////////
 
-    signal analyzerResultUpdated()
+    signal analyzerResultUpdated()  // 分析数据变更
+    signal channelPropUpdated()     // 通道属性变更
 
     // ///////////////////////////////////////////////////////////////
 
@@ -173,8 +179,35 @@ QtObject {
             jsModel[channelIdx][propName] = value;
 //            js_list_properties.json = JSON.stringify(jsModel);
 
-            channelsChanged();
+            if (localProps.indexOf(propName) > -1){
+                if (!blockChannelPropUpdatedSignal)
+                    channelPropUpdated();
+            }else{
+                if (!blockAnalRstUpdatedSignal)
+                    analyzerResultUpdated();
+            }
         }
+    }
+
+    function blockAnalSignal(){
+        blockAnalRstUpdatedSignal = true;
+    }
+    function unblockAnalSignal(emit){
+        blockAnalRstUpdatedSignal = false;
+
+        if (emit)
+            analyzerResultUpdated();
+    }
+
+    function blockPropSignal() {
+        blockChannelPropUpdatedSignal = true;
+    }
+
+    function unblockPropSignal(emit){
+        blockChannelPropUpdatedSignal = false;
+
+        if (emit)
+            channelPropUpdated();
     }
 
     /*! 判断索引编号为channelIdx的通道是否存在属性名propName  */

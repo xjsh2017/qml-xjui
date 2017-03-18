@@ -79,11 +79,16 @@ Item {
                 width: parent.width
 
                 IconButton {
-                    id: action_hide_show_left
+                    id: action_hide_sidebar
+
+                    color: Theme.lightDark(navibar.backgroundColor, Theme.light.iconColor,
+                                                                      Theme.dark.iconColor)
+
+                    anchors.verticalCenter: parent.verticalCenter
 
                     action: Action {
-                        iconName: "editor/border_left"
-                        name: tree.visible ? "Hide Siderbar" : "Show Siderbar"
+                        iconName: "action/hide_sidebar"
+                        name: tree.visible ? "Hide Sidebar" : "Show Sidebar"
                         onTriggered: {
                             tree.visible = !tree.visible;
                         }
@@ -92,7 +97,7 @@ Item {
 
                 Row {
                     anchors.fill: parent
-                    anchors.leftMargin: dp(30)
+                    anchors.leftMargin: dp(26)
                     spacing: dp(1)
 
                     Repeater {

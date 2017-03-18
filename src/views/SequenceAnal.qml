@@ -38,8 +38,6 @@ Item {
 
             elevation: 3
 
-            clip: false
-
             backgroundColor: Theme.primaryColor
 
             Rectangle { // 渐变色
@@ -52,7 +50,7 @@ Item {
             }
 
 
-            Row {
+            RowLayout {
                 width: parent.width
                 height: parent.height
 
@@ -120,45 +118,46 @@ Item {
                     }
                 }
 
-                Button {
-                    id: btnGrooveMode
+                IconButton {
+                    id: action_selchannel
 
-                    height: parent.height
-                    width: dp(80)
+                    color: Theme.lightDark(navibar.backgroundColor, Theme.light.iconColor,
+                                                                      Theme.dark.iconColor)
 
-                    elevation: 1
-                    backgroundColor: Theme.accentColor
+                    anchors.verticalCenter: parent.verticalCenter
 
-                    Label {
-                        anchors.centerIn: parent
-                        text: qsTr("通道选择")
-                        color: "white"
-
-                        font {
-                            family: "微软雅黑"
-                            weight: Font.Light
-                            pixelSize: dp(13)
+                    action: Action {
+                        iconName: "device/storage"
+                        name: qsTr("选择通道")
+                        onTriggered: {
+                            channelSettings.show();
                         }
                     }
+                }
 
-                    onClicked: {
-                        channelSettings.show();
-                    }
+                Item {
+                    Layout.fillWidth: true;
+                    Layout.fillHeight: true;
                 }
 
 
                 IconButton {
-                    id: action_left_end
-                    visible: false
+                    id: action_hide_table
+
+                    color: Theme.lightDark(navibar.backgroundColor, Theme.light.iconColor,
+                                                                      Theme.dark.iconColor)
+
+                    anchors.verticalCenter: parent.verticalCenter
 
                     action: Action {
-                        iconName: "action/scroll_leftend"
-                        name: "To Left End"
+                        iconName: "image/slideshow"
+                        name: tree.visible ? "Hide Sidebar" : "Show Sidebar"
                         onTriggered: {
-                            if (Global.g_plotMode == Global.enSampleMode)
-                                groove.scroller.move(-999999 * Global.g_sampleRate);
+                            Global.g_hide = !Global.g_hide
                         }
                     }
+
+                    rotation: 90
                 }
             }
         }

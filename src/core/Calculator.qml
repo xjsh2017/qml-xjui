@@ -56,12 +56,11 @@ QtObject {
                 var fresult = calcRMS(tmp, selectDataIndex, periodSampleCount);
                 model.setPropValue(i, "rms", (fresult ? fresult.rms.toFixed(2) : ""));
                 model.setPropValue(i, "angle", (fresult ? fresult.angle.toFixed(2) : ""))
-                model.analyzerResultUpdated();
 
-                log("index = " + i + ", analRMS result: "
-                    + "\n\t rms = " + fresult.rms
-                    + "\n\t amplitude = " + fresult.amplitude
-                    + "\n\t angle = " + fresult.angle);
+//                log("index = " + i + ", analRMS result: "
+//                    + "\n\t rms = " + fresult.rms
+//                    + "\n\t amplitude = " + fresult.amplitude
+//                    + "\n\t angle = " + fresult.angle);
             }
         }
     }

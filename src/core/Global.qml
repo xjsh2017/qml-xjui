@@ -33,6 +33,8 @@ QtObject {
 
     property    color g_plotBackgroundColor: "#263238"
 
+    property     bool g_hide: false
+
     // ///////////////////////////////////////////////////////////////
 
     function mergeFlags(defaults,userDefined) {

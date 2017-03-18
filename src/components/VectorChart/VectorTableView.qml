@@ -177,9 +177,13 @@ Item {
                 visible: styleData.column != 1
 
                 color: {
-                    var color = AnalDataModel.getChannelColor(styleData.row);
-                    if ( !styleData.selected && (styleData.column == 2 || styleData.column == 6))
-                        return AnalDataModel.getChannelColor(parseInt(modelChannel.get(styleData.row).serial))
+                    var rowModel = modelChannel.get(styleData.row);
+                    if (rowModel && rowModel.serial){
+                        var idx = parseInt(rowModel.serial) - 1;
+                        var color = AnalDataModel.getChannelColor(idx);
+                        if ( color && !styleData.selected && (styleData.column != 1 && styleData.column != 0)/* && color != "lightgrey"*/)
+                            return color
+                    }
 
                     return styleData.textColor;
                 }

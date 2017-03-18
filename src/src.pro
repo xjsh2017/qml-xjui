@@ -26,17 +26,17 @@ components.files += components/*
 components.path = $$[QT_INSTALL_QML]/$$uri/components
 
 icons.files += icons/*
-icons.path = $$[QT_INSTALL_QML]/XjUi/icons
+icons.path = $$[QT_INSTALL_QML]/$$uri/icons
 
 qmlfiles.files += qml/*
-qmlfiles.path = $$[QT_INSTALL_QML]/XjUi/qml
+qmlfiles.path = $$[QT_INSTALL_QML]/$$uri/qml
 
 qmldir.files = $$PWD/qmldir
 qmldir.path = $$[QT_INSTALL_QML]/$$uri
 qmldir.CONFIG += no_check_exist
 
 stores.files = stores/*
-stores.path = $$[QT_INSTALL_QML]/XjUi/stores
+stores.path = $$[QT_INSTALL_QML]/$$uri/stores
 
 INSTALLS += target qmldir views components core qmlfiles stores# icons
 

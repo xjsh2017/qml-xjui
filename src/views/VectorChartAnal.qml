@@ -53,7 +53,7 @@ Item {
             }
 
 
-            Row {
+            RowLayout {
                 width: parent.width
                 height: parent.height
 
@@ -177,19 +177,28 @@ Item {
                     }
                 }
 
+                Item {
+                    Layout.fillWidth: true;
+                    Layout.fillHeight: true;
+                }
 
                 IconButton {
-                    id: action_left_end
-                    visible: false
+                    id: action_hide_table
+
+                    color: Theme.lightDark(navibar.backgroundColor, Theme.light.iconColor,
+                                                                      Theme.dark.iconColor)
+
+                    anchors.verticalCenter: parent.verticalCenter
 
                     action: Action {
-                        iconName: "action/scroll_leftend"
-                        name: "To Left End"
+                        iconName: "image/slideshow"
+                        name: tree.visible ? "Hide Sidebar" : "Show Sidebar"
                         onTriggered: {
-                            if (Global.g_plotMode == Global.enSampleMode)
-                                groove.scroller.move(-999999 * Global.g_sampleRate);
+                            Global.g_hide = !Global.g_hide
                         }
                     }
+
+                    rotation: 90
                 }
             }
         }

@@ -50,7 +50,7 @@ Item {
                     }
             }
 
-            Row {
+            RowLayout {
                 width: parent.width
                 height: parent.height
 
@@ -62,6 +62,9 @@ Item {
                     Label {
                         anchors.centerIn: parent
                         text: qsTr(titleName)
+
+//                        color: Theme.lightDark(toolbar.backgroundColor, Theme.light.iconColor,
+//                                                                          Theme.dark.iconColor)
 
                         font {
                             family: "微软雅黑"
@@ -93,6 +96,9 @@ Item {
                         anchors.centerIn: parent
                         text: qsTr("最大谐波次数")
 
+//                        color: Theme.lightDark(toolbar.backgroundColor, Theme.light.iconColor,
+//                                                                          Theme.dark.iconColor)
+
                         font {
                             family: "微软雅黑"
                             weight: Font.Light
@@ -106,7 +112,7 @@ Item {
 
                     width: dp(50)
                     height: parent.height
-                    visible: false
+//                    visible: false
 
                     currentIndex: 2
                     model: ListModel {
@@ -140,6 +146,7 @@ Item {
                 Item {
                     width: dp(80)
                     height: parent.height
+                    visible: false
 
                     property alias selectIdx: cmbMenu.selectedIndex
 
@@ -184,21 +191,33 @@ Item {
                     }
                 }
 
+                Item {
+                    Layout.fillHeight: true;
+                    Layout.fillWidth: true;
+                }
+
                 IconButton {
-                    id: action_left_end
-                    visible: false
+                    id: action_hide_table
+
+                    color: Theme.lightDark(navibar.backgroundColor, Theme.light.iconColor,
+                                                                      Theme.dark.iconColor)
+
+                    anchors.verticalCenter: parent.verticalCenter
 
                     action: Action {
-                        iconName: "action/scroll_leftend"
-                        name: "To Left End"
+                        iconName: "image/slideshow"
+                        name: tree.visible ? "Hide Sidebar" : "Show Sidebar"
                         onTriggered: {
-                            if (Global.g_plotMode == Global.enSampleMode)
-                                groove.scroller.move(-999999 * Global.g_sampleRate);
+                            Global.g_hide = !Global.g_hide
                         }
                     }
+
+                    rotation: 90
                 }
 
             }
+
+
         }
 
         Controls.SplitView{
@@ -223,7 +242,7 @@ Item {
 
                 Layout.fillWidth: true
                 Layout.minimumWidth: 300;
-                width: parent.width * 1 / 5
+                width: parent.width * 2 / 5
             }
 
             Connections {
