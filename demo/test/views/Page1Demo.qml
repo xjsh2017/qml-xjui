@@ -73,7 +73,7 @@ Item {
 
                 elevation: 2
 
-                backgroundColor: Theme.primaryDarkColor
+                backgroundColor: Theme.primaryColor
 
                 height: dp(24)
                 width: parent.width
