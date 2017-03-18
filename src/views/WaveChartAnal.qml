@@ -24,8 +24,8 @@ Item {
     property int maxCount: 50;
 
     property var curvelist: new Array(maxCount)
-    property variant waveViewlist: new Array(maxCount)
-    property variant wavePanelist: new Array(maxCount)
+    property var waveViewlist: new Array(maxCount)
+    property var wavePanelist: new Array(maxCount)
 
     onCurvelistChanged: {
         log("onCurvelistChanged: curvelist = " + curvelist)
@@ -842,7 +842,7 @@ Item {
 
     Component.onCompleted: {
         try {
-            Theme.primaryColor = "#00bcd4";
+            Theme.primaryColor = "#009688";
             Theme.accentColor = "#ff9800";
             Theme.tabHighlightColor = "white";
 

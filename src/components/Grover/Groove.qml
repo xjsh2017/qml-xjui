@@ -13,6 +13,7 @@ import QtQuick 2.4
 
 import Material 0.3
 
+//import XjUi 1.0
 import "../../core"
 
 /*!

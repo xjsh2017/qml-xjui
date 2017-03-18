@@ -1,7 +1,8 @@
 import QtQuick 2.0
 
+//import XjUi 1.0
+import "WaveChart.js" as WaveCharts
 import "../../core"
-import "WaveChart.js" as Charts
 
 Canvas {
 
@@ -12,7 +13,7 @@ Canvas {
     property   var model
     property   int index: -1;
 
-    property   int plotType: Charts.ChartType.LINE;
+    property   int plotType: WaveCharts.ChartType.LINE;
     property   var plotHandler;
     property   var plotArea: {
         return {
@@ -332,23 +333,23 @@ Canvas {
 
         if(!plotHandler) {
             switch(plotType) {
-            case Charts.ChartType.BAR:
-                plotHandler = new Charts.Chart(canvas, canvas.getContext("2d")).Bar(plotData, chartOptions);
+            case WaveCharts.ChartType.BAR:
+                plotHandler = new WaveCharts.Chart(canvas, canvas.getContext("2d")).Bar(plotData, chartOptions);
                 break;
-            case Charts.ChartType.DOUGHNUT:
-                plotHandler = new Charts.Chart(canvas, canvas.getContext("2d")).Doughnut(plotData, chartOptions);
+            case WaveCharts.ChartType.DOUGHNUT:
+                plotHandler = new WaveCharts.Chart(canvas, canvas.getContext("2d")).Doughnut(plotData, chartOptions);
                 break;
-            case Charts.ChartType.LINE:
-                plotHandler = new Charts.Chart(canvas, canvas.getContext("2d")).Line(plotData, chartOptions);
+            case WaveCharts.ChartType.LINE:
+                plotHandler = new WaveCharts.Chart(canvas, canvas.getContext("2d")).Line(plotData, chartOptions);
                 break;
-            case Charts.ChartType.PIE:
-                plotHandler = new Charts.Chart(canvas, canvas.getContext("2d")).Pie(plotData, chartOptions);
+            case WaveCharts.ChartType.PIE:
+                plotHandler = new WaveCharts.Chart(canvas, canvas.getContext("2d")).Pie(plotData, chartOptions);
                 break;
-            case Charts.ChartType.POLAR:
-                plotHandler = new Charts.Chart(canvas, canvas.getContext("2d")).PolarArea(plotData, chartOptions);
+            case WaveCharts.ChartType.POLAR:
+                plotHandler = new WaveCharts.Chart(canvas, canvas.getContext("2d")).PolarArea(plotData, chartOptions);
                 break;
-            case Charts.ChartType.RADAR:
-                plotHandler = new Charts.Chart(canvas, canvas.getContext("2d")).Radar(plotData, chartOptions);
+            case WaveCharts.ChartType.RADAR:
+                plotHandler = new WaveCharts.Chart(canvas, canvas.getContext("2d")).Radar(plotData, chartOptions);
                 break;
             default:
                 console.log('Chart type should be specified.');

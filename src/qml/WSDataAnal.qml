@@ -74,13 +74,15 @@ Item {
 
                 elevation: 2
 
-                backgroundColor: Theme.primaryDarkColor
+                backgroundColor: Theme.primaryColor
 
                 height: dp(24)
                 width: parent.width
 
                 IconButton {
                     id: action_hide_show_left
+
+                    enabled: false
 
                     action: Action {
                         iconName: "editor/border_left"

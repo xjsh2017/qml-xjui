@@ -5,9 +5,9 @@ import Material.ListItems 0.1 as ListItem
 
 import Material 0.2
 
+//import XjUi 1.0
 import "../components/VectorChart"
 import "../core"
-//import XjUi 1.0
 
 Item {
     id: me
@@ -27,7 +27,7 @@ Item {
         id: verticallayout
 
         anchors.fill: parent
-        spacing: dp(2)
+        spacing: dp(0)
 
         // 工具栏
         View {

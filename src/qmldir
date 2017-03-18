@@ -3,14 +3,14 @@ module XjUi
 plugin XjUi
 
 # Components
-Groove.qml 1.0 components/Grover/Groove.qml
-WaveChart.qml 1.0 components/WaveChart/WaveChart.qml
-WaveChart.js 1.0 components/WaveChart/WaveChart.js
-VectorChart.qml 1.0 components/VectorChart/VectorChart.qml
-VectorTableView.qml 1.0 components/VectorChart/VectorTableView.qml
+Groove 1.0 components/Grover/Groove.qml
+WaveChart 1.0 components/WaveChart/WaveChart.qml
+WaveCharts 1.0 components/WaveChart/WaveChart.js
+VectorChart 1.0 components/VectorChart/VectorChart.qml
+VectorTableView 1.0 components/VectorChart/VectorTableView.qml
 Harmonic 1.0 components/Harmonic/Harmonic.qml
-Chart.qml 1.0 components/Charts/Chart.qml
-ChartType.qml 1.0 components/Charts/ChartType.qml
+Chart 1.0 components/Charts/Chart.qml
+ChartType 1.0 components/Charts/ChartType.qml
 Chart.js 1.0 components/Charts/Chart.js
 
 # views
@@ -22,9 +22,10 @@ WaveChartAnal 1.0 views/WaveChartAnal.qml
 TabbedPages 1.0 views/TabbedPages.qml
 
 # core
-#singleton Calculator 1.0 core/Calculator.qml
-#singleton Global 1.0 core/Global.qml
-#singleton Matlab 1.0 core/Matlab.qml
-#singleton Matrix 1.0 core/Matrix.qml
+singleton Calculator 1.0 core/Calculator.qml
+singleton Global 1.0 core/Global.qml
+singleton Matlab 1.0 core/Matlab.qml
+singleton Matrix 1.0 core/Matrix.qml
+singleton AnalDataModel 1.0 core/AnalDataModel.qml
 
 #typeinfo plugin.qmltypes

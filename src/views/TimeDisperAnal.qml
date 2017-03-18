@@ -4,10 +4,9 @@ import QtQuick.Controls 1.3 as Controls
 import QtQuick.Layouts 1.1
 import Material.ListItems 0.1 as ListItem
 
-//import "."
+//import XjUi 1.0
 import "../components/Charts"
 import "../core"
-//import XjUi 1.0
 
 Item {
     id: me

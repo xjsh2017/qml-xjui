@@ -5,10 +5,9 @@ import Material.ListItems 0.1 as ListItem
 
 import Material 0.2
 
+//import XjUi 1.0
 import "../components/Harmoinc"
 import "../core"
-
-//import XjUi 1.0
 
 Item {
     id: me
