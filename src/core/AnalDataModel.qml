@@ -23,35 +23,35 @@ QtObject {
 
     property var channels: JSONListModel {
             id: js_list_properties
-        property var locals: ["name", "unit", "phase", "visible", "selected"]
+        property var locals: ["name", "unit", "phase", "visible"]
             json: '[ \
-                    {"name": "通道延时", "unit": "", "phase":"", "visible": false, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护A相电流1", "unit": "A", "phase":"A", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护A相电流2", "unit": "A", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护B相电流1", "unit": "A", "phase":"B", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护B相电流2", "unit": "A", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护C相电流1", "unit": "A", "phase":"C", "visible": true, "selected": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护C相电流2", "unit": "A", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "计量A相电流", "unit": "A", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "计量B相电流", "unit": "A", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "计量C相电流", "unit": "A", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "零序电流I01", "unit": "A", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "零序电流I02", "unit": "A", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "间隙电流Ij1", "unit": "A", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "间隙电流Ij2", "unit": "A", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护A相电压1", "unit": "V", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "保护A相电压2", "unit": "V", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "B相电压采样值1", "unit": "V", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "B相电压采样值2", "unit": "V", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "C相电压采样值1", "unit": "V", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "C相电压采样值2", "unit": "V", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "线路抽取电压1", "unit": "V", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "线路抽取电压2", "unit": "V", "phase":"", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "零序电压1", "unit": "V", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "零序电压2", "unit": "V", "phase":"N", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "计量A相电压", "unit": "V", "phase":"A", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "计量B相电压", "unit": "V", "phase":"B", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
-                    {"name": "计量C相电压", "unit": "V", "phase":"C", "visible": true, "selected": false, "amp":"", "rms":"", "angle":"", "harmonic": []} \
+                    {"name": "通道延时", "unit": "", "phase":"", "visible": false, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电流1", "unit": "A", "phase":"A", "visible": true, "checked": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电流2", "unit": "A", "phase":"A", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护B相电流1", "unit": "A", "phase":"B", "visible": true, "checked": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护B相电流2", "unit": "A", "phase":"B", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护C相电流1", "unit": "A", "phase":"C", "visible": true, "checked": true, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护C相电流2", "unit": "A", "phase":"C", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量A相电流", "unit": "A", "phase":"A", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量B相电流", "unit": "A", "phase":"B", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量C相电流", "unit": "A", "phase":"C", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电流I01", "unit": "A", "phase":"N", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电流I02", "unit": "A", "phase":"N", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "间隙电流Ij1", "unit": "A", "phase":"", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "间隙电流Ij2", "unit": "A", "phase":"", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电压1", "unit": "V", "phase":"A", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "保护A相电压2", "unit": "V", "phase":"A", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "B相电压采样值1", "unit": "V", "phase":"B", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "B相电压采样值2", "unit": "V", "phase":"B", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "C相电压采样值1", "unit": "V", "phase":"C", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "C相电压采样值2", "unit": "V", "phase":"C", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "线路抽取电压1", "unit": "V", "phase":"", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "线路抽取电压2", "unit": "V", "phase":"", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电压1", "unit": "V", "phase":"N", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "零序电压2", "unit": "V", "phase":"N", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量A相电压", "unit": "V", "phase":"A", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量B相电压", "unit": "V", "phase":"B", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []}, \
+                    {"name": "计量C相电压", "unit": "V", "phase":"C", "visible": true, "checked": false, "amp":"", "rms":"", "angle":"", "harmonic": []} \
                     ]'
 
     //        query: "$[?(@.label.charAt(0)==='A')]"
@@ -67,6 +67,7 @@ QtObject {
     property alias json: js_list_properties.json;
     property alias listModel: js_list_properties.listmodel;
     property alias localProps: js_list_properties.locals
+    property int selectDataIndex: 0
 
     /*!
         var tmp = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
@@ -181,6 +182,9 @@ QtObject {
             jsModel[channelIdx][propName] = value;
 //            js_list_properties.json = JSON.stringify(jsModel);
 
+            if (propName == "checked")
+                return;
+
             if (localProps.indexOf(propName) > -1){
                 if (!blockChannelPropUpdatedSignal)
                     channelPropUpdated();
@@ -189,6 +193,27 @@ QtObject {
                     analyzerResultUpdated();
             }
         }
+    }
+
+    function getHarmonValue(channelIdx, times){
+        if (hasProperty(channelIdx, "harmonic")){
+            var harmon = getPropValue(channelIdx, "harmonic");
+            if (isArray(harmon) && times < harmon.length){
+                return harmon[times];
+            }
+        }
+    }
+
+    function isHarmonValueValid(arg){
+        if (arg && arg.n != undefined
+                && arg.real != undefined
+                && arg.img != undefined
+                && arg.rms != undefined
+                && arg.angle != undefined
+                && arg.percentage != undefined)
+            return true;
+
+        return false;
     }
 
     function blockAnalSignal(){
@@ -290,7 +315,7 @@ QtObject {
                     n: j,
                     real: 0.0,
                     img: 0.0,
-                    amp: 0.0,
+                    rms: 0.0,
                     angle: 0.0,
                     percentage: 0.0
                 }
@@ -311,7 +336,7 @@ QtObject {
                 harmon[j].n = j;
                 harmon[j].real = 0.0;
                 harmon[j].img = 0.0;
-                harmon[j].amp = 0.0;
+                harmon[j].rms = 0.0;
                 harmon[j].angle = 0.0;
                 harmon[j].percentage = 0.0;
             }
@@ -355,27 +380,6 @@ QtObject {
         log("Rows: " + Rows + ", Cols: " + Cols)
 
         sampleChanged()();
-    }
-
-    function getHarmonValue(channelIdx, times){
-        if (hasProperty(channelIdx, "harmonic")){
-            var harmon = getPropValue(channelIdx, "harmonic");
-            if (isArray(harmon) && times < harmon.length){
-                return harmon[times];
-            }
-        }
-    }
-
-    function isHarmonValueValid(arg){
-        if (arg && arg.n != undefined
-                && arg.real != undefined
-                && arg.img != undefined
-                && arg.amp != undefined
-                && arg.angle != undefined
-                && arg.percentage != undefined)
-            return true;
-
-        return false;
     }
 
     function isModelReady() {

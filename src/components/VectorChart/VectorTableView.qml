@@ -15,6 +15,7 @@ Item {
     height:600
 
     property int selectDataIndex: 0
+    property int selectHarmonTimes: 1
 
     // ///////////////////////////////////////////////////////////////
 
@@ -37,38 +38,92 @@ Item {
 
         onAnalyzerResultUpdated: {
             modelCheckedChanged();  // 发送给VectorChart
-            update();
+            log("Detected AnalDataModel Anal Result Updated !")
+            log("Doing: update harmonic table model data !")
+            modelChannel.updateModel();
+            log("Done!: update harmonic table model data !")
+        }
+
+        onChannelPropUpdated: {
+            log("Detected AnalDataModel channel info updated !")
+            log("Doing: rebuild harmonic table model data !")
+            modelChannel.rebuildModel();
+            log("Done!: rebuild harmonic table model data !")
         }
     }
 
-    function update() {
-        for (var i = 0; i < modelChannel.count; i++){
-            var idx = modelChannel.get(i).serial - 1;
-            modelChannel.setProperty(i, "rms", AnalDataModel.getPropValue(idx, "rms"))
-            modelChannel.setProperty(i, "angle"
-                           , AnalDataModel.getPropValue(idx, "angle") ?
-                                         "∠ " + AnalDataModel.getPropValue(idx, "angle") + "°": " ")
-        }
+    onSelectHarmonTimesChanged: {
+//        modelCheckedChanged();  // 发送给VectorChart
+        modelChannel.updateModel();
     }
 
     ListModel
     {
         id: modelChannel
 
-        function updateModel() {
+        function rebuildModel() {
             clear();
+            log("rebuildModel: selectHarmonTimes = " + selectHarmonTimes)
             for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
                 if (!AnalDataModel.getPropValue(i, "visible"))
                     continue;
-                append({
-                                   serial: i + 1,
-                                   name: AnalDataModel.getPropValue(i, "name"),
-                                   unit: AnalDataModel.getPropValue(i, "unit"),
-                                   phase: AnalDataModel.getPropValue(i, "phase"),
-                                   rms: AnalDataModel.getPropValue(i, "rms"),
-                                   angle: AnalDataModel.getPropValue(i, "angle"),
-                               }
-                        )
+
+                if (selectHarmonTimes == 0){
+                    append({
+                                       serial: i + 1,
+                                       name: AnalDataModel.getPropValue(i, "name"),
+                                       unit: AnalDataModel.getPropValue(i, "unit"),
+                                       phase: AnalDataModel.getPropValue(i, "phase"),
+                                       rms: AnalDataModel.getPropValue(i, "rms"),
+                                       angle: AnalDataModel.getPropValue(i, "angle"),
+                                   }
+                            )
+                }else{
+                    var harmon_value = AnalDataModel.getHarmonValue(i, selectHarmonTimes);
+                    if (!AnalDataModel.isHarmonValueValid(harmon_value))
+                        continue;
+                    append({
+                                       serial: i + 1,
+                                       name: AnalDataModel.getPropValue(i, "name"),
+                                       unit: AnalDataModel.getPropValue(i, "unit"),
+                                       phase: AnalDataModel.getPropValue(i, "phase"),
+                                       rms: harmon_value.rms.toFixed(2) + "",
+                                       angle: harmon_value.angle.toFixed(2) + "",
+                                   }
+                            )
+                }
+
+
+            }
+        }
+
+        function getRowIdxByChannelIdx(channelIdx) {
+            for (var i = 0; i < modelChannel.count; i++){
+                if (parseInt(modelChannel.get(i).serial) == (channelIdx + 1))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        function updateModel() {
+            log("updateModel: selectHarmonTimes = " + selectHarmonTimes)
+            for (var i = 0; i < modelChannel.count; i++){
+                var idx = modelChannel.get(i).serial - 1;
+
+                if (selectHarmonTimes == 0){
+                    modelChannel.setProperty(i, "rms", AnalDataModel.getPropValue(idx, "rms"))
+                    modelChannel.setProperty(i, "angle"
+                                   , AnalDataModel.getPropValue(idx, "angle") ?
+                                                 "∠ " + AnalDataModel.getPropValue(idx, "angle") + "°": " ")
+                }else{
+                    var harmon_value = AnalDataModel.getHarmonValue(idx, selectHarmonTimes);
+                    if (!AnalDataModel.isHarmonValueValid(harmon_value))
+                        continue;
+
+                    modelChannel.setProperty(i, "rms", harmon_value.rms.toFixed(2) + "")
+                    modelChannel.setProperty(i, "angle", "∠ " + harmon_value.angle.toFixed(2) + "°")
+                }
             }
         }
     }
@@ -196,7 +251,7 @@ Item {
             }
 
             CheckBox {
-                checked: AnalDataModel.getPropValue(modelChannel.get(styleData.row).serial - 1, "selected")
+                checked: AnalDataModel.getPropValue(modelChannel.get(styleData.row).serial - 1, "checked")
                 anchors.verticalCenter: parent.verticalCenter
 
                 visible: styleData.column == 1
@@ -206,7 +261,7 @@ Item {
 
                 onCheckedChanged: {
                     var idx = modelChannel.get(styleData.row).serial - 1;
-                    AnalDataModel.setPropValue(idx, "selected", checked)
+                    AnalDataModel.setPropValue(idx, "checked", checked)
                     root.modelCheckedChanged()
                 }
             }
@@ -220,12 +275,12 @@ Item {
             {
                 var role  = roleList[i];
                 var title  = titleList[i];
-                var width = widths[i];
+                var width0 = widths[i];
                 temp.push(columnComponent.createObject(table,
                                                        {
                                                            "role": role,
                                                            "title": title,
-                                                           "width": width,
+                                                           "width": width0,
                                                            "horizontalAlignment": Text.AlignHCenter
                                                        }))
             }
@@ -243,7 +298,7 @@ Item {
         log("Component.onCompleted")
 
         if (AnalDataModel.isModelValid()){
-            modelChannel.updateModel();
+            modelChannel.rebuildModel();
         }
     }
 

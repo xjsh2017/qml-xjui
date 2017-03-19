@@ -35,6 +35,8 @@ TabbedPage {
         event.accepted = true
     }
 
+//    selectedTabIndex: 1
+
 //    Tab {
 //        title: "Overview"
 //        iconName: "action/home"

@@ -94,7 +94,7 @@ Item {
                     width: dp(80)
                     Label {
                         anchors.centerIn: parent
-                        text: qsTr("参考谐波")
+                        text: qsTr("分析谐波")
 
                         font {
                             family: "微软雅黑"
@@ -105,41 +105,45 @@ Item {
                 }
 
                 Controls.ComboBox {
-                    id: cmbBox
+                    id: cmbHarmon
 
                     width: dp(100)
                     height: parent.height
 
                     model: ListModel {
-                        id: model1
+                        id: harmonModel
                         ListElement { text: "test"; color: "test" }
                     }
                     anchors.verticalCenter: parent.verticalCenter
                     onCurrentIndexChanged: {
-//                        console.debug(model1.get(currentIndex).text + ", " + model1.get(currentIndex).color);
-                        if (table && table.showHarmonTimes)
-                            table.showHarmonTimes = currentIndex + 2;
+                        console.debug(harmonModel.get(currentIndex).text + ", " + harmonModel.get(currentIndex).color);
+                        table.selectHarmonTimes = currentIndex;
+
+                        console.log("table.selectHarmonTimes = " + table.selectHarmonTimes)
                     }
 
                     function updateModel() {
-                        model1.clear();
+                        harmonModel.clear();
 
                         var cols = AnalDataModel.analyzer.maxHarmonicTimes;
-                        for (var i = 1; i <= cols; i++){
+                        for (var i = 0; i <= cols; i++){
                             var js = {};
 
-                            if (i == 1){
+                            if (i == 0){
+                                js["text"] = "真有效值"
+                            }else if (i == 1){
                                 js["text"] = "基波"
                             }else{
                                 js["text"] = i + " 次谐波";
                             }
-                            js["data"] = "random";
+                            js["color"] = "random";
 
-                            model1.append(js);
+                            harmonModel.append(js);
                         }
                     }
                     Component.onCompleted: {
                         updateModel();
+                        cmbHarmon.currentIndex = 1;
                     }
                 }
 
@@ -161,19 +165,78 @@ Item {
                 }
 
                 Controls.ComboBox {
-                    id: cmbBox2
+                    id: cmbShowType
 
                     width: dp(100)
                     height: parent.height
 
                     model: ListModel {
-                        id: model2
-                        ListElement { text: "参考向量"; color: "test" }
+                        id: modelShowType
                         ListElement { text: "旋转向量"; color: "test" }
+                        ListElement { text: "参考向量"; color: "test" }
                     }
                     anchors.verticalCenter: parent.verticalCenter
                     onCurrentIndexChanged: {
-                        console.debug(model2.get(currentIndex).text + ", " + model2.get(currentIndex).color);
+//                        console.debug(modelShowType.get(currentIndex).text + ", " + modelShowType.get(currentIndex).color);
+                    }
+                }
+
+                Item {
+                    height: parent.height
+                    width: dp(80)
+
+                    visible: cmbShowType.currentIndex == 1
+                    Label {
+                        anchors.centerIn: parent
+                        text: qsTr("基准通道")
+
+                        font {
+                            family: "微软雅黑"
+                            weight: Font.Light
+                            pixelSize: dp(12)
+                        }
+                    }
+                }
+
+                Controls.ComboBox {
+                    id: cmbBaseChannel
+
+                    visible: cmbShowType.currentIndex == 1
+
+                    width: dp(130)
+                    height: parent.height
+
+                    property int  channelIdx: 1
+
+                    model: ListModel {
+                        id: baseModel
+                        ListElement { text: "test"; color: "test"; channel: 0 }
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    onCurrentIndexChanged: {
+//                        console.debug(baseModel.get(currentIndex).text + ", " + baseModel.get(currentIndex).color);
+                          channelIdx = baseModel.get(currentIndex).channel;
+                    }
+
+                    function updateModel() {
+                        baseModel.clear();
+
+                        var count = AnalDataModel.getChannelCount();
+                        for (var i = 0; i < count; i++){
+                            var js = {};
+
+                            if (!AnalDataModel.getPropValue(i, "visible"))
+                                continue;
+
+                            js["text"] = (i+1) + " - " + AnalDataModel.getPropValue(i, "name");
+                            js["color"] = "random";
+                            js["channel"] = i;
+
+                            baseModel.append(js);
+                        }
+                    }
+                    Component.onCompleted: {
+                        updateModel();
                     }
                 }
 
@@ -211,6 +274,7 @@ Item {
             VectorTableView {
                 id: table
 
+//                selectHarmonTimes: cmbHarmon.currentIndex
                 Layout.fillWidth: true
                 Layout.minimumWidth: 100;
 
@@ -220,6 +284,9 @@ Item {
                 id: vec
 
     //            visible: false
+                selectHarmonTimes: cmbHarmon.currentIndex
+                showType: cmbShowType.currentIndex
+                baseChannelIndex: cmbBaseChannel.channelIdx
                 Layout.fillWidth: true
                 Layout.minimumWidth: 300;
                 width: parent.width * 1 / 5

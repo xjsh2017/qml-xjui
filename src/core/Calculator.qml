@@ -237,17 +237,19 @@ QtObject {
             harmon[0] = analDC(input);
             for (var j = 1; j <= nMax; j++){
                 harmon[j] = analPeriodHarmonic(input, j);
-                if (j == 1) // 基波幅值作为通道在该索引点的幅值
-                    model.setPropValue(i, "amp", harmon[j].amp.toString());
             }
 
+            var baseHarmonValue = model.getHarmonValue(i, 1);
+            if (!model.isHarmonValueValid(baseHarmonValue))
+                continue;
+            var rms = baseHarmonValue.rms;
+
             // 谐波百分比计算， 各谐波的amp与基波的amp的比值百分数， 所以基波永远是100%
-            var amp = parseInt(model.getPropValue(i, "amp"));
             for (j = 0; j <= nMax; j++){
                 if (j == 1)
                     harmon[j].percentage = 1.0;
-                else if (isArray(harmon) && j <= harmon.length && amp > 1.0)
-                    harmon[j].percentage = harmon[j].amp / amp;
+                else if (isArray(harmon) && j <= harmon.length && rms > 1.0)
+                    harmon[j].percentage = harmon[j].rms / rms;
                 else
                     harmon[j].percentage = 0.0;
             }
@@ -290,7 +292,7 @@ QtObject {
         d = fV * Math.sin(fA);
         divbase = c*c + d*d;
 
-        var real, img, amp, angle;
+        var real, img, rms, angle;
         if (divbase > 0.00001){
             real = (a*c + b*d)/divbase; // 实部
             img = (b*c - a*d)/divbase; // 虚部
@@ -299,14 +301,14 @@ QtObject {
             img = 0.0;
         }
 
-        amp = Math.sqrt((real*real + img*img) / 2);
+        rms = Math.sqrt((real*real + img*img) / 2);
         angle = calcComplexAngle(real, img) * 180 / Math.PI
 
         return {
             n: n,
             real: real,
             img: img,
-            amp: amp,
+            rms: rms,
             angle: angle,
             percentage: 0.0
         }
@@ -420,7 +422,7 @@ QtObject {
         for (var i = 0; i < channel_count; i++){
             says += "\n\t " + model.name[i] + ": ";
             for (var j = 0; j < 7; j++){
-                 says += j +" = " + model.harmonic[i][j].amp.toFixed(3) + " " + (model.harmonic[i][j].percentage * 100).toFixed(3) + "%, "
+                 says += j +" = " + model.harmonic[i][j].rms.toFixed(3) + " " + (model.harmonic[i][j].percentage * 100).toFixed(3) + "%, "
             }
         }
 

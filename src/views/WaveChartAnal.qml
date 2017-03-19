@@ -55,6 +55,7 @@ Item {
         log("wca onSelectDataIndexChanged: new selectDataIndex = " + selectDataIndex);
 
         AnalDataModel.analyzer.curSamplePos = selectDataIndex;
+        AnalDataModel.selectDataIndex = selectDataIndex;
         log("AnalDataModel.analyzer.curSamplePos = " + selectDataIndex);
 
         if (Global.g_plotMode == Global.enSampleMode)

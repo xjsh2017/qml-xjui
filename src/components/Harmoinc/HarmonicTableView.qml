@@ -68,7 +68,7 @@ Item {
                 for (var j = 0; j <= AnalDataModel.analyzer.maxHarmonicTimes; j ++){
                     var harmon_value = AnalDataModel.getHarmonValue(i, j);
                     if (harmon_value && AnalDataModel.isHarmonValueValid(harmon_value)){
-                        js[j] = harmon_value.amp.toFixed(3) + ", "
+                        js[j] = harmon_value.rms.toFixed(3) + ", "
                                 + (harmon_value.percentage * 100).toFixed(2) + " %";
                     }else{
                         js[j] = "";
@@ -89,16 +89,15 @@ Item {
         }
 
         function updateModel() {
-            for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
-                if (!AnalDataModel.getPropValue(i, "visible"))
+            for (var i = 0; i < modelChannel.count; i++){
+                var idx = modelChannel.get(i).serial - 1;
+                if (idx < 0)
                     continue;
 
-                var rowIdx = getRowIdxByChannelIdx(i);
-                log("rowIdx = " + rowIdx + ", channel idx = " + i);
                 for (var j = 0; j <= AnalDataModel.analyzer.maxHarmonicTimes; j ++){
-                    var harmon_value = AnalDataModel.getHarmonValue(i, j);
-                    if (AnalDataModel.isHarmonValueValid(harmon_value) && rowIdx > -1){
-                        modelChannel.setProperty(rowIdx, j.toString(), harmon_value.amp.toFixed(3) + ", "
+                    var harmon_value = AnalDataModel.getHarmonValue(idx, j);
+                    if (AnalDataModel.isHarmonValueValid(harmon_value)){
+                        modelChannel.setProperty(i, j.toString(), harmon_value.rms.toFixed(3) + ", "
                                                  + (harmon_value.percentage * 100).toFixed(2) + " %");
                     }
                 }

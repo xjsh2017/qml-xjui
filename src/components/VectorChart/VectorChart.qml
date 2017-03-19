@@ -12,6 +12,9 @@ Canvas {
     // ///////////////////////////////////////////////////////////////
 
     property    var model: AnalDataModel.listModel
+    property    int selectHarmonTimes: 1
+    property    int baseChannelIndex: 1
+    property    int showType: 0
 
     property    var ctx;
     property    var plotArea;        // 绘图区域
@@ -57,20 +60,52 @@ Canvas {
 
         var tmp = 0;
         for (var i = 0; i < len; i++){
-            if (!model.get(i).selected)
+            if (!model.get(i).checked || !model.get(i).visible)
                 continue;
 
-            if (parseFloat(model.get(i).rms) > tmp){
-                tmp = parseFloat(model.get(i).rms);
-                log("index = " + i + ", model.rms = " + parseFloat(model.get(i).rms));
+            if (selectHarmonTimes == 0){
+                if (parseFloat(model.get(i).rms) > tmp){
+                    tmp = parseFloat(model.get(i).rms);
+                    log("checked channel index = " + i + ", model.rms = " + parseFloat(model.get(i).rms));
+                }
+            }else{
+                var harmon_value = AnalDataModel.getHarmonValue(i, selectHarmonTimes);
+                if (!AnalDataModel.isHarmonValueValid(harmon_value))
+                    continue;
+
+                if (harmon_value.rms > tmp){
+                    tmp = harmon_value.rms;
+                    log("checked channel index = " + i + ", harmon: " + selectHarmonTimes
+                        + ", harmon.rms = " + harmon_value.rms);
+                }
             }
         }
 
         maxRMS = tmp;
 
-        log("max RMS = " + maxRMS);
+        log("max rms = " + maxRMS);
+
+        if (maxRMS < 0.001)
+            maxRMS = 1;
 
         return tmp;
+    }
+
+    function updateRefAnagle() {
+        if (showType == 0)
+            refAngle = 0.0;
+        else if (baseChannelIndex >= 0){
+            if (selectHarmonTimes == 0){
+                refAngle = parseInt(AnalDataModel.getPropValue(baseChannelIndex, "angle"));
+            }else{
+                var harmon_value = AnalDataModel.getHarmonValue(baseChannelIndex, selectHarmonTimes);
+                if (!AnalDataModel.isHarmonValueValid(harmon_value))
+                    refAngle = 0.0;
+                else
+                    refAngle = harmon_value.angle;
+            }
+
+        }
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -85,9 +120,28 @@ Canvas {
     }
 
     onRefAngleChanged: {
+        log("onRefAngleChanged: refAngle = " + refAngle)
         repaint();
     }
 
+    onSelectHarmonTimesChanged: {
+        updateRefAnagle();
+
+        log("detected~ showType = " + showType + ", refAngle = " + refAngle)
+        repaint();
+    }
+
+    onShowTypeChanged: {
+        updateRefAnagle();
+
+        repaint();
+    }
+
+    onBaseChannelIndexChanged: {
+        updateRefAnagle();
+
+        repaint();
+    }
 
     // ///////////////////////////////////////////////////////////////
 
@@ -167,7 +221,7 @@ Canvas {
             ctx.fillStyle = Theme.accentColor
 
             ctx.fillText("0", plotArea.center.x + dp(4), plotArea.center.y + fontSize * 2);
-            ctx.fillText(maxRMS, plotArea.center.x + dp(2), plotArea.leftTop.y + fontSize * 2);
+            ctx.fillText(maxRMS.toFixed(2), plotArea.center.x + dp(2), plotArea.leftTop.y + fontSize * 2);
             ctx.fillText((maxRMS * 2/3).toFixed(2), plotArea.center.x + dp(2), plotArea.leftTop.y + plotArea.r / 3 + fontSize * 2);
             ctx.fillText((maxRMS * 1/3).toFixed(2), plotArea.center.x + dp(2), plotArea.leftTop.y + plotArea.r * 2 / 3 + fontSize * 2);
 
@@ -254,11 +308,20 @@ Canvas {
         var len = canvas.model.count;
 
         for (var i = 0; i < len; i++){
-            if (!model.get(i).selected)
+            if (!model.get(i).checked || !model.get(i).visible)
                 continue;
 
             var color = Global.phaseTypeColor(model.get(i).phase);
-            drawVector(getContext("2d"), parseFloat(model.get(i).rms), parseFloat(model.get(i).angle), color)
+            if (selectHarmonTimes == 0)
+                drawVector(getContext("2d"), parseFloat(model.get(i).rms), parseFloat(model.get(i).angle), color)
+            else{
+                var harmon_value = AnalDataModel.getHarmonValue(i, selectHarmonTimes);
+                if (!AnalDataModel.isHarmonValueValid(harmon_value))
+                    continue;
+
+                drawVector(getContext("2d"), (harmon_value.rms  < 0.001 ? 1 : harmon_value.rms)
+                           , harmon_value.angle, color)
+            }
         }
     }
 
@@ -305,6 +368,7 @@ Canvas {
 //        console.log("r = " + r + ", angle = " + angle)
 //        console.log(typeof r + ", " + typeof angle)
 
+        log("drawVector： refAngle = " + refAngle)
         r = parseFloat(r);
         angle = parseFloat(angle) - refAngle;
         var posx0, posy0, posx, posy
