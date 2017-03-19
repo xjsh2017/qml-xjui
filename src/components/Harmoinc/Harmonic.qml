@@ -14,7 +14,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     property int currentIndex: -1;      // 通道
-
+    property int showHarmonTimes: 7;          // 谐波次数
 
     // ///////////////////////////////////////////////////////////////
 
@@ -30,7 +30,14 @@ Item {
         if (currentIndex < 0)
             return;
 
-        for (var i = 0; i <= 7; i++){
+        var title = "谐波分布"
+        var name = AnalDataModel.getPropValue(currentIndex, "name");
+        if (name)
+            title += " - " + name;
+        chart.chartData.datasets[0].label = title;
+        chart.chartData.datasets[0].data.length = showHarmonTimes + 1
+        chart.chartData.labels.length = showHarmonTimes + 1;
+        for (var i = 0; i <= showHarmonTimes; i++){
             var harmon_value = AnalDataModel.getHarmonValue(currentIndex, i);
             if (AnalDataModel.isHarmonValueValid(harmon_value))
                 chart.chartData.datasets[0].data[i] = (harmon_value.percentage * 100).toFixed(2);
@@ -49,9 +56,33 @@ Item {
     }
 
     onCurrentIndexChanged: {
+        if (currentIndex < 0)
+            return;
         updateChartData();
 
         chart.repaint();
+    }
+
+    onShowHarmonTimesChanged: {
+        log("onShowHarmonTimesChanged")
+        if (currentIndex < 0)
+            return;
+        updateChartData();
+
+        chart.repaint();
+    }
+
+    Connections {
+        target: AnalDataModel
+
+        onAnalyzerResultUpdated: {
+            if (currentIndex < 0)
+                return;
+            updateChartData();
+
+            chart.repaint();
+
+        }
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -115,6 +146,28 @@ Item {
 
         }
 
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
+    function log(says) {
+        console.log("## Harmonic.qml ##: " + says);
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
+    Component.onCompleted: {
+        try {
+
+        } catch (error) {
+            // Ignore the error; it only means that the fonts were not enabled
+        }
+
+        log("Component.onCompleted")
+    }
+
+    Component.onDestruction: {
+        log("Component.onDestruction")
     }
 
 }

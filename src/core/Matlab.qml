@@ -530,52 +530,53 @@ QtObject {
         }
     }
 
+    // [start, end]
     function x_row(index, start, end, who) {
-//        log(index + ", " + start + ", " + end + ", " + who)
         if (!who)
             who = this;
 
-        if (!who.x || index > who.rows() - 1 || index < 0)
-            return NaN;
+        if (!who.x|| index < 0 || index >= who.rows() && !isArray(who.x) )
+            return [];
 
         start = arguments[1] ? arguments[1] : 0;
-        end = arguments[2] ? arguments[2] : who.cols() - 1;
+        end = arguments[2] ? arguments[2] : who.cols();
 
-        if (start < 0 || end < 0 || end < start || start > who.cols() - 1)
-            return NaN;
+        if (start < 0 || end < 0 || end < start)
+            return [];
 
-        end = Math.min(end, who.cols() - 1)
-        var tmp = new Array(end - start + 1);
-        for (var i = start; i <= end; i++)
-            tmp[i - start] = who.x[index][i];
+        end = Math.min(end, who.cols())
+//        var tmp = new Array(end - start + 1);
+//        for (var i = start; i <= end; i++)
+//            tmp[i - start] = who.x[index][i];
 
         return {
-            data: tmp,
+            data: who.x[index].slice(start, end + 1),
 
             print: matrix_print_row
         }
     }
 
+    // [start, end]
     function y_row(index, start, end, who) {
         if (!who)
             who = this;
 
-        if (!who.y || index > who.rows() - 1 || index < 0)
-            return NaN;
+        if (!who.y || index < 0 || index >= who.rows() && !is2dArray(who.y) )
+            return [];
 
         start = arguments[1] ? arguments[1] : 0;
-        end = arguments[2] ? arguments[2] : who.cols() - 1;
+        end = arguments[2] ? arguments[2] : who.cols();
 
-        if (start < 0 || end < 0 || end < start || start > who.cols() - 1)
-            return NaN;
+        if (start < 0 || end < 0 || end < start)
+            return [];
 
-        end = Math.min(end, who.cols() - 1)
-        var tmp = new Array(end - start + 1);
-        for (var i = start; i <= end; i++)
-            tmp[i - start] = who.y[index][i];
+        end = Math.min(end, who.cols())
+//        var tmp = new Array(end - start + 1);
+//        for (var i = start; i <= end; i++)
+//            tmp[i - start] = who.y[index][i];
 
         return {
-            data: tmp,
+            data: who.y[index].slice(start, end + 1),
 
             print: matrix_print_row
         }
@@ -686,7 +687,8 @@ QtObject {
     // ///////////////////////////////////////////////////////////////
 
     function isArray(o){
-        return Object.prototype.toString.call(o)=='[object Array]';
+        return o && Array.isArray(o)
+//        return Object.prototype.toString.call(o)=='[object Array]';
     }
 
     function is2dArray(arg){

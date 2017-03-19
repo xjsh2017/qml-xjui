@@ -582,23 +582,7 @@ Item {
 
                                         wca.grooveXPlot = curve.grooveXPlot; // 通知其它波形更新
 
-                                        console.log(says)
-
-//                                        groove.value = curve.grooveXPlot + groove.minimumValue
-//                                        if (curve.plotMode == Global.enSampleMode)
-//                                            groove.knobLabel = curve.selectDataIndex;
-
-    //                                    for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
-    //                                        if (wca.curvelist[i] == curve)
-    //                                            continue;
-    //                                        if (curve.grooveXPlot == wca.curvelist[i].grooveXPlot)
-    //                                            continue;
-
-    //                                        console.log("wca.curvelist[" + i + "].grooveXPlot = "
-    //                                                    + wca.curvelist[i].grooveXPlot)
-
-    //                                        wca.curvelist[i].grooveXPlot = curve.grooveXPlot;
-    //                                    }
+//                                        console.log(says)
                                     }
 
 
@@ -613,18 +597,9 @@ Item {
                                         says += "\n\t new selectDataIndex = " + curve.selectDataIndex;
 
                                         wca.selectDataIndex = curve.selectDataIndex;
-                                        says += "\n\t set wca.selectDataIndex = " + curve.selectDataIndex;
+//                                        says += "\n\t set wca.selectDataIndex = " + curve.selectDataIndex;
 
-                                        console.log(says);
-
-//                                        if (visible)
-//                                            wavePanel.updatePanel();
-
-//                                        AnalDataModel.analyzer.curSamplePos = selectDataIndex;
-
-//                                        groove.value = curve.grooveXPlot + groove.minimumValue
-//                                        if (plotMode == Global.enSampleMode)
-//                                            groove.knobLabel = selectDataIndex;
+//                                        console.log(says);
                                     }
                                 }
 
@@ -825,17 +800,20 @@ Item {
             log("Detected AnalDataModel anal param updated !")
 
         }
-    }
 
-//    Connections {
-//        target: waveModel
+        onChannelPropUpdated: {
+            log("Detected AnalDataModel channel info updated !")
+
+        }
+
+        onSyncModelChanged: {
+            log("Detect AnalDataModel sync model data updated !")
+        }
 
 //        onModelDataChanged: {
-//            console.log("Detect waveModel data changed outside!")
-
-////            AnalDataModel.updateModelFromInternalDataAPI(waveModel)
+//            log("Detect AnalDataModel sync model data updated !")
 //        }
-//    }
+    }
 
     // ///////////////////////////////////////////////////////////////
 
@@ -845,14 +823,11 @@ Item {
             Theme.accentColor = "#ff9800";
             Theme.tabHighlightColor = "white";
 
-//            Calculator.model = AnalDataModel
-
             AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
             var sample = AnalDataModel.sample;
-
-            log("Component.onCompleted")
             log("wca.curvelist = " + curvelist);
 
+            log("Component.onCompleted")
         } catch (error) {
             // Ignore the error; it only means that the fonts were not enabled
         }

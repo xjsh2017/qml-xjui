@@ -244,7 +244,7 @@ Item {
 
                 Item {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: dp(9)
+                    height: dp(9)
                 }
 
                 MagicDivider {
@@ -255,7 +255,7 @@ Item {
 
 //                Item {
 //                    Layout.fillWidth: true
-//                    Layout.preferredHeight: dp(9)
+//                    height: dp(9)
 //                }
 
                 Repeater{

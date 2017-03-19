@@ -240,6 +240,7 @@ Item {
             Harmonic {
                 id: harmon
 
+                showHarmonTimes: table.showHarmonTimes
                 Layout.fillWidth: true
                 Layout.minimumWidth: 300;
                 width: parent.width * 2 / 5
@@ -248,9 +249,11 @@ Item {
             Connections {
                 target: table
 
-                onSelectRowChanged: {
-                    console.log("onSelectRowChanged : " + index)
-                    harmon.currentIndex = index;
+                onSelRowChanged: {
+                    harmon.currentIndex = channelIdx;
+                    harmon.showHarmonTimes = showHarmonTimes;
+
+                    console.log("Harmonic.showHarmonTimes = "+showHarmonTimes)
                 }
             }
         }

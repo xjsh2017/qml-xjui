@@ -1,4 +1,4 @@
-#include "waveanaldatamodel.h"
+ï»¿#include "waveanaldatamodel.h"
 
 #include <QTime>
 #include <iostream>
@@ -195,7 +195,7 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 //    if (nMaxValue < samplePoints || nRows == 0)
 //        return;
 
-    // ÏÈÉ¾³ýÊý¾Ý
+    // å…ˆåˆ é™¤æ•°æ®
 //    int nDeleteCount = qMin(nCols, samplePoints);
 //    for (int i = 0; i < nRows; ++i)
 //    {

@@ -177,7 +177,6 @@ Item {
             height: parent.height - dp(2)
 
             radius: height / 2
-//            width: control.valueRange - (waveModel.cols() - control.valueRange) / control.scrollbarSteps
             width: Math.max(parent.width * parent.width / (control.ratedWith * control.sampleRate), implicitWidth)
             implicitWidth: dp(50)
 

@@ -19,6 +19,8 @@ QtObject {
 
     property  string typename: "AnalDataModel"
 
+    property var syncModel: waveModel
+
     property var channels: JSONListModel {
             id: js_list_properties
         property var locals: ["name", "unit", "phase", "visible", "selected"]
@@ -233,13 +235,13 @@ QtObject {
     }
 
     function getXRow(index, start, end){
-        if (index < getChannelCount() && sample && sample.x_row){
+        if (index < getChannelCount() && sample && sample.x && sample.x_row){
             return sample.x_row(index, start, end).data;
         }
     }
 
     function getYRow(index, start, end){
-        if (index < getChannelCount() && sample && sample.y_row){
+        if (index < getChannelCount() && sample && sample.y &&  sample.y_row){
             return sample.y_row(index, start, end).data;
         }
     }
@@ -333,19 +335,18 @@ QtObject {
     /*
         从内部数据接口更新模型数据
       */
-    function updateModelFromInternalDataAPI(modeldata) {
-        if(!modeldata)
+    function sync() {
+        if(!syncModel)
             return;
-        console.log("here: " + modeldata)
+        log("syncModel: " + syncModel)
 
-        var Rows = modeldata.rows();
-        var Cols = modeldata.cols();
-        var x = modeldata.x_data();
+        var Rows = syncModel.rows();
+        var Cols = syncModel.cols();
+        var x = syncModel.x_data();
         var y = new Array(Rows);
         for (var i = 0; i < Rows; i ++){
-            y[i] = modeldata.y_data(i);
+            y[i] = syncModel.y_data(i);
         }
-
         sample.x = x;
         sample.y = y;
         sample.rows = Rows;
@@ -353,7 +354,7 @@ QtObject {
 
         log("Rows: " + Rows + ", Cols: " + Cols)
 
-        root.sampleChanged()();
+        sampleChanged()();
     }
 
     function getHarmonValue(channelIdx, times){
@@ -366,7 +367,7 @@ QtObject {
     }
 
     function isHarmonValueValid(arg){
-        if (arg.n != undefined
+        if (arg && arg.n != undefined
                 && arg.real != undefined
                 && arg.img != undefined
                 && arg.amp != undefined
@@ -394,7 +395,8 @@ QtObject {
     // ///////////////////////////////////////////////////////////////
 
     function isArray(o){
-        return o && Object.prototype.toString.call(o)=='[object Array]';
+        return o && Array.isArray(o);
+//        return o && Object.prototype.toString.call(o)=='[object Array]';
     }
 
     function is2dArray(arg){

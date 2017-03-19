@@ -21,17 +21,7 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    signal selectRowChanged(var index);
-
-    // ///////////////////////////////////////////////////////////////
-
-    function log(says) {
-        console.log("## HarmonicTableView.qml ##: " + says);
-    }
-
-    function dp(di){
-        return di;
-    }
+    signal selRowChanged(var channelIdx, var showHarmonTimes)
 
     // ///////////////////////////////////////////////////////////////
 
@@ -40,32 +30,39 @@ Item {
 
         onAnalyzerResultUpdated: {
             log("Detected AnalDataModel Anal Result Updated !")
-            update();
+            log("Doing: update harmonic table model data !")
+            modelChannel.updateModel();
+            log("Done!: update harmonic table model data !")
         }
-    }
 
-    function update() {
-        modelChannel.updateModel();
+        onChannelPropUpdated: {
+            log("Detected AnalDataModel channel info updated !")
+            log("Doing: rebuild harmonic table model data !")
+            modelChannel.rebuildModel();
+            log("Done!: rebuild harmonic table model data !")
+        }
     }
 
     onShowHarmonTimesChanged: {
         log("onShowHarmonTimesChanged")
-//        modelChannel.updateModel();
         table.update();
+
+        selRowChanged(table.currentRow, showHarmonTimes)
     }
 
     ListModel
     {
         id: modelChannel
 
-        function updateModel() {
+        function rebuildModel() {
             clear();
 
             for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
                 if (!AnalDataModel.getPropValue(i, "visible"))
                     continue;
+
                 var js = {};
-                js["serial"] = i + 1;
+                js["serial"] = i + 1;   // 通道编号
                 js["name"] = AnalDataModel.getPropValue(i, "name");
 
                 for (var j = 0; j <= AnalDataModel.analyzer.maxHarmonicTimes; j ++){
@@ -79,6 +76,32 @@ Item {
                 }
 
                 append(js);
+            }
+        }
+
+        function getRowIdxByChannelIdx(channelIdx) {
+            for (var i = 0; i < modelChannel.count; i++){
+                if (parseInt(modelChannel.get(i).serial) == (channelIdx + 1))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        function updateModel() {
+            for (var i = 0; i < AnalDataModel.getChannelCount(); i++){
+                if (!AnalDataModel.getPropValue(i, "visible"))
+                    continue;
+
+                var rowIdx = getRowIdxByChannelIdx(i);
+                log("rowIdx = " + rowIdx + ", channel idx = " + i);
+                for (var j = 0; j <= AnalDataModel.analyzer.maxHarmonicTimes; j ++){
+                    var harmon_value = AnalDataModel.getHarmonValue(i, j);
+                    if (AnalDataModel.isHarmonValueValid(harmon_value) && rowIdx > -1){
+                        modelChannel.setProperty(rowIdx, j.toString(), harmon_value.amp.toFixed(3) + ", "
+                                                 + (harmon_value.percentage * 100).toFixed(2) + " %");
+                    }
+                }
             }
         }
     }
@@ -168,7 +191,7 @@ Item {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 onClicked: {
-                    table.currentRow = modelChannel.get(styleData.row).serial - 1;
+                    table.currentRow = modelChannel.get(styleData.row).serial - 1;  // 将通道的index传过去，而不是行号
                     if(rowDelegate.sizeOpen == rowDelegate.height)
                     {
                         table.selection.deselect(styleData.row);
@@ -252,7 +275,7 @@ Item {
         resources: createResources()
 
         onCurrentRowChanged: {
-            selectRowChanged(currentRow);
+            selRowChanged(currentRow, showHarmonTimes)
         }
     }
 
@@ -262,9 +285,28 @@ Item {
         TableViewColumn{ width: 100 }
     }
 
+    // ///////////////////////////////////////////////////////////////
+
+    function log(says) {
+        console.log("## HarmonicTableView.qml ##: " + says);
+    }
+
+    function dp(di){
+        return di;
+    }
+
+    // ///////////////////////////////////////////////////////////////
+
     Component.onCompleted: {
-        if (AnalDataModel.isModelValid())
-            modelChannel.updateModel();
+        try {
+            if (AnalDataModel.isModelValid())
+                modelChannel.rebuildModel();
+
+        } catch (error) {
+            // Ignore the error
+        }
+
+        log("Component.onCompleted")
     }
 
     Component.onDestruction: {
