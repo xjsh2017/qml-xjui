@@ -175,10 +175,9 @@ Item {
 
             }
 
-            VectorChart {
+            SeqVectorChart {
                 id: vec
 
-    //            visible: false
                 Layout.fillWidth: true
                 Layout.minimumWidth: 300;
                 width: parent.width * 1 / 5
@@ -198,6 +197,8 @@ Item {
     Dialog {
         id: channelSettings
         title: qsTr("")
+
+        property var selAnalChannels: [-1, -1, -1, -1, -1, -1]
 
         positiveButtonText: qsTr("确定")
         negativeButtonText: qsTr("取消")
@@ -259,7 +260,7 @@ Item {
 //                }
 
                 Repeater{
-                    model: column.sections
+                    model: column.sections.length
 
                     delegate: ListItem.Standard {
                         content: RowLayout {
@@ -268,11 +269,12 @@ Item {
 
                             Item {
                                 Layout.alignment: Qt.AlignHCenter
-                                Layout.preferredWidth: 0.2 * parent.width
+//                                Layout.preferredWidth: 0.2 * parent.width
+                                width: 0.2*parent.width
 
                                 Label {
                                     anchors.centerIn: parent
-                                    text: modelData
+                                    text: column.sections[modelData]
                                 }
                             }
 
@@ -283,6 +285,15 @@ Item {
                                 model: []
                                 Component.onCompleted: {
                                     model = channelSettings.updateModel();
+                                }
+
+                                onItemSelected: {
+                                    console.log("modelData = " + modelData + ", index = " + index);
+                                    if (index > 0){
+                                        channelSettings.selAnalChannels[modelData] = (index - 1);
+                                    }else{
+                                        channelSettings.selAnalChannels[modelData] = -1;
+                                    }
                                 }
                             }
                         }
@@ -297,6 +308,12 @@ Item {
                 }
             }
 
+        }
+
+        onAccepted: {
+            console.log("channelSettings.selAnalChannels = " + channelSettings.selAnalChannels);
+            table.selAnalChannels = channelSettings.selAnalChannels;
+            table.selAnalChannelsChanged();
         }
 
         onRejected: {

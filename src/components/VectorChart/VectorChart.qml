@@ -39,7 +39,7 @@ Canvas {
     }
 
     function log(says) {
-        console.log("# VectorChart.qml: # " + says);
+//        console.log("# VectorChart.qml: # " + says);
     }
 
     function debug(de) {

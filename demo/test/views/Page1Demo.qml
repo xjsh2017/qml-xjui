@@ -87,7 +87,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     action: Action {
-                        iconName: "action/hide_sidebar"
+                        iconName: "action/language"
                         name: tree.visible ? "Hide Sidebar" : "Show Sidebar"
                         onTriggered: {
                             tree.visible = !tree.visible;

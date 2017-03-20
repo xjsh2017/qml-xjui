@@ -415,6 +415,136 @@ QtObject {
     }
 
 
+    /*!
+     *
+     * 正序分量计算
+     * input:  [A相幅值，A相相角，B相幅值，B相相角，C相幅值，C相相角] (均为基波物理量)
+     * 返回： {
+                real: 0,
+                img: img,
+                rms: rms,
+                angle: angle
+            }
+            E1 = (A + B * Vector(-0.5, 0.8660254) + C * Vector(-0.5, -0.8660254)) / Vector(3, 0);
+       正序分量计算公式： E1 = （A+B*α+C*α*α）/3   α=-0.5+j0.8660254  α*α= -0.5-j0.8660254
+
+     */
+    function calcE1(input){
+        var a_r, a_i;
+        var b_r, b_i;
+        var c_r, c_i;
+
+        a_r = input[0]*Math.cos(input[1]*Math.PI/180);
+        a_i = input[0]*Math.sin(input[1]*Math.PI/180);
+
+        b_r = input[2]*Math.cos(input[3]*Math.PI/180);
+        b_i = input[2]*Math.sin(input[3]*Math.PI/180);
+
+        c_r = input[0]*Math.cos(input[5]*Math.PI/180);
+        c_i = input[4]*Math.sin(input[5]*Math.PI/180);
+
+        var real = (a_r + (b_r * (-0.5) - b_i * 0.8660254) + (c_r * (-0.5) - c_i * (-0.8660254))) / 3; //实部
+        var img = (a_i + (b_r * 0.8660254 + b_i * (-0.5)) + (c_r * (-0.8660254) + c_i * (-0.5))) / 3; //虚部
+        var rms = Math.sqrt(real * real + img * img); // 幅值
+        var angle = calcComplexAngle(real, img) * 180 / Math.PI
+
+        return {
+            n: 0,
+            real: real,
+            img: img,
+            rms: rms,
+            angle: angle,
+            percentage: 0.0
+        }
+    }
+
+    /*!
+     *
+     * 负序分量计算
+     * input:  [A相幅值，A相相角，B相幅值，B相相角，C相幅值，C相相角] (均为基波物理量)
+     * 返回： {
+                real: 0,
+                img: img,
+                rms: rms,
+                angle: angle
+            }
+            E2 = (A + B * Vector(-0.5, -0.8660254) + C * Vector(-0.5, 0.8660254)) / Vector(3, 0);
+       负序分量计算公式： E2 = （A+B*α+C*α*α）/3   α=-0.5-j0.8660254  α*α= -0.5+j0.8660254
+
+     */
+    function calcE2(input){
+        var a_r, a_i;
+        var b_r, b_i;
+        var c_r, c_i;
+
+        a_r = input[0]*Math.cos(input[1]*Math.PI/180);
+        a_i = input[0]*Math.sin(input[1]*Math.PI/180);
+
+        b_r = input[2]*Math.cos(input[3]*Math.PI/180);
+        b_i = input[2]*Math.sin(input[3]*Math.PI/180);
+
+        c_r = input[0]*Math.cos(input[5]*Math.PI/180);
+        c_i = input[4]*Math.sin(input[5]*Math.PI/180);
+
+        var real = (a_r + (b_r * (-0.5) - b_i * (-0.8660254)) + (c_r * (-0.5) - c_i * 0.8660254)) / 3; //实部
+        var img = (a_i + (b_r *(-0.8660254) + b_i * (-0.5)) + (c_r * 0.8660254 + c_i * (-0.5))) / 3; //虚部
+        var rms = Math.sqrt(real * real + img * img); // 幅值
+        var angle = calcComplexAngle(real, img) * 180 / Math.PI
+
+        return {
+            n: 0,
+            real: real,
+            img: img,
+            rms: rms,
+            angle: angle,
+            percentage: 0.0
+        }
+    }
+
+    /*!
+     *
+     * 0序分量计算
+     * input:  [A相幅值，A相相角，B相幅值，B相相角，C相幅值，C相相角] (均为基波物理量)
+     * 返回： {
+                real: 0,
+                img: img,
+                rms: rms,
+                angle: angle
+            }
+
+       0序分量计算公式： 3E0 = A + B + C
+
+     */
+    function calc3E0(input){
+        var a_r, a_i;
+        var b_r, b_i;
+        var c_r, c_i;
+
+        a_r = input[0]*Math.cos(input[1]*Math.PI/180);
+        a_i = input[0]*Math.sin(input[1]*Math.PI/180);
+
+        b_r = input[2]*Math.cos(input[3]*Math.PI/180);
+        b_i = input[2]*Math.sin(input[3]*Math.PI/180);
+
+        c_r = input[0]*Math.cos(input[5]*Math.PI/180);
+        c_i = input[4]*Math.sin(input[5]*Math.PI/180);
+
+        var real = a_r + b_r + c_r; //实部
+        var img = a_i + b_i + c_i; //虚部
+        var rms = Math.sqrt(real * real + img * img); // 幅值
+        var angle = calcComplexAngle(real, img) * 180 / Math.PI
+
+        return {
+            n: 0,
+            real: real,
+            img: img,
+            rms: rms,
+            angle: angle,
+            percentage: 0.0
+        }
+    }
+
+
     function print_harmonic_result() {
         var says;
 

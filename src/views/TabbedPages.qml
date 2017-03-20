@@ -35,7 +35,7 @@ TabbedPage {
         event.accepted = true
     }
 
-//    selectedTabIndex: 1
+    selectedTabIndex: 2
 
 //    Tab {
 //        title: "Overview"

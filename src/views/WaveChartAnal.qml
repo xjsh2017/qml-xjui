@@ -328,7 +328,7 @@ Item {
 
                         IconButton {
                             id: runInRealTime
-                            Layout.leftMargin: dp(8)
+//                            Layout.leftMargin: dp(8)
 
                             action: Action {
                                 iconName: "action/alarm"
