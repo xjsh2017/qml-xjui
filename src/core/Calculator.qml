@@ -384,13 +384,11 @@ QtObject {
             log("Error anal model !");
             return;
         }
-        log("h1")
 
         var anlyzer = model.analyzer
         if (!anlyzer)
             return;
 
-        log("h2")
         var fhege = 0.0;
         var nhege = 0;
         var nTotal = model.getDataCols();
@@ -418,7 +416,6 @@ QtObject {
                 + "  帧速： " + nZhenSu + " 帧/秒  流量： " + fLiuLiang.toFixed(3) + " Mb/s"
                 + "  持续时间： " + fkeep.toFixed(3);
 
-        log("h3")
         return {
             title: title,
             static: anlyzer.timeRelastStatic

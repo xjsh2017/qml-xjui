@@ -24,7 +24,7 @@ INCLUDEPATH += $$SDKInclude \
         $$SDKInclude/cim/core/topology \
         $$SDKInclude/cim/core/wires
 
-searchlist += $$PWD/*.h
+searchlist = $$PWD/*.h
 for(searchvar, searchlist) {
     hlist += $$files($$searchvar, true)
 }

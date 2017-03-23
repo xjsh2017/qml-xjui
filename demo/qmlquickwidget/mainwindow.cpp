@@ -79,9 +79,13 @@ void MainWindow::setupUi()
 
     // 波形图
     m_qwWaveView = new QXJQuickWidget(this);
+    m_qwWaveView->resize(300,300);
     m_qwWaveView->setObjectName(QStringLiteral("qwWaveAnal"));
     m_qwWaveView->setResizeMode(QQuickWidget::SizeRootObjectToView );
     m_qwWaveView->setSource(QUrl("qrc:/quick/WSDataAnal.qml"));
+//    QQmlComponent *component = new QQmlComponent(m_qwWaveView->engine());
+//    component->setData("import QtQuick 2.4\n import XjUi 1.0 \n WSDataAnal{}", QUrl());
+//    m_qwWaveView->setContent(QUrl(), component, component->create());
     m_qwWaveData = new WaveAnalDataModel();
 //    QList<qreal> starts;
 //    starts.push_back(0);
@@ -89,7 +93,7 @@ void MainWindow::setupUi()
 //    starts.push_back(120);
 //    starts.push_back(240);
     m_qwWaveData->buildSinWaveData(27, 1601, 20, 0, 900, -20, 20, true/*, starts*/);
-    m_qwWaveView->rootContext()->setContextProperty("waveModel", m_qwWaveData);
+//    m_qwWaveView->rootContext()->setContextProperty("waveModel", m_qwWaveData);
 
     tabw->addTab(m_qwWaveView, QStringLiteral("Wave - Sample1"));
 

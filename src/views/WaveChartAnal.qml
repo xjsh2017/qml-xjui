@@ -28,9 +28,9 @@ Item {
     property var wavePanelist: new Array(maxCount)
     property var rowPaneCurvelist: new Array(maxCount)
 
-    onCurvelistChanged: {
-        log("onCurvelistChanged: curvelist = " + curvelist)
-    }
+//    onCurvelistChanged: {
+//        log("onCurvelistChanged: curvelist = " + curvelist)
+//    }
 
     // 更新大标尺groove的位置和读数，更新其它波形的刻度线位置
     onGrooveXPlotChanged: {
