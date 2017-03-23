@@ -88,7 +88,7 @@ private:
 
     int m_channelCount;
 
-signals:
+Q_SIGNALS:
     void modelDataChanged();    // 数据模型变化请求同步信号
 
 //    QML_PROPERTY(QString, test, READ, test, WRITE, setTest, NOTIFY, testChanged)
@@ -158,7 +158,7 @@ public:
     inline bool popFront(QList<qreal> &list, int nCount);
     inline bool popBack(QList<qreal> &list, int nCount);
 
-    Q_INVOKABLE void sync() { emit modelDataChanged(); }
+    Q_INVOKABLE void sync() { setTest(QString("%1").arg(rand())); emit modelDataChanged(); }
     void setNotify(bool arg) { m_notify = arg; }
 
 signals:

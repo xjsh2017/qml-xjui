@@ -35,7 +35,7 @@ TabbedPage {
         event.accepted = true
     }
 
-    selectedTabIndex: 2
+//    selectedTabIndex: 1
 
 //    Tab {
 //        title: "Overview"
@@ -53,14 +53,14 @@ TabbedPage {
 //        }
 //    }
 
-//    Tab {
-//        title: "离散度分析"
+    Tab {
+        title: "离散度分析"
 
-//        sourceComponent: TimeDisperAnal {
-//            id: timeDisperAnal
-////            model: page.model
-//        }
-//    }
+        sourceComponent: TimeDisperAnal {
+            id: timeDisperAnal
+//            model: page.model
+        }
+    }
 
     Tab {
         title: "谐波分析"

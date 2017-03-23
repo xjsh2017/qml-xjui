@@ -378,37 +378,46 @@ QtObject {
     /*
       离散度分析
       */
-    function analTimeDisper() {
+    function analTimeDisper(model) {
+        if (!isModelValid(model)){
+            log("Error anal model !");
+            return;
+        }
+
         var fhege = 0.0;
         var nhege = 0;
-        var nTotal = model.data.cols;
+        var nTotal = model.getDataCols();
         if (nTotal == 0)
             nTotal += 1;
 
-        nhege = model.timeRelastStatic.n0us + model.timeRelastStatic.n1us +
-                model.timeRelastStatic.n2us + model.timeRelastStatic.n3us +
-                model.timeRelastStatic.n4us + model.timeRelastStatic.n5us +
-                model.timeRelastStatic.n6us +model.timeRelastStatic.n7us +
-                model.timeRelastStatic.n8us + model.timeRelastStatic.n9us +
-                model.timeRelastStatic.n10us + model.timeRelastStatic.neg_n1us +
-                model.timeRelastStatic.neg_n2us +model.timeRelastStatic.neg_n3us +
-                model.timeRelastStatic.neg_n4us + model.timeRelastStatic.neg_n5us +
-                model.timeRelastStatic.neg_n6us + model.timeRelastStatic.neg_n7us +
-                model.timeRelastStatic.neg_n8us + model.timeRelastStatic.neg_n9us +
-                model.timeRelastStatic.neg_n10us;
+        var anlyzer = model.anlyzer
+        if (!anlyzer)
+            return;
+
+        nhege = anlyzer.timeRelastStatic.n0us + anlyzer.timeRelastStatic.n1us +
+                anlyzer.timeRelastStatic.n2us + anlyzer.timeRelastStatic.n3us +
+                anlyzer.timeRelastStatic.n4us + anlyzer.timeRelastStatic.n5us +
+                anlyzer.timeRelastStatic.n6us +anlyzer.timeRelastStatic.n7us +
+                anlyzer.timeRelastStatic.n8us + anlyzer.timeRelastStatic.n9us +
+                anlyzer.timeRelastStatic.n10us + anlyzer.timeRelastStatic.neg_n1us +
+                anlyzer.timeRelastStatic.neg_n2us +anlyzer.timeRelastStatic.neg_n3us +
+                anlyzer.timeRelastStatic.neg_n4us + anlyzer.timeRelastStatic.neg_n5us +
+                anlyzer.timeRelastStatic.neg_n6us + anlyzer.timeRelastStatic.neg_n7us +
+                anlyzer.timeRelastStatic.neg_n8us + anlyzer.timeRelastStatic.neg_n9us +
+                anlyzer.timeRelastStatic.neg_n10us;
 
         fhege = nhege / nTotal;
-        var fkeep = model.ftime_relative_last - model.ftime_relative_first;
+        var fkeep = anlyzer.ftime_relative_last - anlyzer.ftime_relative_first;
         var nZhenSu = Math.round(nTotal / fkeep);
-        var fLiuLiang = model.lTotalCapLenth * 8/(fkeep*1024*1024);
-        var title = "0x" + model.ncapp_id + " 总帧数： " + nTotal
+        var fLiuLiang = anlyzer.lTotalCapLenth * 8/(fkeep*1024*1024);
+        var title = "0x" + anlyzer.ncapp_id + " 总帧数： " + nTotal
                 + "  合格： " + nhege + " 帧, " + (fhege * 100).toFixed(2) + " %(帧间差-250us≤10us)"
                 + "  帧速： " + nZhenSu + " 帧/秒  流量： " + fLiuLiang.toFixed(3) + " Mb/s"
                 + "  持续时间： " + fkeep.toFixed(3);
 
         return {
             title: title,
-            static: model.timeRelastStatic
+            static: anlyzer.timeRelastStatic
         }
 
 

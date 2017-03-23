@@ -14,9 +14,7 @@ Item {
 
     // ///////////////////////////////////////////////////////////////
 
-    property var model: Calculator.model
-    property bool isModelUpdate: Calculator.isNeedUpdate
-
+    property var model: AnalDataModel.analyzer
 
     // ///////////////////////////////////////////////////////////////
 
@@ -28,7 +26,7 @@ Item {
     // ///////////////////////////////////////////////////////////////
 
     function updateChartData() {
-        var result = Calculator.analTimeDisper();
+        var result = Calculator.analTimeDisper(AnalDataModel);
 
         chart.chartData.labels = ["<-10","-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","0"
                                    ,"1","2","3","4","5","6","7","8","9","10",">10"];
@@ -109,9 +107,9 @@ Item {
                                      0,
                                      0,
                                      0,
-                                     0,
-                                     0,
-                                     0,
+                                     0.1452,
+                                     0.7087,
+                                     0.1452,
                                      0,
                                      0,
                                      0,

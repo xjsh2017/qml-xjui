@@ -376,6 +376,7 @@ Item {
                                 name: qsTr("Refresh (Ctrl + R)")
                                 hoverAnimation: true
                                 onTriggered: {
+                                    AnalDataModel.sync();
                                     repaintCurves();
                                     snackbar.open("All Curves Refreshed !")
                                 }
@@ -792,9 +793,10 @@ Item {
         target: AnalDataModel
 
         onSampleChanged: {
+            var sample = AnalDataModel.sample;
             log("Detecting AnalDataModel Sample Updtated: "
-                + " rows = " + AnalDataModel.sample.rows()
-                + ", cols = " + AnalDataModel.sample.cols());
+                + " rows = " + AnalDataModel.getDataRows()
+                + ", cols = " + AnalDataModel.getDataCols());
         }
 
         onAnalyzerChanged: {
@@ -811,9 +813,11 @@ Item {
             log("Detect AnalDataModel sync model data updated !")
         }
 
-//        onModelDataChanged: {
-//            log("Detect AnalDataModel sync model data updated !")
-//        }
+        onTestChanged: {
+            log("detect sync request from test string")
+//            AnalDataModel.sync();
+            wca.repaintCurves();
+        }
     }
 
     // ///////////////////////////////////////////////////////////////

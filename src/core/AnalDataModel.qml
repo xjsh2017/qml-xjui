@@ -19,7 +19,8 @@ QtObject {
 
     property  string typename: "AnalDataModel"
 
-    property var syncModel: waveModel
+    property variant syncModel: waveModel
+    property string test: waveModel.test
 
     property var channels: JSONListModel {
             id: js_list_properties
@@ -96,8 +97,6 @@ QtObject {
         return {
             x: [[]],
             y: [[]],
-            rows: 0,
-            cols: 0,
 
             // Functions
             print: undefined,
@@ -243,6 +242,12 @@ QtObject {
     }
 
     function getDataCols() {
+//        log("sample = " + sample);
+//        log("isArray(arg) = " + isArray(sample.y))
+//        log("isArray(arg[0])" + isArray(sample.y[0]))
+//        log("isArray(arg[0])" + Array.isArray(sample.y[0]))
+//        log("typeof sample.y[0] = " + typeof sample.y[0])
+//        log("is2dArray(sample.y) = " + is2dArray(sample.y));
         if (sample && is2dArray(sample.y))
             return sample.y[0].length
     }
@@ -260,26 +265,40 @@ QtObject {
     }
 
     function getXRow(index, start, end){
-        if (index < getChannelCount() && sample && sample.x && sample.x_row){
-            return sample.x_row(index, start, end).data;
+        start = arguments[1] ? arguments[1] : 0;
+        end = arguments[2] ? arguments[2] : getDataCols();
+        end = Math.min(end, getDataCols());
+
+        if (index >= 0 && index < 1 /*getDataRows()*/ && sample && sample.x/* && sample.x_row*/){
+//            return sample.x_row(index, start, end).data;
+            return sample.x[index].slice(start, end + 1);
         }
     }
 
-    function getYRow(index, start, end){
-        if (index < getChannelCount() && sample && sample.y &&  sample.y_row){
-            return sample.y_row(index, start, end).data;
+    function getYRow(index, start, end){ // [start, end]
+        start = arguments[1] ? arguments[1] : 0;
+        end = arguments[2] ? arguments[2] : getDataCols();
+        end = Math.min(end, getDataCols());
+
+        if (index >= 0 && index < getDataRows() && sample && sample.y/* &&  sample.y_row*/){
+//            return sample.y_row(index, start, end).data;
+            return sample.y[index].slice(start, end + 1);
         }
     }
 
     function getXData(rowIdx, colIdx){
-        if (rowIdx < getChannelCount() && sample && sample.x_data){
-            return sample.x_data(rowIdx, colIdx);
+        if (rowIdx >= 0 && rowIdx < getDataRows()
+            && colIdx >= 0 && colIdx < getDataCols() && sample/* && sample.x_data*/){
+//            return sample.x_data(rowIdx, colIdx);
+           return sample.x[rowIdx][colIdx];
         }
     }
 
     function getYData(rowIdx, colIdx){
-        if (rowIdx < getChannelCount() && sample && sample.y_data){
-            return sample.y_data(rowIdx, colIdx);
+        if (rowIdx >= 0 && rowIdx < getDataRows()
+            && colIdx >= 0 && colIdx < getDataCols() && sample/* && sample.x_data*/){
+//            return sample.x_data(rowIdx, colIdx);
+           return sample.y[rowIdx][colIdx];
         }
     }
 
@@ -363,23 +382,25 @@ QtObject {
     function sync() {
         if(!syncModel)
             return;
-        log("syncModel: " + syncModel)
 
+        log("syncModel: " + syncModel)
         var Rows = syncModel.rows();
         var Cols = syncModel.cols();
-        var x = syncModel.x_data();
-        var y = new Array(Rows);
-        for (var i = 0; i < Rows; i ++){
-            y[i] = syncModel.y_data(i);
+        sample.x = new Array(1);
+        sample.y = new Array(Rows);
+        for (var k = 0; k < Cols; k++){
+            sample.x[k] = syncModel.x_data(k);
         }
-        sample.x = x;
-        sample.y = y;
-        sample.rows = Rows;
-        sample.cols = Cols;
+        for (var i = 0; i < Rows; i ++){
+            sample.y[i] = new Array(Cols);
+            for (var j = 0; j < Cols; j++)
+                sample.y[i][j] = syncModel.y_data(i)[j];
+        }
 
         log("Rows: " + Rows + ", Cols: " + Cols)
 
-        sampleChanged()();
+
+        sampleChanged();
     }
 
     function isModelReady() {
@@ -399,8 +420,8 @@ QtObject {
     // ///////////////////////////////////////////////////////////////
 
     function isArray(o){
-        return o && Array.isArray(o);
-//        return o && Object.prototype.toString.call(o)=='[object Array]';
+//        return o && Array.isArray(o);
+        return o && Object.prototype.toString.call(o)=='[object Array]';
     }
 
     function is2dArray(arg){
@@ -409,6 +430,12 @@ QtObject {
 
     function log(says) {
         console.log("## AnalDataModel.qml ##: " + says);
+    }
+
+    onTestChanged: {
+        log("detect sync request from test string")
+
+        sync();
     }
 
     // ///////////////////////////////////////////////////////////////
