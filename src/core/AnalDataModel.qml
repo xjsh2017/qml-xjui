@@ -22,6 +22,7 @@ QtObject {
     property variant syncModel: waveModel
     property string sampleUpdate: waveModel.sampleUpdate
     property string channelUpdate: waveModel.channelUpdate
+    property var relastStatic: waveModel.relastStatic
 
     property var channels: JSONListModel {
             id: js_list_properties
@@ -125,7 +126,8 @@ QtObject {
         timeRelastStatic: {},       // 本链路时间均匀度统计
         ftime_relative_first: 0,    // 本链路第一帧报文与采样与采样文件中第一帧的时间差，见CAPCONNECTINFO，单位：秒
         ftime_relative_last:0,      // 最后一帧报文与采样文件中第一帧的时间差
-        lTotalCapLenth: 0           // 本链路字节数
+        lTotalCapLenth: 0,          // 本链路字节数
+        Total: 0                    // 本链路总帧数
     }
 
     property bool blockChannelPropUpdatedSignal: false
@@ -135,6 +137,7 @@ QtObject {
 
     signal analyzerResultUpdated()  // 分析数据变更
     signal channelPropUpdated()     // 通道属性变更
+    signal analyzerTimeDisperUpdated()     // 离散度等信息变更
 
     // ///////////////////////////////////////////////////////////////
 
@@ -398,7 +401,7 @@ QtObject {
             neg_n1us: 0, neg_n2us: 0, neg_n3us: 0, neg_n4us: 0, neg_n5us: 0, neg_n6us: 0, neg_n7us:0,
             neg_n8us:0, neg_n9us: 0, neg_n10us:0, neg_nup11us:0,
 
-            n4to10us:0, n11to25us:0, n25tous:0
+            n4to10us:0, n11to25us:0, n25tous:0, Total: 0
         }
     }
 
@@ -453,6 +456,9 @@ QtObject {
 
         syncChannels.json = syncModel.json;
         completeJson();
+        rebuildHarmonData();
+
+//        log("json = " + json)
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -480,6 +486,53 @@ QtObject {
         log("detect channel info sync request from channelUpdate string")
 
         syncJson();
+    }
+
+    onRelastStaticChanged: {
+        log("detect connect smv pcap relaststatic data sync request")
+
+        if (relastStatic.length != 31){
+            log("Incomplete smv pcap relast static data found")
+            return;
+        }
+
+        analyzer.timeRelastStatic = {
+            n0us: relastStatic[0],
+            n1us: relastStatic[1],
+            n2us: relastStatic[2],
+            n3us: relastStatic[3],
+            n4us: relastStatic[4],
+            n5us: relastStatic[5],
+            n6us: relastStatic[6],
+            n7us: relastStatic[7],
+            n8us: relastStatic[8],
+            n9us: relastStatic[9],
+            n10us: relastStatic[10],
+            nup11us: relastStatic[11],
+            neg_n1us: relastStatic[12],
+            neg_n2us: relastStatic[13],
+            neg_n3us: relastStatic[14],
+            neg_n4us: relastStatic[15],
+            neg_n5us: relastStatic[16],
+            neg_n6us: relastStatic[17],
+            neg_n7us: relastStatic[18],
+            neg_n8us: relastStatic[19],
+            neg_n9us: relastStatic[20],
+            neg_n10us: relastStatic[21],
+            neg_nup11us: relastStatic[22],
+
+            n4to10us: relastStatic[23],
+            n11to25us: relastStatic[24],
+            n25tous: relastStatic[25]
+        }
+
+        analyzer.ftime_relative_first = relastStatic[26];
+        analyzer.ftime_relative_last = relastStatic[27];
+        analyzer.lTotalCapLenth = relastStatic[28];
+        analyzer.Total = relastStatic[29];
+        analyzer.ncapp_id = relastStatic[30];
+
+        analyzerTimeDisperUpdated();
     }
 
     // ///////////////////////////////////////////////////////////////

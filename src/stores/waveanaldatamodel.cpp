@@ -23,6 +23,8 @@ void WaveAnalDataModel::reset(int chnn_count, int sample_count)
 
     m_x = QVector<qreal>(sample_count, 0);
     m_y = QVector<QVector<qreal> >(chnn_count, QVector<qreal>(sample_count, 0));
+
+    m_relastStatic = QVector<qreal>(31, 0.0f);
 }
 
 void WaveAnalDataModel::setChannelCount(int arg)

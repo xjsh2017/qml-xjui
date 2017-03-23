@@ -81,6 +81,28 @@ Q_SIGNALS:
     void sampleUpdateChanged(QString arg);
 private:
 
+//    qreal m_time_relative_first;
+//    Q_PROPERTY(qreal time_relative_first READ time_relative_first
+//               WRITE setTime_relative_first NOTIFY time_relative_firstChanged)
+//public:
+//    qreal time_relative_first() const { return m_time_relative_first; }
+//public Q_SLOTS:
+//    void setTime_relative_first(qreal arg) { if (m_time_relative_first != arg) { m_time_relative_first = arg; emit time_relative_firstChanged(arg); } }
+//Q_SIGNALS:
+//    void time_relative_firstChanged(qreal arg);
+//private:
+
+    QVector<qreal> m_relastStatic;
+    Q_PROPERTY(QVector<qreal> relastStatic READ relastStatic
+               WRITE setRelastStatic NOTIFY relastStaticChanged)
+public:
+    QVector<qreal> relastStatic() const { return m_relastStatic; }
+public Q_SLOTS:
+    void setRelastStatic(QVector<qreal> arg) { if (m_relastStatic != arg) { m_relastStatic = arg; emit relastStaticChanged(arg); } }
+Q_SIGNALS:
+    void relastStaticChanged(QVector<qreal> arg);
+private:
+
     /*!
      * \brief m_json    通道属性JSON数据结构
      *

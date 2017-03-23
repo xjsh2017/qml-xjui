@@ -23,6 +23,15 @@ Item {
         console.log("## TimeDisperAnal.qml ##: " + says);
     }
 
+    Connections {
+        target: AnalDataModel
+
+        onAnalyzerTimeDisperUpdated: {
+            log("Detect AnalDataModel Relast Static Updated")
+            update();
+        }
+    }
+
     // ///////////////////////////////////////////////////////////////
 
     function updateChartData() {

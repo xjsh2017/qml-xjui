@@ -11,7 +11,7 @@ Canvas {
 
     // ///////////////////////////////////////////////////////////////
 
-    property    var model: AnalDataModel.listModel
+    property    var model
     property    int selectHarmonTimes: 1
     property    int baseChannelIndex: 1
     property    int showType: 0
@@ -39,7 +39,7 @@ Canvas {
     }
 
     function log(says) {
-//        console.log("# VectorChart.qml: # " + says);
+        console.log("# SeqVectorChart.qml: # " + says);
     }
 
     function debug(de) {
@@ -60,24 +60,12 @@ Canvas {
 
         var tmp = 0;
         for (var i = 0; i < len; i++){
-            if (!model.get(i).checked || !model.get(i).visible)
+            if (!model.get(i).checked)
                 continue;
 
-            if (selectHarmonTimes == 0){
-                if (parseFloat(model.get(i).rms) > tmp){
-                    tmp = parseFloat(model.get(i).rms);
-                    log("checked channel index = " + i + ", model.rms = " + parseFloat(model.get(i).rms));
-                }
-            }else{
-                var harmon_value = AnalDataModel.getHarmonValue(i, selectHarmonTimes);
-                if (!AnalDataModel.isHarmonValueValid(harmon_value))
-                    continue;
-
-                if (harmon_value.rms > tmp){
-                    tmp = harmon_value.rms;
-                    log("checked channel index = " + i + ", harmon: " + selectHarmonTimes
-                        + ", harmon.rms = " + harmon_value.rms);
-                }
+            if (parseFloat(model.get(i).rms) > tmp){
+                tmp = parseFloat(model.get(i).rms);
+                log("checked channel index = " + i + ", model.rms = " + parseFloat(model.get(i).rms));
             }
         }
 
@@ -308,20 +296,16 @@ Canvas {
         var len = canvas.model.count;
 
         for (var i = 0; i < len; i++){
-            if (!model.get(i).checked || !model.get(i).visible)
+            if (!model.get(i).checked)
                 continue;
 
-            var color = Global.phaseTypeColor(model.get(i).phase);
-            if (selectHarmonTimes == 0)
-                drawVector(getContext("2d"), parseFloat(model.get(i).rms), parseFloat(model.get(i).angle), color)
-            else{
-                var harmon_value = AnalDataModel.getHarmonValue(i, selectHarmonTimes);
-                if (!AnalDataModel.isHarmonValueValid(harmon_value))
-                    continue;
+//            log("draw vector: idx = " + i)
+            var angle = model.get(i).angle;
+            angle = parseFloat(Global.getEnd(Global.getFront(angle, "°"),"∠"));
 
-                drawVector(getContext("2d"), (harmon_value.rms  < 0.001 ? 1 : harmon_value.rms)
-                           , harmon_value.angle, color)
-            }
+            var color = AnalDataModel.phaseColorByTypeName(model.get(i).phase);
+            drawVector(getContext("2d"), parseFloat(model.get(i).rms)
+                       , angle, color)
         }
     }
 
@@ -365,10 +349,12 @@ Canvas {
     }
 
     function drawVector(ctx, r, angle, color) {
-//        console.log("r = " + r + ", angle = " + angle)
-//        console.log(typeof r + ", " + typeof angle)
+//        color = "red"
 
-        log("drawVector： refAngle = " + refAngle)
+//        log("drawVector： refAngle = " + refAngle
+//            + ", r = " + r
+//            + ", angle = " + angle)
+
         r = parseFloat(r);
         angle = parseFloat(angle) - refAngle;
         var posx0, posy0, posx, posy

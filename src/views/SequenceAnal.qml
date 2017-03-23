@@ -178,6 +178,8 @@ Item {
             SeqVectorChart {
                 id: vec
 
+                model: table.model
+
                 Layout.fillWidth: true
                 Layout.minimumWidth: 300;
                 width: parent.width * 1 / 5

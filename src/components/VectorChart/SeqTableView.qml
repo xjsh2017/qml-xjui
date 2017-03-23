@@ -18,6 +18,8 @@ Item {
 //    property var selAnalChannels: [-1, -1, -1, -1, -1, -1]
     property var selAnalChannels: [14,16,18,1,3,5]
 
+    property alias model: modelChannel
+
     // ///////////////////////////////////////////////////////////////
 
     signal modelCheckedChanged();
@@ -53,9 +55,7 @@ Item {
         target: AnalDataModel
 
         onAnalyzerResultUpdated: {
-//            modelCheckedChanged();  // 发送给VectorChart
-//            update();
-
+            modelCheckedChanged();  // 发送给VectorChart
             modelChannel.rebuildModel();
         }
     }
@@ -63,15 +63,6 @@ Item {
     onSelAnalChannelsChanged: {
         log("selAnalChannels = " + selAnalChannels)
         modelChannel.rebuildModel();
-    }
-
-    function update() {
-        for (var i = 0; i < modelChannel.count; i++){
-            modelChannel.setProperty(i, "rms", AnalDataModel.getPropValue(i, "rms"))
-            modelChannel.setProperty(i, "angle"
-                           , AnalDataModel.getPropValue(i, "angle") ?
-                                         "∠ " + AnalDataModel.getPropValue(i, "angle") + "°": " ")
-        }
     }
 
     function formatAngle(arg){
@@ -93,6 +84,7 @@ Item {
             var unit = ["", "", "", "", "", "", "", "", "", "", "", ""];
             var rms = ["", "", "", "", "", "", "", "", "", "", "", ""];
             var angle = ["", "", "", "", "", "", "", "", "", "", "", ""];
+            var checked = [false, false, false, false, false, false, false, false, false, false, false, false];
             var input_U = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
             var input_I = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 
@@ -204,6 +196,7 @@ Item {
 
             for (var i = 0; i < names.length; i++){
                 append({
+                                   checked: checked[i],
                                    serial: i + 1,
                                    name: names[i],
                                    unit: unit[i],
@@ -348,6 +341,8 @@ Item {
 
                 onCheckedChanged: {
                     var idx = modelChannel.get(styleData.row).serial - 1;
+                    modelChannel.get(styleData.row).checked = checked;
+                    modelCheckedChanged();
                 }
             }
         }

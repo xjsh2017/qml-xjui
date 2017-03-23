@@ -229,9 +229,10 @@ QtObject {
             if (index != -1 && i != index)
                 continue;
 
-            log("harmonic: " + i + ", anal started ...");
+//            log("harmonic: " + i + ", anal started ...");
 
-            var input = sample.y_row(i, pos - period, pos).data;
+//            var input = sample.y_row(i, pos - period, pos).data;
+            var input = model.getYRow(i, pos - period, pos);
             var harmon = model.getPropValue(i, "harmonic");
 
             harmon[0] = analDC(input);
@@ -304,6 +305,8 @@ QtObject {
         rms = Math.sqrt((real*real + img*img) / 2);
         angle = calcComplexAngle(real, img) * 180 / Math.PI
 
+//        log("n = " + n + ", rms = " + rms + ", angle = " + angle)
+
         return {
             n: n,
             real: real,
@@ -335,11 +338,13 @@ QtObject {
 
         fTemp /= count;
 
+//        log("n = " + 0 + ", rms = " + fTemp + ", angle = " + 0.0)
+
         return {
             n: 0,
             real: fTemp,
             img: 0.0,
-            amp: fTemp,
+            rms: fTemp,
             angle: 0.0,
             percentage: 0.0
         }
@@ -391,7 +396,7 @@ QtObject {
 
         var fhege = 0.0;
         var nhege = 0;
-        var nTotal = model.getDataCols();
+        var nTotal = anlyzer.Total;
         if (nTotal == 0)
             nTotal += 1;
 
@@ -411,10 +416,10 @@ QtObject {
         var fkeep = anlyzer.ftime_relative_last - anlyzer.ftime_relative_first;
         var nZhenSu = fkeep ? Math.round(nTotal / fkeep) : 0;
         var fLiuLiang = fkeep ? anlyzer.lTotalCapLenth * 8/(fkeep*1024*1024) : 0;
-        var title = "0x" + anlyzer.ncapp_id + " 总帧数： " + nTotal
+        var title = "0x" + anlyzer.ncapp_id.toString(16) + " 总帧数： " + nTotal
                 + "  合格： " + nhege + " 帧, " + (fhege * 100).toFixed(2) + " %(帧间差-250us≤10us)"
                 + "  帧速： " + nZhenSu + " 帧/秒  流量： " + fLiuLiang.toFixed(3) + " Mb/s"
-                + "  持续时间： " + fkeep.toFixed(3);
+                + "  持续时间： " + fkeep.toFixed(3) + " 秒";
 
         return {
             title: title,

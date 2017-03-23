@@ -251,7 +251,7 @@ Item {
             }
 
             CheckBox {
-                checked: AnalDataModel.getPropValue(modelChannel.get(styleData.row).serial - 1, "checked")
+                checked: false//AnalDataModel.getPropValue(modelChannel.get(styleData.row).serial - 1, "checked")
                 anchors.verticalCenter: parent.verticalCenter
 
                 visible: styleData.column == 1

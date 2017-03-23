@@ -73,6 +73,23 @@ QtObject {
         }
     }
 
+    function getFront(mainStr,searchStr){
+        var foundOffset = mainStr.indexOf(searchStr);
+        if(foundOffset == -1){
+            return null;
+        }
+
+        return mainStr.substr(0,foundOffset);
+    }
+
+    function getEnd(mainStr,searchStr){
+        var foundOffset = mainStr.indexOf(searchStr);
+        if(foundOffset == -1){
+            return null;
+        }
+        return mainStr.substr(foundOffset + searchStr.length, mainStr.length);
+    }
+
     function log(says) {
         console.log("## Global.qml ##: " + says)
     }
