@@ -9,6 +9,7 @@ class MainWindow;
 
 class QQuickWidget;
 class WaveAnalDataModel;
+class QTimer;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,9 +23,11 @@ private:
 
 private slots:
     void currentChanged(int index);
+    void onTimerOut();
 
 private:
     Ui::MainWindow *ui;
+    QTimer *m_timer;
 
     QQuickWidget *m_qwWaveView; // Qml波形分析图
     QQuickWidget *m_qwWaveAnal2; // Qml波形分析图2

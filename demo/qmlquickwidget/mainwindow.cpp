@@ -6,6 +6,7 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQmlComponent>
+#include <QTimer>
 
 #include <QDebug>
 
@@ -20,6 +21,15 @@ MainWindow::MainWindow(QWidget *parent) :
     setupUi();
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(currentChanged(int)));
+
+    //新建一个QTimer对象
+    m_timer = new QTimer();
+    //设置定时器每个多少毫秒发送一个timeout()信号
+    m_timer->setInterval(11000);
+    //启动定时器
+    m_timer->start();
+
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimerOut()));
 }
 
 MainWindow::~MainWindow()
@@ -96,4 +106,14 @@ void MainWindow::setupUi()
 void MainWindow::currentChanged(int index)
 {
 
+}
+
+void MainWindow::onTimerOut()
+{
+    //获取系统当前时间
+    QTime time = QTime::currentTime();
+
+    qDebug() << time.toString("hh:mm:ss") << "onTimerOut triggered!";
+
+    m_qwWaveData->sync();
 }

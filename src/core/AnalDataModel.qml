@@ -20,7 +20,8 @@ QtObject {
     property  string typename: "AnalDataModel"
 
     property variant syncModel: waveModel
-    property string test: waveModel.test
+    property string sampleUpdate: waveModel.sampleUpdate
+    property string channelUpdate: waveModel.channelUpdate
 
     property var channels: JSONListModel {
             id: js_list_properties
@@ -60,7 +61,8 @@ QtObject {
         property alias analyzer: root.analyzer
 
             onJsonChanged: {
-                root.channelsChanged();
+//                root.channelsChanged();
+                root.channelPropUpdated();
             }
 
         }
@@ -143,8 +145,10 @@ QtObject {
     }
 
     function getChannelColor(index) {
-        if(hasProperty(index, "phase"))
-            return phaseColorByTypeName(listModel.get(index).phase)
+        if(hasProperty(index, "phase")){
+            if (listModel && listModel.get(index))
+                return phaseColorByTypeName(listModel.get(index).phase)
+        }
 
         return undefined;
     }
@@ -303,6 +307,8 @@ QtObject {
     }
 
     function phaseColorByTypeName(type) {
+        if (!type)
+            return "lightgrey";
         switch (type) {
         case 'A':
             return "#ff9800";
@@ -379,7 +385,7 @@ QtObject {
     /*
         从内部数据接口更新模型数据
       */
-    function sync() {
+    function syncSample() {
         if(!syncModel)
             return;
 
@@ -432,10 +438,19 @@ QtObject {
         console.log("## AnalDataModel.qml ##: " + says);
     }
 
-    onTestChanged: {
-        log("detect sync request from test string")
+    onSampleUpdateChanged: {
+        log("detect sample sync request from sampleUpdate string")
 
-        sync();
+        syncSample();
+    }
+
+    onChannelUpdateChanged: {
+        log("detect channel info sync request from channelUpdate string")
+
+        if(!syncModel)
+            return;
+
+        json = syncModel.json;
     }
 
     // ///////////////////////////////////////////////////////////////

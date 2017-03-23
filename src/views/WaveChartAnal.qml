@@ -26,6 +26,7 @@ Item {
     property var curvelist: new Array(maxCount)
     property var waveViewlist: new Array(maxCount)
     property var wavePanelist: new Array(maxCount)
+    property var rowPaneCurvelist: new Array(maxCount)
 
     onCurvelistChanged: {
         log("onCurvelistChanged: curvelist = " + curvelist)
@@ -87,6 +88,25 @@ Item {
         }
     }
 
+    function updatePanelCurveByPropChanged(){
+        for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
+            var panel = wca.wavePanelist[i];
+            var wave = wca.waveViewlist[i];
+            var rowPaneCurve = wca.rowPaneCurvelist[i];
+
+            // visible
+            var show = AnalDataModel.getPropValue(i, "visible")
+            panel.visible = show;
+            wave.visible = show;
+
+            panel.channelInfoText = "通道 " + (i + 1) + "： "
+                    + AnalDataModel.getPropValue(i, "name");
+
+            rowPaneCurve.drawColor = (AnalDataModel.getChannelColor(i) ?
+                        AnalDataModel.getChannelColor(i) : Theme.backgroundColor);
+        }
+    }
+
     function repaintCurves(){
         for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
             var curve = wca.curvelist[i];
@@ -97,10 +117,9 @@ Item {
         }
     }
 
-    // ///////////////////////////////////////////////////////////////
+    // ////////////////  ///////////////////////////////////////////////
 
-    function log(says) {
-        console.log("## WaveChartAnal.qml ##: " + says);
+    function log(says) {        console.log("## WaveChartAnal.qml ##: " + says);
     }
 
     function dp(di){
@@ -348,9 +367,9 @@ Item {
                                     snackbar.open(varTmpInfo)
                                     log(varTmpInfo)
 
-                                    for (var i = 0; i < wca.curvelist.length; ++i){
-                                        wca.curvelist[i].startRunningTime(timer_wave.running);
-                                    }
+//                                    for (var i = 0; i < wca.curvelist.length; ++i){
+//                                        wca.curvelist[i].startRunningTime(timer_wave.running);
+//                                    }
                                 }
                             }
                         }
@@ -363,7 +382,8 @@ Item {
                                 name: qsTr("Chart Settings (Ctrl + I)")
                                 hoverAnimation: true
                                 onTriggered: {
-                                    chartSettings.show()
+                                    var show = AnalDataModel.getPropValue(0, "visible");
+                                    AnalDataModel.setPropValue(0, "visible", !show);
                                 }
                             }
                         }
@@ -376,7 +396,7 @@ Item {
                                 name: qsTr("Refresh (Ctrl + R)")
                                 hoverAnimation: true
                                 onTriggered: {
-                                    AnalDataModel.sync();
+                                    AnalDataModel.syncSample();
                                     repaintCurves();
                                     snackbar.open("All Curves Refreshed !")
                                 }
@@ -443,6 +463,7 @@ Item {
                         model: Math.max(AnalDataModel.getChannelCount(), maxCount)
 
                         Row {
+                            id: rowPanelCurve
                             spacing: dp(2)
 
                             property color drawColor: AnalDataModel.getChannelColor(modelData) ?
@@ -459,6 +480,7 @@ Item {
                                 backgroundColor: Qt.lighter(drawColor)
 
                                 visible: AnalDataModel.isChannelVisible(modelData)
+                                property alias channelInfoText: labelChn.text
 
                                 function updatePanel(){
                                     var value_rms = AnalDataModel.getPropValue(index, "rms");
@@ -608,10 +630,15 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                console.log("Component.onCompleted: index = " + modelData);
+//                                console.log("Component.onCompleted: index = " + modelData);
                                 wca.curvelist[modelData] = curve;
                                 wca.wavePanelist[modelData] = wavePanel;
-                                wca.waveViewlist[modelData] = waveView
+                                wca.waveViewlist[modelData] = waveView;
+                                wca.rowPaneCurvelist[modelData] = rowPanelCurve;
+                            }
+
+                            onDrawColorChanged: {
+                                curve.repaint();
                             }
                         }
                     }
@@ -634,6 +661,7 @@ Item {
         triggeredOnStart: true;
         onTriggered: {
             log("Detected: Anal Run-time Sample Data changed again...")
+//            wca.repaintCurves();
         }
     }
 
@@ -792,30 +820,21 @@ Item {
     Connections {
         target: AnalDataModel
 
-        onSampleChanged: {
-            var sample = AnalDataModel.sample;
-            log("Detecting AnalDataModel Sample Updtated: "
-                + " rows = " + AnalDataModel.getDataRows()
-                + ", cols = " + AnalDataModel.getDataCols());
-        }
-
         onAnalyzerChanged: {
-            log("Detected AnalDataModel anal param updated !")
+            log("Detected AnalDataModel analyzer settings updated !")
 
         }
 
         onChannelPropUpdated: {
             log("Detected AnalDataModel channel info updated !")
-
+            wca.updatePanelCurveByPropChanged();
         }
 
-        onSyncModelChanged: {
-            log("Detect AnalDataModel sync model data updated !")
-        }
-
-        onTestChanged: {
-            log("detect sync request from test string")
-//            AnalDataModel.sync();
+        onSampleChanged: {
+            log("Detected AnalDataModel Sample Updtated: "
+                + " rows = " + AnalDataModel.getDataRows()
+                + ", cols = " + AnalDataModel.getDataCols());
+            var sample = AnalDataModel.sample;
             wca.repaintCurves();
         }
     }
@@ -830,7 +849,7 @@ Item {
 
             AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
             var sample = AnalDataModel.sample;
-            log("wca.curvelist = " + curvelist);
+//            log("wca.curvelist = " + curvelist);
 
             log("Component.onCompleted")
         } catch (error) {

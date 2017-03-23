@@ -379,20 +379,23 @@ QtObject {
       离散度分析
       */
     function analTimeDisper(model) {
+        log("Call analTimeDisper ...")
         if (!isModelValid(model)){
             log("Error anal model !");
             return;
         }
+        log("h1")
 
+        var anlyzer = model.analyzer
+        if (!anlyzer)
+            return;
+
+        log("h2")
         var fhege = 0.0;
         var nhege = 0;
         var nTotal = model.getDataCols();
         if (nTotal == 0)
             nTotal += 1;
-
-        var anlyzer = model.anlyzer
-        if (!anlyzer)
-            return;
 
         nhege = anlyzer.timeRelastStatic.n0us + anlyzer.timeRelastStatic.n1us +
                 anlyzer.timeRelastStatic.n2us + anlyzer.timeRelastStatic.n3us +
@@ -408,13 +411,14 @@ QtObject {
 
         fhege = nhege / nTotal;
         var fkeep = anlyzer.ftime_relative_last - anlyzer.ftime_relative_first;
-        var nZhenSu = Math.round(nTotal / fkeep);
-        var fLiuLiang = anlyzer.lTotalCapLenth * 8/(fkeep*1024*1024);
+        var nZhenSu = fkeep ? Math.round(nTotal / fkeep) : 0;
+        var fLiuLiang = fkeep ? anlyzer.lTotalCapLenth * 8/(fkeep*1024*1024) : 0;
         var title = "0x" + anlyzer.ncapp_id + " 总帧数： " + nTotal
                 + "  合格： " + nhege + " 帧, " + (fhege * 100).toFixed(2) + " %(帧间差-250us≤10us)"
                 + "  帧速： " + nZhenSu + " 帧/秒  流量： " + fLiuLiang.toFixed(3) + " Mb/s"
                 + "  持续时间： " + fkeep.toFixed(3);
 
+        log("h3")
         return {
             title: title,
             static: anlyzer.timeRelastStatic

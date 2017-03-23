@@ -256,6 +256,40 @@ bool WaveAnalDataModel::popBack(QList<qreal> &list, int nCount)
     return true;
 }
 
+void WaveAnalDataModel::setTestJson()
+{
+    QString json = "[ \
+    {\"name\": \"通道延时a\", \"unit\": \"\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护A相电流1\", \"unit\": \"A\", \"phase\":\"A\", \"visible\": true, \"checked\": true, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护A相电流2\", \"unit\": \"A\", \"phase\":\"A\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护B相电流1\", \"unit\": \"A\", \"phase\":\"B\", \"visible\": true, \"checked\": true, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护B相电流2\", \"unit\": \"A\", \"phase\":\"B\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护C相电流1\", \"unit\": \"A\", \"phase\":\"C\", \"visible\": true, \"checked\": true, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护C相电流2\", \"unit\": \"A\", \"phase\":\"C\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"计量A相电流\", \"unit\": \"A\", \"phase\":\"A\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"计量B相电流\", \"unit\": \"A\", \"phase\":\"B\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"计量C相电流\", \"unit\": \"A\", \"phase\":\"C\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"零序电流I01\", \"unit\": \"A\", \"phase\":\"N\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"零序电流I02\", \"unit\": \"A\", \"phase\":\"N\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"间隙电流Ij1\", \"unit\": \"A\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"间隙电流Ij2\", \"unit\": \"A\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护A相电压1\", \"unit\": \"V\", \"phase\":\"A\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"保护A相电压2\", \"unit\": \"V\", \"phase\":\"A\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"B相电压采样值1\", \"unit\": \"V\", \"phase\":\"B\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"B相电压采样值2\", \"unit\": \"V\", \"phase\":\"B\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"C相电压采样值1\", \"unit\": \"V\", \"phase\":\"C\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"C相电压采样值2\", \"unit\": \"V\", \"phase\":\"C\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"线路抽取电压1\", \"unit\": \"V\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"线路抽取电压2\", \"unit\": \"V\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"零序电压1\", \"unit\": \"V\", \"phase\":\"N\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"零序电压2\", \"unit\": \"V\", \"phase\":\"N\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"计量A相电压\", \"unit\": \"V\", \"phase\":\"A\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"计量B相电压\", \"unit\": \"V\", \"phase\":\"B\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"计量C相电压\", \"unit\": \"V\", \"phase\":\"C\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []} \
+            ]";
+
+            setJson(json);
+}
 
 
 

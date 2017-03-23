@@ -3,6 +3,7 @@
 
 #include <QDate>
 #include <QObject>
+#include <QDebug>
 
 #define QML_PROPERTY(type, name, \
     READ, getter, \
@@ -58,6 +59,26 @@ public Q_SLOTS:
     void setTest(QString arg) { if (m_test != arg) { m_test = arg; emit testChanged(arg); } }
 Q_SIGNALS:
     void testChanged(QString arg);
+private:
+
+    QString m_channelUpdate;
+    Q_PROPERTY(QString channelUpdate READ channelUpdate WRITE setChannelUpdate NOTIFY channelUpdateChanged)
+public:
+    QString channelUpdate() const { return m_channelUpdate; }
+public Q_SLOTS:
+    void setChannelUpdate(QString arg) { if (m_channelUpdate != arg) { m_channelUpdate = arg; emit channelUpdateChanged(arg); } }
+Q_SIGNALS:
+    void channelUpdateChanged(QString arg);
+private:
+
+    QString m_sampleUpdate;
+    Q_PROPERTY(QString sampleUpdate READ sampleUpdate WRITE setSampleUpdate NOTIFY sampleUpdateChanged)
+public:
+    QString sampleUpdate() const { return m_sampleUpdate; }
+public Q_SLOTS:
+    void setSampleUpdate(QString arg) { if (m_sampleUpdate != arg) { m_sampleUpdate = arg; emit sampleUpdateChanged(arg); } }
+Q_SIGNALS:
+    void sampleUpdateChanged(QString arg);
 private:
 
     /*!
@@ -158,8 +179,27 @@ public:
     inline bool popFront(QList<qreal> &list, int nCount);
     inline bool popBack(QList<qreal> &list, int nCount);
 
-    Q_INVOKABLE void sync() { setTest(QString("%1").arg(rand())); emit modelDataChanged(); }
+    /*!
+     *  type: 0 - 通道属性同步； 1 - 样本数据同步；  -1 同步所有
+     */
+    Q_INVOKABLE void sync(int type = -1) {
+        setTestJson();
+        qDebug() << "sync = " << type;
+        if (type == 0)
+            setChannelUpdate(QString("%1").arg(rand()));
+        else if (type == 1)
+            setSampleUpdate(QString("%1").arg(rand()));
+        else{
+            setChannelUpdate(QString("%1").arg(rand()));
+            setSampleUpdate(QString("%1").arg(rand()));
+        }
+
+        emit modelDataChanged();
+    }
+
     void setNotify(bool arg) { m_notify = arg; }
+
+    void setTestJson();
 
 signals:
     void xChanged(QList<qreal> &arg);
