@@ -120,23 +120,29 @@ Q_SIGNALS:
 public:
     explicit WaveAnalDataModel(QObject *parent = 0);
 
-    Q_INVOKABLE void reset();
+    Q_INVOKABLE void reset(int chnn_count, int sample_count);
     Q_INVOKABLE void setChannelCount(int arg);
 
-    Q_INVOKABLE QList<qreal> x_data();
-    Q_INVOKABLE QList<qreal> y_data(int idx);
+    Q_INVOKABLE QVector<qreal> x_data();
+    Q_INVOKABLE QVector<qreal> y_data(int idx);
 
-    Q_INVOKABLE void setXData(const QList<qreal> &rowValue) { m_x = rowValue; }
-    Q_INVOKABLE void setYData(const QList<QList<qreal> > &matrix) { m_y = matrix; }
+    Q_INVOKABLE QVector<qreal> x() { return m_x; }
+    Q_INVOKABLE QVector<QVector<qreal> > y() { return m_y; }
+
+    Q_INVOKABLE void setXData(const QVector<qreal> &rowValue) { m_x = rowValue; }
+    Q_INVOKABLE void setXData(int index, qreal value) { m_x[index] = value; }
+    Q_INVOKABLE void setYData(const QVector<QVector<qreal> > &matrix) { m_y = matrix; }
+    Q_INVOKABLE void setYData(int chnnIdx, int smpIdx, qreal value) { m_y[chnnIdx][smpIdx] = value; }
 
     Q_INVOKABLE void xAppend(qreal value, bool needQueen = false);
-    Q_INVOKABLE void xAppend(QList<qreal> rowValue, bool needQueen = false);
+    Q_INVOKABLE void xAppend(QVector<qreal> rowValue, bool needQueen = false);
     Q_INVOKABLE void yAppend(int idx, qreal value, bool needQueen = false);
-    Q_INVOKABLE void yAppend(int idx, QList<qreal> rowValue, bool needQueen = false);
-    Q_INVOKABLE void yAppend(QList<QList<qreal> > matrix, bool needQueen = false);
+    Q_INVOKABLE void yAppend(int idx, QVector<qreal> rowValue, bool needQueen = false);
+    Q_INVOKABLE void yAppend(QVector<QVector<qreal> > matrix, bool needQueen = false);
 
     Q_INVOKABLE int rows() { return m_y.size(); }
-    Q_INVOKABLE int cols() { if (m_y.size() > 0) return m_y.at(0).size(); else return 0; }
+//    Q_INVOKABLE int cols() { if (m_y.size() > 0) return m_y.at(0).size(); else return 0; }
+    Q_INVOKABLE int cols() { return m_x.size(); }
 
     /*!
       正弦波发生器
@@ -159,7 +165,7 @@ public:
      *
      * \code
      *
-            QList<qreal> starts;
+            QVector<qreal> starts;
             starts.push_back(0);
             starts.push_back(120);
             starts.push_back(240);
@@ -171,19 +177,19 @@ public:
     Q_INVOKABLE void buildSinWaveData(int rows, int cols, int nT
                                , qreal xMin, qreal xMax, qreal yMin, qreal yMax
                                , bool bRandStartAngle = false
-                               , QList<qreal> startAngles = QList<qreal>());
+                               , QVector<qreal> startAngles = QVector<qreal>());
 
     Q_INVOKABLE void queenNewSampleData(int yMin, int yMax, int count);
-    Q_INVOKABLE QList<qreal> RAND(int min, int max, int n);
+    Q_INVOKABLE QVector<qreal> RAND(int min, int max, int n);
 
-    inline bool popFront(QList<qreal> &list, int nCount);
-    inline bool popBack(QList<qreal> &list, int nCount);
+    inline bool popFront(QVector<qreal> &list, int nCount);
+    inline bool popBack(QVector<qreal> &list, int nCount);
 
     /*!
      *  type: 0 - 通道属性同步； 1 - 样本数据同步；  -1 同步所有
      */
     Q_INVOKABLE void sync(int type = -1) {
-        setTestJson();
+//        setTestJson();
         qDebug() << "sync = " << type;
         if (type == 0)
             setChannelUpdate(QString("%1").arg(rand()));
@@ -202,12 +208,12 @@ public:
     void setTestJson();
 
 signals:
-    void xChanged(QList<qreal> &arg);
-    void yChanged(QList<QList<qreal> > &arg);
+    void xChanged(QVector<qreal> &arg);
+    void yChanged(QVector<QVector<qreal> > &arg);
 
 private:
-    QList<qreal> m_x;               // 帧时间序列
-    QList<QList<qreal> >m_y;        // 各通道帧采样点序列
+    QVector<qreal> m_x;               // 帧时间序列
+    QVector<QVector<qreal> >m_y;        // 各通道帧采样点序列
 
     bool m_notify;                  // 单个数据操作对应的更新通知
 

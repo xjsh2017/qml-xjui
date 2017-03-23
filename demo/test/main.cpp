@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     WaveAnalDataModel data;
 
-    QList<qreal> starts;
+    QVector<qreal> starts;
     starts.push_back(0);
     starts.push_back(120);
     starts.push_back(240);

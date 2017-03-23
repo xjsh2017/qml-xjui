@@ -93,7 +93,7 @@ void MainWindow::setupUi()
 //    starts.push_back(120);
 //    starts.push_back(240);
     m_qwWaveData->buildSinWaveData(27, 1601, 20, 0, 900, -20, 20, true/*, starts*/);
-//    m_qwWaveView->rootContext()->setContextProperty("waveModel", m_qwWaveData);
+    m_qwWaveView->rootContext()->setContextProperty("waveModel", m_qwWaveData);
 
     tabw->addTab(m_qwWaveView, QStringLiteral("Wave - Sample1"));
 

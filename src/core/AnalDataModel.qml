@@ -61,7 +61,6 @@ QtObject {
         property alias analyzer: root.analyzer
 
             onJsonChanged: {
-//                root.channelsChanged();
                 root.channelPropUpdated();
             }
 
@@ -71,6 +70,8 @@ QtObject {
     property alias listModel: js_list_properties.listmodel;
     property alias localProps: js_list_properties.locals
     property int selectDataIndex: 0
+
+    property var syncChannels: JSONListModel{}
 
     /*!
         var tmp = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
@@ -245,6 +246,25 @@ QtObject {
         return isArray(jsModel) && channelIdx < jsModel.length && (propName in jsModel[channelIdx])
     }
 
+    function completeJson(){
+        var standprops = ["name", "unit", "phase", "visible", "checked", "amp", "rms", "angle", "harmonic"];
+        var standvalue = ["", "", "", true, false, "", "", "", []];
+
+        for (var i = 0; i < syncChannels.count; i++){
+            for (var j = 0; j < standprops.length; j++){
+                if (standprops[j] in syncChannels.jsmodel[i])
+                    continue;
+
+                syncChannels.jsmodel[i][standprops[j]] = standvalue[j];
+            }
+        }
+
+        if (syncChannels.jsmodel)
+            json = JSON.stringify(syncChannels.jsmodel);
+
+//        log("json = " + json);
+    }
+
     function getDataCols() {
 //        log("sample = " + sample);
 //        log("isArray(arg) = " + isArray(sample.y))
@@ -252,7 +272,7 @@ QtObject {
 //        log("isArray(arg[0])" + Array.isArray(sample.y[0]))
 //        log("typeof sample.y[0] = " + typeof sample.y[0])
 //        log("is2dArray(sample.y) = " + is2dArray(sample.y));
-        if (sample && is2dArray(sample.y))
+        if (sample && isArray(sample.y))
             return sample.y[0].length
     }
 
@@ -392,18 +412,22 @@ QtObject {
         log("syncModel: " + syncModel)
         var Rows = syncModel.rows();
         var Cols = syncModel.cols();
+        log("Rows: " + Rows + ", Cols: " + Cols)
+
         sample.x = new Array(1);
         sample.y = new Array(Rows);
-        for (var k = 0; k < Cols; k++){
-            sample.x[k] = syncModel.x_data(k);
-        }
+//        for (var k = 0; k < Cols; k++){
+//            sample.x[k] = syncModel.x_data(k);
+//        }
+//        for (var i = 0; i < Rows; i ++){
+//            sample.y[i] = new Array(Cols);
+//            for (var j = 0; j < Cols; j++)
+//                sample.y[i][j] = syncModel.y_data(i)[j];
+//        }
+        sample.x[0] = syncModel.x();
         for (var i = 0; i < Rows; i ++){
-            sample.y[i] = new Array(Cols);
-            for (var j = 0; j < Cols; j++)
-                sample.y[i][j] = syncModel.y_data(i)[j];
+            sample.y[i] = syncModel.y_data(i);
         }
-
-        log("Rows: " + Rows + ", Cols: " + Cols)
 
 
         sampleChanged();
@@ -421,6 +445,14 @@ QtObject {
             return false;
 
         return true;
+    }
+
+    function syncJson() {
+        if(!syncModel)
+            return;
+
+        syncChannels.json = syncModel.json;
+        completeJson();
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -447,10 +479,7 @@ QtObject {
     onChannelUpdateChanged: {
         log("detect channel info sync request from channelUpdate string")
 
-        if(!syncModel)
-            return;
-
-        json = syncModel.json;
+        syncJson();
     }
 
     // ///////////////////////////////////////////////////////////////

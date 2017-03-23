@@ -46,9 +46,9 @@ QtObject {
             if (channelIdx != -1 && i != channelIdx)
                 continue;
 
-            log("analRMS: channel idx = " + i + ", select data idx = " + selectDataIndex
-                + ", periodSampelCount = " + periodSampleCount
-                + ", started ...");
+//            log("analRMS: channel idx = " + i + ", select data idx = " + selectDataIndex
+//                + ", periodSampelCount = " + periodSampleCount
+//                + ", started ...");
 
             var tmp = model.getYRow(i);
 //            log("data = " + tmp);

@@ -81,8 +81,8 @@ Item {
     function updatePanels() {
         for (var i = 0; i < AnalDataModel.getChannelCount(); ++i){
             var panel = wca.wavePanelist[i];
-            if (!panel || !panel.visible)
-                continue;
+//            if (!panel || !panel.visible)
+//                continue;
 
             panel.updatePanel();
         }
@@ -479,7 +479,8 @@ Item {
                                 height: wca.wavePannelHeight
                                 backgroundColor: Qt.lighter(drawColor)
 
-                                visible: AnalDataModel.isChannelVisible(modelData)
+                                visible: AnalDataModel.isChannelVisible(modelData) === "undefined" ? true
+                                                                                                   : AnalDataModel.isChannelVisible(modelData)
                                 property alias channelInfoText: labelChn.text
 
                                 function updatePanel(){
@@ -556,13 +557,13 @@ Item {
                                 width: waveFrameView.width - wavePanel.width - parent.spacing
 
                                 backgroundColor: Global.g_plotBackgroundColor
-                                visible: AnalDataModel.isChannelVisible(modelData)
+                                visible: AnalDataModel.isChannelVisible(modelData) === "undefined" ? true
+                                                                                                   : AnalDataModel.isChannelVisible(modelData)
 
                                 WaveChart {
                                     id: curve;
 
                                     anchors.fill: parent
-                                    visible: AnalDataModel.isChannelVisible(modelData)
 
                                     chartAnimated: false;
                                     chartAnimationEasing: Easing.InOutElastic;
@@ -835,6 +836,7 @@ Item {
                 + " rows = " + AnalDataModel.getDataRows()
                 + ", cols = " + AnalDataModel.getDataCols());
             var sample = AnalDataModel.sample;
+            wca.selectDataIndexChanged();
             wca.repaintCurves();
         }
     }
@@ -850,6 +852,8 @@ Item {
             AnalDataModel.sample = Matlab.sampleSin(27, 1601, 0, 16000, -20, 20, 20);
             var sample = AnalDataModel.sample;
 //            log("wca.curvelist = " + curvelist);
+
+            selectDataIndexChanged();
 
             log("Component.onCompleted")
         } catch (error) {

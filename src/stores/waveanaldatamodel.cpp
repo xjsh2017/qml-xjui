@@ -13,30 +13,32 @@ WaveAnalDataModel::WaveAnalDataModel(QObject *parent)
 //    , m_ip2(QString())
 //    , m_appid(QString("SMV Ox00"))
 {
-    reset();
+    reset(0, 0);
 }
 
-void WaveAnalDataModel::reset()
+void WaveAnalDataModel::reset(int chnn_count, int sample_count)
 {
     m_x.clear();
-    setChannelCount(m_channelCount);
+    m_y.clear();
+
+    m_x = QVector<qreal>(sample_count, 0);
+    m_y = QVector<QVector<qreal> >(chnn_count, QVector<qreal>(sample_count, 0));
 }
 
 void WaveAnalDataModel::setChannelCount(int arg)
 {
     m_channelCount = arg;
     m_y.clear();
-
-    for (int i = 0; i < m_channelCount; i++)
-        m_y.append(QList<qreal>());
+    QVector<QVector<qreal> > x(m_channelCount, QVector<qreal>());
+    m_y = x;
 }
 
-QList<qreal> WaveAnalDataModel::x_data()
+QVector<qreal> WaveAnalDataModel::x_data()
 {
     return m_x;
 }
 
-QList<qreal> WaveAnalDataModel::y_data(int idx)
+QVector<qreal> WaveAnalDataModel::y_data(int idx)
 {
     return m_y.at(idx);
 }
@@ -51,7 +53,7 @@ void WaveAnalDataModel::xAppend(qreal value, bool needQueen)
     emit xChanged(m_x);
 }
 
-void WaveAnalDataModel::xAppend(QList<qreal> rowValue, bool needQueen)
+void WaveAnalDataModel::xAppend(QVector<qreal> rowValue, bool needQueen)
 {
     if (needQueen){
         popFront(m_x, rowValue.size());
@@ -76,11 +78,11 @@ void WaveAnalDataModel::yAppend(int idx, qreal value, bool needQueen)
     emit yChanged(m_y);
 }
 
-void WaveAnalDataModel::yAppend(int idx, QList<qreal> rowValue, bool needQueen)
+void WaveAnalDataModel::yAppend(int idx, QVector<qreal> rowValue, bool needQueen)
 {
     if (m_channelCount < 1 || m_y.size() < m_channelCount)
         return;
-    QList<qreal> tmp = m_y.at(idx);
+    QVector<qreal> tmp = m_y.at(idx);
     if (needQueen){
         popFront(tmp, rowValue.size());
     }
@@ -91,7 +93,7 @@ void WaveAnalDataModel::yAppend(int idx, QList<qreal> rowValue, bool needQueen)
     emit yChanged(m_y);
 }
 
-void WaveAnalDataModel::yAppend(QList<QList<qreal> > matrix, bool needQueen)
+void WaveAnalDataModel::yAppend(QVector<QVector<qreal> > matrix, bool needQueen)
 {
     if (m_channelCount < 1 || m_y.size() < m_channelCount)
         return;
@@ -106,9 +108,9 @@ void WaveAnalDataModel::yAppend(QList<QList<qreal> > matrix, bool needQueen)
     emit yChanged(m_y);
 }
 
-QList<qreal> WaveAnalDataModel::RAND(int min, int max, int n)
+QVector<qreal> WaveAnalDataModel::RAND(int min, int max, int n)
 {
-    QList<qreal> rt;
+    QVector<qreal> rt;
     for(int i = 0; i < n; ++i)
     {
         int u = (double)rand() / (RAND_MAX + 1) * (max - min) + min;
@@ -120,12 +122,12 @@ QList<qreal> WaveAnalDataModel::RAND(int min, int max, int n)
 
 void WaveAnalDataModel::buildSinWaveData(int rows, int cols, int nT
                                          , qreal xMin, qreal xMax, qreal yMin, qreal yMax
-                                         , bool bRandStartAngle, QList<qreal> startAngles)
+                                         , bool bRandStartAngle, QVector<qreal> startAngles)
 {
     if (nT < 0)
         return;
 
-    reset();
+    reset(rows, cols);
 
     qreal xRange = xMax - xMin;
     qreal yRange = yMax - yMin;
@@ -134,12 +136,9 @@ void WaveAnalDataModel::buildSinWaveData(int rows, int cols, int nT
     qreal offset = yMax - yRange / 2;
     qreal Tx = (xMax - xMin) / nT;
 
-    m_y.reserve(rows);
-    m_x.reserve(cols);
-
     qreal pi = 3.1415926;
 
-    QList<qreal> ampFactor;
+    QVector<qreal> ampFactor;
     ampFactor << 1;
     for(int i=1; i< rows;i++){
         ampFactor.append(qrand()% rows);
@@ -150,41 +149,20 @@ void WaveAnalDataModel::buildSinWaveData(int rows, int cols, int nT
         startAngles = RAND(0, 360, rows);
     }
 
-//    cout << setiosflags(ios::fixed);
-//    cout << "y = [\n";
     for (int i = 0; i < rows; i++){
         qreal tmp = 0.0;
-        QList<qreal> rowValue;
-        rowValue.reserve(cols);
         for (int j = 0; j < cols; j++){
             if (i == 0)
-                m_x.append(xMin + j * hopX);
+                m_x[j] = xMin + j * hopX;
 
             qreal offsetAngle = (startAngles.size() <= i ? 0 : startAngles.at(i)) * pi / 180.0f;
             tmp = yRange / 2 * sin((m_x[j]) / Tx * 2 * pi  + offsetAngle);
             tmp *= ampFactor.at(i) / rows;
             tmp += offset;
 
-            rowValue.push_back(tmp);
-//            cout << setprecision(2) << tmp;
-//            if (j != cols -1)
-//                cout << ", ";
+            m_y[i][j] = tmp;
         }
-        m_y.push_back(rowValue);
-
-//        cout << endl;
     }
-
-//    cout << "]" << endl;
-
-//    cout << "x = [\n";
-//    for (int i = 0; i < m_x.size(); i++){
-//        cout << m_x.at(i);
-//        if (i != m_x.size() -1)
-//            cout << ", ";
-//    }
-
-//    cout << "]" << endl;
 }
 
 void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
@@ -199,8 +177,8 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 //    int nDeleteCount = qMin(nCols, samplePoints);
 //    for (int i = 0; i < nRows; ++i)
 //    {
-//        QList<qreal> x = m_x.at(i);
-//        QList<qreal> y = m_y.at(i);
+//        QVector<qreal> x = m_x.at(i);
+//        QVector<qreal> y = m_y.at(i);
 
 //        for (int j = 0; j < nDeleteCount; ++j)
 //        {
@@ -217,8 +195,8 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 
 //    for (int i = 0; i < nRows; ++i)
 //    {
-//        QList<int> x = random(nMax, nCount);
-//        QList<int> y = random(nMax, nCount);
+//        QVector<int> x = random(nMax, nCount);
+//        QVector<int> y = random(nMax, nCount);
 
 //        for (int j = 0; j < nCount; ++j)
 //        {
@@ -228,7 +206,7 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 //    }
 }
 
-bool WaveAnalDataModel::popFront(QList<qreal> &list, int nCount)
+bool WaveAnalDataModel::popFront(QVector<qreal> &list, int nCount)
 {
     int nChop = qMin(list.size(), nCount);
     if (nChop < 0){
@@ -242,7 +220,7 @@ bool WaveAnalDataModel::popFront(QList<qreal> &list, int nCount)
     return true;
 }
 
-bool WaveAnalDataModel::popBack(QList<qreal> &list, int nCount)
+bool WaveAnalDataModel::popBack(QVector<qreal> &list, int nCount)
 {
     int nChop = qMin(list.size(), nCount);
     if (nChop < 0){
@@ -259,7 +237,7 @@ bool WaveAnalDataModel::popBack(QList<qreal> &list, int nCount)
 void WaveAnalDataModel::setTestJson()
 {
     QString json = "[ \
-    {\"name\": \"通道延时a\", \"unit\": \"\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
+    {\"name\": \"通道延时\", \"unit\": \"\", \"phase\":\"\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
     {\"name\": \"保护A相电流1\", \"unit\": \"A\", \"phase\":\"A\", \"visible\": true, \"checked\": true, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
     {\"name\": \"保护A相电流2\", \"unit\": \"A\", \"phase\":\"A\", \"visible\": true, \"checked\": false, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
     {\"name\": \"保护B相电流1\", \"unit\": \"A\", \"phase\":\"B\", \"visible\": true, \"checked\": true, \"amp\":\"\", \"rms\":\"\", \"angle\":\"\", \"harmonic\": []}, \
