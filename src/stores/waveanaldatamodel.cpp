@@ -61,7 +61,7 @@ void WaveAnalDataModel::xAppend(QVector<qreal> rowValue, bool needQueen)
     if (needQueen){
         popFront(m_x, rowValue.size());
     }
-    m_x.append(rowValue);
+    m_x += rowValue;
 
     if (m_notify)
     emit xChanged(m_x);
@@ -89,7 +89,7 @@ void WaveAnalDataModel::yAppend(int idx, QVector<qreal> rowValue, bool needQueen
     if (needQueen){
         popFront(tmp, rowValue.size());
     }
-    tmp.append(rowValue);
+    tmp += rowValue;
     m_y.replace(idx, tmp);
 
     if (m_notify)
@@ -105,7 +105,7 @@ void WaveAnalDataModel::yAppend(QVector<QVector<qreal> > matrix, bool needQueen)
             yAppend(i, matrix.at(i), needQueen);
         }
     }else
-        m_y.append(matrix);
+        m_y += matrix;
 
     if (m_notify)
     emit yChanged(m_y);
