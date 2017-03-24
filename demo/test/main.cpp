@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
                                 #elif defined(Q_OS_MAC)
                                     QStringLiteral("/../../..")
                                 #endif
-                                + QStringLiteral("/test/main.qml")));
+                                + ("/test/main.qml")));
 #endif
 
     return app.exec();
