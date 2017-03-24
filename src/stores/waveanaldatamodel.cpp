@@ -2,7 +2,8 @@
 
 #include <QTime>
 #include <iostream>
-#include<iomanip>
+#include <iomanip>
+#include <math.h>
 using namespace std;
 
 WaveAnalDataModel::WaveAnalDataModel(QObject *parent)
