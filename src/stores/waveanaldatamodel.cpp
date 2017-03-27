@@ -10,9 +10,6 @@ WaveAnalDataModel::WaveAnalDataModel(QObject *parent)
     : QObject(parent)
     , m_test(QStringLiteral("mac address"))
     , m_notify(true)
-//    , m_mac2(QString("00-00-00-00-00-00"))
-//    , m_ip2(QString())
-//    , m_appid(QString("SMV Ox00"))
 {
     reset(0, 0);
 }
@@ -21,27 +18,33 @@ void WaveAnalDataModel::reset(int chnn_count, int sample_count)
 {
     m_x.clear();
     m_y.clear();
+    m_relastStatic.clear();
 
-    m_x = QVector<qreal>(sample_count, 0);
-    m_y = QVector<QVector<qreal> >(chnn_count, QVector<qreal>(sample_count, 0));
+    m_channelCount = chnn_count;
 
-    m_relastStatic = QVector<qreal>(31, 0.0f);
+//    m_x = QList<qreal>(sample_count, 0);
+//    m_y = QList<QList<qreal> >(chnn_count, QList<qreal>(sample_count, 0));
+//    m_relastStatic = QList<qreal>(31, 0.0f);
+
+    m_x.reserve(sample_count);
+    for (int i = 0; i < sample_count; i++)
+        m_x.append(0.0f);
+
+    m_y.reserve(chnn_count);
+    for (int i = 0; i < chnn_count; i++)
+        m_y.append(m_x);
+
+    m_relastStatic.reserve(31);
+    for (int i = 0; i < 31; i++)
+        m_relastStatic.append(0.0f);
 }
 
-void WaveAnalDataModel::setChannelCount(int arg)
-{
-    m_channelCount = arg;
-    m_y.clear();
-    QVector<QVector<qreal> > x(m_channelCount, QVector<qreal>());
-    m_y = x;
-}
-
-QVector<qreal> WaveAnalDataModel::x_data()
+QList<qreal> WaveAnalDataModel::x_data()
 {
     return m_x;
 }
 
-QVector<qreal> WaveAnalDataModel::y_data(int idx)
+QList<qreal> WaveAnalDataModel::y_data(int idx)
 {
     return m_y.at(idx);
 }
@@ -56,7 +59,7 @@ void WaveAnalDataModel::xAppend(qreal value, bool needQueen)
     emit xChanged(m_x);
 }
 
-void WaveAnalDataModel::xAppend(QVector<qreal> rowValue, bool needQueen)
+void WaveAnalDataModel::xAppend(QList<qreal> rowValue, bool needQueen)
 {
     if (needQueen){
         popFront(m_x, rowValue.size());
@@ -81,11 +84,11 @@ void WaveAnalDataModel::yAppend(int idx, qreal value, bool needQueen)
     emit yChanged(m_y);
 }
 
-void WaveAnalDataModel::yAppend(int idx, QVector<qreal> rowValue, bool needQueen)
+void WaveAnalDataModel::yAppend(int idx, QList<qreal> rowValue, bool needQueen)
 {
     if (m_channelCount < 1 || m_y.size() < m_channelCount)
         return;
-    QVector<qreal> tmp = m_y.at(idx);
+    QList<qreal> tmp = m_y.at(idx);
     if (needQueen){
         popFront(tmp, rowValue.size());
     }
@@ -96,7 +99,7 @@ void WaveAnalDataModel::yAppend(int idx, QVector<qreal> rowValue, bool needQueen
     emit yChanged(m_y);
 }
 
-void WaveAnalDataModel::yAppend(QVector<QVector<qreal> > matrix, bool needQueen)
+void WaveAnalDataModel::yAppend(QList<QList<qreal> > matrix, bool needQueen)
 {
     if (m_channelCount < 1 || m_y.size() < m_channelCount)
         return;
@@ -111,9 +114,9 @@ void WaveAnalDataModel::yAppend(QVector<QVector<qreal> > matrix, bool needQueen)
     emit yChanged(m_y);
 }
 
-QVector<qreal> WaveAnalDataModel::RAND(int min, int max, int n)
+QList<qreal> WaveAnalDataModel::RAND(int min, int max, int n)
 {
-    QVector<qreal> rt;
+    QList<qreal> rt;
     for(int i = 0; i < n; ++i)
     {
         int u = (double)rand() / (RAND_MAX + 1) * (max - min) + min;
@@ -125,7 +128,7 @@ QVector<qreal> WaveAnalDataModel::RAND(int min, int max, int n)
 
 void WaveAnalDataModel::buildSinWaveData(int rows, int cols, int nT
                                          , qreal xMin, qreal xMax, qreal yMin, qreal yMax
-                                         , bool bRandStartAngle, QVector<qreal> startAngles)
+                                         , bool bRandStartAngle, QList<qreal> startAngles)
 {
     if (nT < 0)
         return;
@@ -141,7 +144,7 @@ void WaveAnalDataModel::buildSinWaveData(int rows, int cols, int nT
 
     qreal pi = 3.1415926;
 
-    QVector<qreal> ampFactor;
+    QList<qreal> ampFactor;
     ampFactor << 1;
     for(int i=1; i< rows;i++){
         ampFactor.append(qrand()% rows);
@@ -180,8 +183,8 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 //    int nDeleteCount = qMin(nCols, samplePoints);
 //    for (int i = 0; i < nRows; ++i)
 //    {
-//        QVector<qreal> x = m_x.at(i);
-//        QVector<qreal> y = m_y.at(i);
+//        QList<qreal> x = m_x.at(i);
+//        QList<qreal> y = m_y.at(i);
 
 //        for (int j = 0; j < nDeleteCount; ++j)
 //        {
@@ -198,8 +201,8 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 
 //    for (int i = 0; i < nRows; ++i)
 //    {
-//        QVector<int> x = random(nMax, nCount);
-//        QVector<int> y = random(nMax, nCount);
+//        QList<int> x = random(nMax, nCount);
+//        QList<int> y = random(nMax, nCount);
 
 //        for (int j = 0; j < nCount; ++j)
 //        {
@@ -209,7 +212,7 @@ void WaveAnalDataModel::queenNewSampleData(int yMin, int yMax, int samplePoints)
 //    }
 }
 
-bool WaveAnalDataModel::popFront(QVector<qreal> &list, int nCount)
+bool WaveAnalDataModel::popFront(QList<qreal> &list, int nCount)
 {
     int nChop = qMin(list.size(), nCount);
     if (nChop < 0){
@@ -223,7 +226,7 @@ bool WaveAnalDataModel::popFront(QVector<qreal> &list, int nCount)
     return true;
 }
 
-bool WaveAnalDataModel::popBack(QVector<qreal> &list, int nCount)
+bool WaveAnalDataModel::popBack(QList<qreal> &list, int nCount)
 {
     int nChop = qMin(list.size(), nCount);
     if (nChop < 0){
