@@ -7,6 +7,7 @@ Groove 1.0 components/Grover/Groove.qml
 WaveChart 1.0 components/WaveChart/WaveChart.qml
 WaveCharts 1.0 components/WaveChart/WaveChart.js
 VectorChart 1.0 components/VectorChart/VectorChart.qml
+VectorMon 1.0 components/VectorChart/VectorMon.qml
 VectorTableView 1.0 components/VectorChart/VectorTableView.qml
 Harmonic 1.0 components/Harmonic/Harmonic.qml
 Chart 1.0 components/Charts/Chart.qml
@@ -19,6 +20,7 @@ SequenceAnal 1.0 views/SequenceAnal.qml
 TimeDisperAnal 1.0 views/TimeDisperAnal.qml
 VectorChartAnal 1.0 views/VectorChartAnal.qml
 WaveChartAnal 1.0 views/WaveChartAnal.qml
+WaveMonitor 1.0 views/WaveMonitor.qml
 TabbedPages 1.0 views/TabbedPages.qml
 
 # core
